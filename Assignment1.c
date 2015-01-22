@@ -66,16 +66,34 @@ void setup(char inputBuffer[], char *args[],int *background)
       char inputBuffer[MAX_LINE]; /* buffer to hold the command entered */
       int background; /* equals 1 if a command is followed by '&' */
       char *args[MAX_LINE/+1]; /* command line (of 80) has max of 40 arguments */
+      pid_t child;
 
       while (1)
       { /* Program terminates normally inside setup */
         background = 0;
         printf(" COMMAND->\n");
         setup(inputBuffer,args,&background); /* get next command */
+
+        child = fork();
+
+        if (child == 0)
+        {
+          execvp(inputBuffer[MAX_LINE], args[MAX_LINE/+1]);
+
+          if (background == 1)
+          {
+            waitpid(child);
+          }
+
+        }
+
+      }
+
+
         /* the steps are:
         (1) fork a child process using fork()
         (2) the child process will invoke execvp()
         (3) if background == 1, the parent will wait,
         otherwise returns to the setup() function. */
-      }
+
   }
