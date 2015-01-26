@@ -1,6 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #define MAX_LINE 80 /* 80 chars per line, per command, should be enough. */
+char history[10][MAX_LINE];
+int cmdHist = 1;
 /**
 * setup() reads in the next command line, separating it into distinct tokens
 * using whitespace as delimiters. setup() sets the args parameter as a
@@ -74,26 +77,63 @@ void setup(char inputBuffer[], char *args[],int *background)
         printf(" COMMAND->\n");
         setup(inputBuffer,args,&background); /* get next command */
 
-        child = fork();
+        pid_t pid = fork(); //(1) fork a child process using fork()
 
-        if (child == 0)
+        if (pid == 0)
         {
-          execvp(inputBuffer[MAX_LINE], args[MAX_LINE/+1]);
-
-          if (background == 1)
+          if ( args[0] == r)
           {
-            waitpid(child);
+            x = args[1];
+
+            for(int i == 9; i >= 0; i--) //Search for corresponding command
+            {
+              if(history[i][0] == x)
+              {
+                execvp(history[i][0], history[i]);
+              }
+            }
+
+          }else
+          {
+            int count = cmdHist;
+            if (cmdHist >= 10)
+            {
+              for (i = 0; i < 9; i)
+              {
+                history[i] = history[i+1];
+              }
+              history[count] = NULL;
+              count = 10;
+            }
+
+            for (int i = 0; i < sizeof(args); i++)
+            {
+              history[count][i] = args[i];
+            }
+
+            execvp(args[0], args); //(2) the child process will invoke execvp()
           }
 
+
+        } else if (pid > 0)/*(3) if background == 1, the parent will wait,
+                              otherwise returns to the setup() function. */
+        {
+          if (background == 1)
+          {
+            waitpid(0);
+
+          }
+        } else
+        {
+          printf("Error: Fork failed.\n");
         }
 
       }
 
 
-        /* the steps are:
-        (1) fork a child process using fork()
-        (2) the child process will invoke execvp()
-        (3) if background == 1, the parent will wait,
-        otherwise returns to the setup() function. */
+
+
+
+
 
   }
