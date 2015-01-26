@@ -82,7 +82,7 @@ void setup(char inputBuffer[], char *args[],int *background)
 
         if (pid == 0)
         {
-          if ( args[0] == 'r')
+          if ( strcmp(args[0], 'r'))
           {
             char x = args[1][0];
 
@@ -90,7 +90,7 @@ void setup(char inputBuffer[], char *args[],int *background)
             {
               if(history[i][0] == x)
               {
-                execvp(history[i][0], history[i]);
+                execvp((char) (*history[i][0]), (char)(*history[i]));
               }
             }
 
@@ -106,12 +106,10 @@ void setup(char inputBuffer[], char *args[],int *background)
               count = 10;
             }
 
-            history[count] = args;
-
-          /*  for (int i = 0; i < sizeof(args); i++)
+            for (int i = 0; i < sizeof(args); i++)
             {
               history[count][i] = args[i];
-            } */
+            }
 
             execvp(args[0], args); //(2) the child process will invoke execvp()
           }
