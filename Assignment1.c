@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #define MAX_LINE 80 /* 80 chars per line, per command, should be enough. */
+
 char history[10][MAX_LINE];
 int cmdHist = 1;
 /**
@@ -81,11 +82,11 @@ void setup(char inputBuffer[], char *args[],int *background)
 
         if (pid == 0)
         {
-          if ( args[0] == r)
+          if ( args[0] == 'r')
           {
-            x = args[1];
+            char x = args[1][0];
 
-            for(int i == 9; i >= 0; i--) //Search for corresponding command
+            for(int i = 9; i >= 0; i--) //Search for corresponding command
             {
               if(history[i][0] == x)
               {
@@ -98,18 +99,19 @@ void setup(char inputBuffer[], char *args[],int *background)
             int count = cmdHist;
             if (cmdHist >= 10)
             {
-              for (i = 0; i < 9; i)
+              for (int i = 0; i < 9; i)
               {
                 history[i] = history[i+1];
               }
-              history[count] = NULL;
               count = 10;
             }
 
-            for (int i = 0; i < sizeof(args); i++)
+            history[count] = args;
+
+          /*  for (int i = 0; i < sizeof(args); i++)
             {
               history[count][i] = args[i];
-            }
+            } */
 
             execvp(args[0], args); //(2) the child process will invoke execvp()
           }
