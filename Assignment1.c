@@ -84,7 +84,7 @@ void setup(char inputBuffer[], char *args[],int *background)
 
         if (pid == 0)
         {
-          if (strcmp(args[0], 'r'))
+          if (strcmp(args[0], 'r') != 0)
           {
             char x = args[1][0];
 
@@ -112,7 +112,7 @@ void setup(char inputBuffer[], char *args[],int *background)
             {
               history[count][i] = args[i];
             }
-
+            printf("hey .\n");
             execvp(args[0], args); //(2) the child process will invoke execvp()
           }
 
