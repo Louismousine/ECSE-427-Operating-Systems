@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 #define MAX_LINE 80 /* 80 chars per line, per command, should be enough. */
 
 char *history[10][MAX_LINE];
@@ -71,7 +72,7 @@ void setup(char inputBuffer[], char *args[],int *background)
       char inputBuffer[MAX_LINE]; /* buffer to hold the command entered */
       int background; /* equals 1 if a command is followed by '&' */
       char *args[MAX_LINE/+1]; /* command line (of 80) has max of 40 arguments */
-      
+      pid_t pid;
 
       while (1)
       { /* Program terminates normally inside setup */
@@ -79,7 +80,7 @@ void setup(char inputBuffer[], char *args[],int *background)
         printf(" COMMAND->\n");
         setup(inputBuffer,args,&background); /* get next command */
 
-        int pid = fork(); //(1) fork a child process using fork()
+        pid = fork(); //(1) fork a child process using fork()
 
         if (pid == 0)
         {
