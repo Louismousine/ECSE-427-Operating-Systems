@@ -84,8 +84,9 @@ void setup(char inputBuffer[], char *args[],int *background)
 
         if (pid == 0)
         {
-          if (strcmp(args[0], 'r') != 0)
+          if (strcmp(args[0], 'r') == 0)
           {
+            printf("hey1 .\n");
             char x = args[1][0];
 
             for(int i = 9; i >= 0; i--) //Search for corresponding command
@@ -112,7 +113,7 @@ void setup(char inputBuffer[], char *args[],int *background)
             {
               history[count][i] = args[i];
             }
-            printf("hey .\n");
+            printf("hey2 .\n");
             execvp(args[0], args); //(2) the child process will invoke execvp()
           }
 
