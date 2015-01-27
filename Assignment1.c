@@ -84,9 +84,10 @@ void setup(char inputBuffer[], char *args[],int *background)
 
         if (pid == 0)
         {
-          if (strcmp(args[0], 'r') == 0)
+          fprintf(stderr,"Child process created... \n");
+          if (args[0][0] == 'r')
           {
-            fprintf(stderr,"hey1 .\n");
+            fprintf(stderr,"entered history...\n");
             char x = args[1][0];
 
             for(int i = 9; i >= 0; i--) //Search for corresponding command
@@ -99,6 +100,7 @@ void setup(char inputBuffer[], char *args[],int *background)
 
           }else
           {
+            fprintf(stderr,"entering command... \n");
             int count = cmdHist;
             if (cmdHist >= 10)
             {
@@ -113,9 +115,9 @@ void setup(char inputBuffer[], char *args[],int *background)
             {
               history[count][i] = args[i];
             }
-            fprintf(stderr,"hey2 .\n");
+            fprintf(stderr,"executing... \n");
             execvp(args[0], args); //(2) the child process will invoke execvp()
-            }
+          }
 
 
       } else if (pid > 0)/*(3) if background == 0, the parent will wait,
