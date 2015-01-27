@@ -84,7 +84,7 @@ void setup(char inputBuffer[], char *args[],int *background)
 
         if (pid == 0)
         {
-          fprintf(stdeer,"hey1 .\n");
+
         /*  if (strcmp(args[0], 'r') == 0)
           {
             fprintf("hey1 .\n");
@@ -96,11 +96,11 @@ void setup(char inputBuffer[], char *args[],int *background)
               {
                 execvp(history[i][0], history[i]);
               }
-            } */
+            }
 
           }else
           {
-          /*  int count = cmdHist;
+            int count = cmdHist;
             if (cmdHist >= 10)
             {
               for (int i = 9; i > 0; i)
@@ -116,7 +116,7 @@ void setup(char inputBuffer[], char *args[],int *background)
             } */
             fprintf(stderr,"hey2 .\n");
             execvp(args[0], args); //(2) the child process will invoke execvp()
-          }
+        //  }
 
 
         } else if (pid > 0)/*(3) if background == 1, the parent will wait,
