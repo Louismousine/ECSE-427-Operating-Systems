@@ -84,9 +84,10 @@ void setup(char inputBuffer[], char *args[],int *background)
 
         if (pid == 0)
         {
-          if (strcmp(args[0], 'r') == 0)
+          fprintf(stdeer,"hey1 .\n");
+        /*  if (strcmp(args[0], 'r') == 0)
           {
-            printf("hey1 .\n");
+            fprintf("hey1 .\n");
             char x = args[1][0];
 
             for(int i = 9; i >= 0; i--) //Search for corresponding command
@@ -95,11 +96,11 @@ void setup(char inputBuffer[], char *args[],int *background)
               {
                 execvp(history[i][0], history[i]);
               }
-            }
+            } */
 
           }else
           {
-            int count = cmdHist;
+          /*  int count = cmdHist;
             if (cmdHist >= 10)
             {
               for (int i = 9; i > 0; i)
@@ -112,8 +113,8 @@ void setup(char inputBuffer[], char *args[],int *background)
             for (int i = 0; i < sizeof(args); i++)
             {
               history[count][i] = args[i];
-            }
-            printf("hey2 .\n");
+            } */
+            fprintf(stderr,"hey2 .\n");
             execvp(args[0], args); //(2) the child process will invoke execvp()
           }
 
