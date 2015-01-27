@@ -97,8 +97,9 @@ void setup(char inputBuffer[], char *args[],int *background)
               {
                 execvp(history[i][0], history[i]);
               }
-              fprintf(stderr,"no match found\n");
+
             }
+            fprintf(stderr,"not match found.\n");
 
           }else
           {
