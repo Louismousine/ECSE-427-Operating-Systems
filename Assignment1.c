@@ -3,7 +3,7 @@
 #include <unistd.h>
 #define MAX_LINE 80 /* 80 chars per line, per command, should be enough. */
 
-char history[10][MAX_LINE];
+char *history[10][MAX_LINE];
 int cmdHist = 1;
 /**
 * setup() reads in the next command line, separating it into distinct tokens
@@ -82,15 +82,15 @@ void setup(char inputBuffer[], char *args[],int *background)
 
         if (pid == 0)
         {
-          if ( strcmp(args[0], 'r'))
+          if (strcmp(args[0], 'r'))
           {
             char x = args[1][0];
 
             for(int i = 9; i >= 0; i--) //Search for corresponding command
             {
-              if(history[i][0] == x)
+              if(strcmp(history[i][1], 'x'))
               {
-                execvp((char) (*history[i][0]), (char)(*history[i]));
+                execvp(history[i][0], history[i]);
               }
             }
 
@@ -99,11 +99,11 @@ void setup(char inputBuffer[], char *args[],int *background)
             int count = cmdHist;
             if (cmdHist >= 10)
             {
-              for (int i = 0; i < 9; i)
+              for (int i = 9; i > 0; i)
               {
-                history[i] = history[i+1];
+                *history[i-1] = *history[i];
               }
-              count = 10;
+              count = 9;
             }
 
             for (int i = 0; i < sizeof(args); i++)
