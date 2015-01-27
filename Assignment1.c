@@ -115,7 +115,7 @@ void setup(char inputBuffer[], char *args[],int *background)
             }
             fprintf(stderr,"hey2 .\n");
             execvp(args[0], args); //(2) the child process will invoke execvp()
-        //  }
+            }
 
 
       } else if (pid > 0)/*(3) if background == 0, the parent will wait,
