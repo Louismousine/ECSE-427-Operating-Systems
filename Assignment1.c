@@ -79,7 +79,7 @@ void setup(char inputBuffer[], char *args[],int *background)
         printf(" COMMAND->\n");
         setup(inputBuffer,args,&background); /* get next command */
 
-        pid_t pid = fork(); //(1) fork a child process using fork()
+        int pid = fork(); //(1) fork a child process using fork()
 
         if (pid == 0)
         {
