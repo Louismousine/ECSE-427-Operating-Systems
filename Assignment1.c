@@ -119,10 +119,10 @@ void setup(char inputBuffer[], char *args[],int *background)
         //  }
 
 
-        } else if (pid > 0)/*(3) if background == 1, the parent will wait,
+      } else if (pid > 0)/*(3) if background == 0, the parent will wait,
                               otherwise returns to the setup() function. */
         {
-          if (background == 1)
+          if (background == 0)
           {
             waitpid(0, NULL, NULL);
 
