@@ -71,7 +71,7 @@ void setup(char inputBuffer[], char *args[],int *background)
       char inputBuffer[MAX_LINE]; /* buffer to hold the command entered */
       int background; /* equals 1 if a command is followed by '&' */
       char *args[MAX_LINE/+1]; /* command line (of 80) has max of 40 arguments */
-      pid_t child;
+      
 
       while (1)
       { /* Program terminates normally inside setup */
