@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #define MAX_LINE 80 /* 80 chars per line, per command, should be enough. */
 
 char *history[10][MAX_LINE];
@@ -120,7 +121,7 @@ void setup(char inputBuffer[], char *args[],int *background)
         {
           if (background == 1)
           {
-            waitpid(0);
+            waitpid(0, NULL, NULL);
 
           }
         } else
