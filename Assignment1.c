@@ -92,7 +92,7 @@ void setup(char inputBuffer[], char *args[],int *background)
 
             for(int i = 9; i >= 0; i--) //Search for corresponding command
             {
-              if(strcmp(history[i][1], 'x'))
+              if(history[i][0] == 'x')
               {
                 execvp(history[i][0], history[i]);
               }
