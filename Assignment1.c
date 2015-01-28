@@ -98,9 +98,9 @@ void setup(char inputBuffer[], char *args[],int *background)
             for(int i = 9; i >= 0; i--) //Search for corresponding command
             {
               fprintf(stderr,"searching...\n");
-              if(history[i][0][0] == 'x')
+              if(commandHist.history[i][0][0] == 'x')
               {
-                execvp(history[i][0], history[i]);
+                execvp(commandHist.history[i][0], commandHist.history[i]);
               }
 
             }
