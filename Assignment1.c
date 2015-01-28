@@ -93,18 +93,18 @@ void setup(char inputBuffer[], char *args[],int *background)
           if (args[0][0] == 'r')
           {
             fprintf(stderr,"entered history...\n");
-            char x = args[1][0];
 
             for(int i = 9; i >= 0; i--) //Search for corresponding command
             {
               fprintf(stderr,"searching...\n");
-              if(commandHist.history[i][0][0] == 'x')
+              if(commandHist.history[i][0][0] == args[1][0])
               {
-                execvp(commandHist.history[i][0], commandHist.history[i]);
+                fprintf(stderr, "entry found executing....\n");
+                execvp(commandHist.args[0], commandHist.args);
               }
 
             }
-            fprintf(stderr,"not match found.\n");
+            fprintf(stderr,"no match found.\n");
 
           }else
           {
@@ -123,6 +123,7 @@ void setup(char inputBuffer[], char *args[],int *background)
             {
               fprintf(stderr,"copying ...\n");
               memcopy(commandHist.history[count][i], args[i], strlen(args[i])+1);
+              fprintf(stderr, "%d", commandHist.history);
             }
             fprintf(stderr,"executing... \n");
             execvp(args[0], args); //(2) the child process will invoke execvp()
