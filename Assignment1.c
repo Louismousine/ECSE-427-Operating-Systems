@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -7,9 +8,9 @@
 
 struct history
 {
-  char history[10][MAX_LINE/+1];
-  char *args[];
-} commandHist;
+
+  char* args[MAX_LINE/+1];
+} commandHist[10];
 
 int cmdHist = 1;
 /**
@@ -97,10 +98,10 @@ void setup(char inputBuffer[], char *args[],int *background)
             for(int i = 9; i >= 0; i--) //Search for corresponding command
             {
               fprintf(stderr,"searching...\n");
-              if(commandHist.history[i][0][0] == args[1][0])
+              if(commandHist[i].args[0][0] == args[1][0])
               {
                 fprintf(stderr, "entry found executing....\n");
-                execvp(commandHist.args[0], commandHist.args);
+                execvp(commandHist[i].args[0], commandHist[i].args);
               }
 
             }
@@ -112,19 +113,23 @@ void setup(char inputBuffer[], char *args[],int *background)
             int count = cmdHist;
             if (cmdHist >= 10)
             {
-              for (int i = 9; i > 0; i)
+              int i;
+              for (i = 9; i > 0; i--)
               {
-                memcopy(commandHist.history[i-1], commandHist.history[i], strlen(commandHist.history[i])+1 );
+                memcpy(commandHist[i-1].args, commandHist[i].args, sizeof(commandHist[i].args) );
               }
               count = 9;
             }
 
-            for (int i = 0; i < sizeof(args); i++)
+
+            fprintf(stderr,"copying ...\n");
+            memcpy(commandHist[count].args, args, sizeof(args));
+            int i;
+            for( i = 9; i >= 0; i--)
             {
-              fprintf(stderr,"copying ...\n");
-              memcopy(commandHist.history[count][i], args[i], strlen(args[i])+1);
-              fprintf(stderr, "%d", commandHist.history);
+              fprintf(stdout, "%c.\n", commandHist[i].args[0][0]);
             }
+
             fprintf(stderr,"executing... \n");
             execvp(args[0], args); //(2) the child process will invoke execvp()
           }
