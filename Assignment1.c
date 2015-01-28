@@ -5,7 +5,12 @@
 #include <sys/types.h>
 #define MAX_LINE 80 /* 80 chars per line, per command, should be enough. */
 
-char *history[10][MAX_LINE];
+struct history
+{
+  char history[10][MAX_LINE/+1];
+  char *args[];
+} commandHist;
+
 int cmdHist = 1;
 /**
 * setup() reads in the next command line, separating it into distinct tokens
@@ -93,7 +98,7 @@ void setup(char inputBuffer[], char *args[],int *background)
             for(int i = 9; i >= 0; i--) //Search for corresponding command
             {
               fprintf(stderr,"searching...\n");
-              if(history[i][0] == 'x')
+              if(history[i][0][0] == 'x')
               {
                 execvp(history[i][0], history[i]);
               }
@@ -109,7 +114,7 @@ void setup(char inputBuffer[], char *args[],int *background)
             {
               for (int i = 9; i > 0; i)
               {
-                *history[i-1] = *history[i];
+                memcopy(commandHist.history[i-1], commandHist.history[i], strlen(commandHist.history[i])+1 );
               }
               count = 9;
             }
@@ -117,7 +122,7 @@ void setup(char inputBuffer[], char *args[],int *background)
             for (int i = 0; i < sizeof(args); i++)
             {
               fprintf(stderr,"copying ...\n");
-              history[count][i] = args[i];
+              memcopy(commandHist.history[count][i], args[i], strlen(args[i])+1);
             }
             fprintf(stderr,"executing... \n");
             execvp(args[0], args); //(2) the child process will invoke execvp()
