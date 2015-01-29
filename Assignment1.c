@@ -9,10 +9,10 @@
 struct history
 {
 
-  char* args[MAX_LINE/+1];
+  char* args[MAX_LINE/2];
 } commandHist[10];
 
-int cmdHist = 1;
+int cmdHist = -1;
 /**
 * setup() reads in the next command line, separating it into distinct tokens
 * using whitespace as delimiters. setup() sets the args parameter as a
@@ -77,83 +77,249 @@ void setup(char inputBuffer[], char *args[],int *background)
   {
       char inputBuffer[MAX_LINE]; /* buffer to hold the command entered */
       int background; /* equals 1 if a command is followed by '&' */
-      char *args[MAX_LINE/+1]; /* command line (of 80) has max of 40 arguments */
+      char *args[MAX_LINE/2]; /* command line (of 80) has max of 40 arguments */
+      char *hold[MAX_LINE/2];
       pid_t pid;
+
+
+      commandHist[0].args[0] = NULL;
 
       while (1)
       { /* Program terminates normally inside setup */
         background = 0;
+        int found = 0;
         printf(" COMMAND->\n");
         setup(inputBuffer,args,&background); /* get next command */
 
-        pid = fork(); //(1) fork a child process using fork()
-
-        if (pid == 0)
+        if (strcmp(args[0], "r") == 0)
         {
-          fprintf(stderr,"Child process created... \n");
-          if (args[0][0] == 'r')
+          if (commandHist[0].args[0] == NULL)
           {
-            fprintf(stderr,"entered history...\n");
-
-            for(int i = 9; i >= 0; i--) //Search for corresponding command
-            {
-              fprintf(stderr,"searching...\n");
-              if(commandHist[i].args[0][0] == args[1][0])
-              {
-                fprintf(stderr, "entry found executing....\n");
-                execvp(commandHist[i].args[0], commandHist[i].args);
-              }
-
-            }
-            fprintf(stderr,"no match found.\n");
+            fprintf(stderr, "No elements currently in history...\n");
 
           }else
           {
-            fprintf(stderr,"entering command... \n");
-            int count = cmdHist;
-            if (cmdHist >= 10)
-            {
-              int i;
-              for (i = 9; i > 0; i--)
-              {
-                memcpy(commandHist[i-1].args, commandHist[i].args, sizeof(commandHist[i].args) );
-              }
-              count = 9;
-            }
+            fprintf(stderr,"entered history...\n");
 
+            if (args[1] == NULL)
+            {
+              found = -1;
+              if (cmdHist < 10)
+              {
+                cmdHist++;
+              }
+              if (cmdHist > 9)
+              {
+                fprintf(stderr,"Shifting previous commands... \n");
+
+                int j;
+                for (j = 0; j < 9; j++)
+                {
+                  *commandHist[j].args = strdup(*commandHist[j+1].args);
+                  fprintf(stderr, "shifted an element\n");
+                }
+                cmdHist = 9;
+              }else
+                {
+                  int l;
+                  for (l = 0; l < sizeof(commandHist[cmdHist-1])/2; l++)
+                  {
+                    if(commandHist[cmdHist-1].args[l] == NULL)
+                    {
+                      commandHist[cmdHist].args[l] = NULL;
+                      break;
+                    }else
+                    {
+                      fprintf(stderr, "qwe");
+                      commandHist[cmdHist].args[l] = strdup(commandHist[cmdHist-1].args[l]);
+                    }
+                  }
+                }
+                int k;
+                fprintf(stderr,"copying complete printing current history by first letter ...\n");
+                for(k = cmdHist; k > -1; k--)
+                {
+                  fprintf(stderr, "%c\n", commandHist[k].args[0][0]);
+                }
+              // fprintf(stderr,"count is: %d\n", cmdHist);
+              // fprintf(stderr,"executing... \n");
+              //
+              // pid = fork(); //(1) fork a child process using fork()
+              // if (pid == 0)
+              // {
+              //   execvp(commandHist[cmdHist].args[0], commandHist[cmdHist].args); //(2) the child process will invoke execvp()
+              //
+              // } else if (pid > 0)/*(3) if background == 0, the parent will wait,
+              //                             otherwise returns to the setup() function.*/
+              // {
+              //   if (background == 0)
+              //   {
+              //     waitpid(0, NULL, NULL);
+              //     }
+              //   } else
+              //   {
+              //     printf("Error: Fork failed.\n");
+              //   }
+              }else
+              {
+                int i;
+                if (cmdHist > 9)
+                  cmdHist = 9;
+                  for( i = cmdHist; i > -1; i--) //Search for corresponding command
+                  {
+                    fprintf(stderr,"searching...\n");
+                    //fprintf(stderr,"%c\n",args[1][0]);
+                    fprintf(stderr, "%c\n",commandHist[i].args[0][0]);
+                    if(commandHist[i].args[0][0] == args[1][0])
+                    {
+                      found = 1;
+                      int p;
+                      for (p = 0; p < sizeof(commandHist[i].args)/4; p++)
+                      {
+                        if(commandHist[i].args[p] == NULL)
+                        {
+                          hold[p] = NULL;
+                          break;
+                        }else
+                        {
+                          fprintf(stderr, "qwe");
+                          hold[p] = strdup(commandHist[i].args[p]);
+                        }
+                      }
+                      fprintf(stderr, "entry found entering command....\n");
+                      if (cmdHist < 10)
+                      {
+                        cmdHist++;
+                      }
+                      if (cmdHist > 9)
+                      {
+                        fprintf(stderr,"Shifting previous commands... \n");
+
+                        int j;
+                        for (j = 0; j < 9; j++)
+                        {
+                          *commandHist[j].args = strdup(*commandHist[j+1].args);
+                          fprintf(stderr, "shifted an element\n");
+                        }
+                        cmdHist = 9;
+                      }
+                      fprintf(stderr,"copying ...\n");
+                      int l;
+                      for (l = 0; l < sizeof(hold)/2; l++)
+                      {
+                        if(hold[l] == NULL)
+                        {
+                          commandHist[cmdHist].args[l] = NULL;
+                          break;
+                        }else
+                        {
+                          fprintf(stderr, "qwe");
+                          commandHist[cmdHist].args[l] = strdup(hold[l]);
+                        }
+                      }
+                      int k;
+                      fprintf(stderr,"copying complete printing current history by first letter ...\n");
+                      for(k = cmdHist; k > -1; k--)
+                      {
+                        fprintf(stderr, "%c\n", commandHist[k].args[0][0]);
+                      }
+                      fprintf(stderr,"count is: %d", cmdHist);
+                      break;
+
+                    }
+
+                  }
+                }
+              }
+              if(found == 0 || commandHist[0].args[0] == NULL)
+              {
+                fprintf(stderr,"no match found.\n");
+
+              } else
+              {
+                fprintf(stderr,"executing... \n");
+
+                pid = fork(); //(1) fork a child process using fork()
+                if (pid == 0)
+                {
+                  execvp(commandHist[cmdHist].args[0], commandHist[cmdHist].args); //(2) the child process will invoke execvp()
+
+                }else if (pid > 0)/*(3) if background == 0, the parent will wait,
+                                        otherwise returns to the setup() function.*/
+                  {
+                    if (background == 0)
+                    {
+                      waitpid(0, NULL, NULL);
+                    }
+                  } else
+                    {
+                      printf("Error: Fork failed.\n");
+                    }
+
+                }
+
+              }else
+          {
+            if (cmdHist < 10)
+            {
+              cmdHist++;
+            }
+            fprintf(stderr,"entering command... \n");
+            if (cmdHist > 9)
+            {
+              fprintf(stderr,"Shifting previous commands... \n");
+              int i;
+              for (i = 0; i < 9; i++)
+              {
+
+                *commandHist[i].args = strdup(*commandHist[i+1].args);
+                fprintf(stderr, "shifted an element\n");
+              }
+              cmdHist = 9;
+            }
 
             fprintf(stderr,"copying ...\n");
-            memcpy(commandHist[count].args, args, sizeof(args));
-            int i;
-            for( i = 9; i >= 0; i--)
+            int j;
+            for (j = 0; j < sizeof(args)/4; j++)
             {
-              fprintf(stdout, "%c.\n", commandHist[i].args[0][0]);
+              if(args[j] == NULL)
+              {
+                commandHist[cmdHist].args[j] = NULL;
+                break;
+              }else
+              {
+                commandHist[cmdHist].args[j] = strdup(args[j]);
+              }
             }
 
+
+            int i;
+            fprintf(stderr,"copying complete printing current history by first letter ...\n");
+
+            for(i = cmdHist; i > -1; i--)
+            {
+              fprintf(stderr, "%c\n", commandHist[i].args[0][0]);
+            }
+            fprintf(stderr,"count is: %d", cmdHist);
             fprintf(stderr,"executing... \n");
-            execvp(args[0], args); //(2) the child process will invoke execvp()
+
+
+            pid = fork(); //(1) fork a child process using fork()
+            if (pid == 0)
+            {
+              execvp(args[0], args); //(2) the child process will invoke execvp()
+            } else if (pid > 0)/*(3) if background == 0, the parent will wait,
+                                      otherwise returns to the setup() function.*/
+            {
+              if (background == 0)
+              {
+                waitpid(0, NULL, NULL);
+
+              }
+            } else
+            {
+              printf("Error: Fork failed.\n");
+            }
           }
-
-
-      } else if (pid > 0)/*(3) if background == 0, the parent will wait,
-                              otherwise returns to the setup() function. */
-        {
-          if (background == 0)
-          {
-            waitpid(0, NULL, NULL);
-
-          }
-        } else
-        {
-          printf("Error: Fork failed.\n");
         }
-
       }
-
-
-
-
-
-
-
-  }
