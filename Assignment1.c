@@ -106,7 +106,7 @@ int setup(char inputBuffer[], char *args[],int *background)
       }
 
       while (1)
-      { /* Program terminates normally inside setup */
+      { /* Program terminates normally inside setup  */
         background = 0;
         int found = 0;
         printf(" COMMAND->\n");
