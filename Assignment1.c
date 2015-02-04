@@ -1,3 +1,9 @@
+/* Simple Shell ECSE 427 Assignment1
+
+Copyright (C) Stephen Carter 2015
+
+Author Stephen Carter 260500858, stephen.carter@mail.mcgill.ca
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
