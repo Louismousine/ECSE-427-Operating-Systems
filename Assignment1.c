@@ -6,15 +6,15 @@
 #include <sys/types.h>
 #define MAX_LINE 80 /* 80 chars per line, per command, should be enough. */
 
-struct history
+struct history          //a struct to hold the information required for a hostory feature
 {
   char* args[MAX_LINE/2];
   int background;
-} commandHist[10];
+} commandHist[10];      //need to be able to handle past 10 commands
 
 int cmdHist = -1;
 
-struct job
+struct job            //a struct to hold the information required for a job feature
 {
   char* name;
   pid_t pid;
@@ -22,7 +22,7 @@ struct job
 
 int jobsIndex = 0;
 
-void exec(char* args[], int background);
+void exec(char* args[], int background);    //define a exec function for smooth execution
 /**
 * setup() reads in the next command line, separating it into distinct tokens
 * using whitespace as delimiters. setup() sets the args parameter as a
@@ -94,14 +94,14 @@ int setup(char inputBuffer[], char *args[],int *background)
       char inputBuffer[MAX_LINE]; /* buffer to hold the command entered */
       int background; /* equals 1 if a command is followed by '&' */
       char *args[MAX_LINE/2]; /* command line (of 80) has max of 40 arguments */
-      char *hold[MAX_LINE/2];
+      char *hold[MAX_LINE/2]; //a temp storage that mimics args for when shifting the history
       pid_t pid;
       //Initial set up for history and jobs
-      commandHist[0].args[0] = NULL;
+      commandHist[0].args[0] = NULL;  //initalize the first slot in history
       int i;
       for (i=0; i<10;i++)
       {
-        jobs[i].name=NULL;
+        jobs[i].name=NULL;    //initalize the jobs array
       }
 
       while (1)
@@ -109,11 +109,12 @@ int setup(char inputBuffer[], char *args[],int *background)
         background = 0;
         int found = 0;
         printf(" COMMAND->\n");
-        while(setup(inputBuffer, args, &background) == 0) /* get next command */
+        while(setup(inputBuffer, args, &background) == 0) /* get next command, if the setup
+                                                          fails to properly parse the buffer have user re-enter command */
         {
           printf(" COMMAND->\n");
         }
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < 10; i++)    //check the processes running in the jobs list to see if they have completed execution or not
         {
           if (jobs[i].name != NULL)
           {
@@ -123,39 +124,33 @@ int setup(char inputBuffer[], char *args[],int *background)
                 //do nothing as child is still running
             } else
             {
-              jobs[i].name = NULL; //free up space in jobs list
+              jobs[i].name = NULL; //free up space in jobs list since process has finished
               jobsIndex--;
             }
           }
         }
-        if (strcmp(args[0], "r") == 0)
+        if (strcmp(args[0], "r") == 0)  //enter the history.
         {
-          if (commandHist[0].args[0] == NULL)
+          if (commandHist[0].args[0] == NULL) //No commands have been entered yet
           {
             fprintf(stderr, "No elements currently in history...\n");
           }else
           {
-            fprintf(stderr,"entered history...\n");
-            if (args[1] == NULL)
+            if (args[1] == NULL) // if the user does not enter a search parameter
             {
               found = -1;
-              if (cmdHist < 10)
-              {
+              if (cmdHist < 10) //update counter
                 cmdHist++;
-              }
-              if (cmdHist > 9)
+              if (cmdHist > 9) //history is full, shift the previous commands
               {
-                fprintf(stderr,"Shifting previous commands... \n");
-
                 int j;
                 for (j = 0; j < 9; j++)
                 {
                   commandHist[j].background = commandHist[j+1].background;
                   memmove(commandHist[j].args, commandHist[j+1].args, sizeof(commandHist[j+1].args));
-                  fprintf(stderr, "shifted an element\n");
                 }
-                cmdHist = 9;
-              }else
+                cmdHist = 9; //make sure counter is at the 10th entry for history
+              }else // is history is not full simply copy last entered command to currently history slot
                 {
                   int l;
                   commandHist[cmdHist].background = commandHist[cmdHist-1].background;
@@ -166,34 +161,22 @@ int setup(char inputBuffer[], char *args[],int *background)
                       commandHist[cmdHist].args[l] = NULL;
                       break;
                     }else
-                    {
-                      fprintf(stderr, "qwe");
                       commandHist[cmdHist].args[l] = strdup(commandHist[cmdHist-1].args[l]);
-                    }
                   }
                 }
-                int k;
-                fprintf(stderr,"copying complete printing current history by first letter ...\n");
-                for(k = cmdHist; k > -1; k--)
-                {
-                  fprintf(stderr, "%c\n", commandHist[k].args[0][0]);
-                }
-              }else
+              }else //if user entered a search parameter for history
               {
-                if (cmdHist > 9)
+                if (cmdHist > 9) //correct counter if its value is 10
                   cmdHist = 9;
                   for( i = cmdHist; i > -1; i--) //Search for corresponding command
                   {
-                    fprintf(stderr,"searching...\n");
-                    //fprintf(stderr,"%c\n",args[1][0]);
-                    fprintf(stderr, "%c\n",commandHist[i].args[0][0]);
-                    if(commandHist[i].args[0][0] == args[1][0])
+                    if(commandHist[i].args[0][0] == args[1][0]) // if a match is found in history
                     {
                       found = 1;
                       int p;
                       if (commandHist[i].background == 1)
                         background = 1;
-                      for (p = 0; p < sizeof(commandHist[i].args)/4; p++)
+                      for (p = 0; p < sizeof(commandHist[i].args)/4; p++) //copy the found command over to the a temp args hold[]
                       {
                         if(commandHist[i].args[p] == NULL)
                         {
@@ -201,97 +184,69 @@ int setup(char inputBuffer[], char *args[],int *background)
                           break;
                         }else
                         {
-                          fprintf(stderr, "qwe");
                           hold[p] = strdup(commandHist[i].args[p]);
                         }
                       }
-                      fprintf(stderr, "entry found entering command....\n");
-                      if (cmdHist < 10)
-                      {
+                      if (cmdHist < 10) //adjust counter accordingly
                         cmdHist++;
-                      }
-                      if (cmdHist > 9)
+                      if (cmdHist > 9) //history is full shift previous commands
                       {
-                        fprintf(stderr,"Shifting previous commands... \n");
-
                         int j;
                         for (j = 0; j < 9; j++)
                         {
                           commandHist[j].background = commandHist[j+1].background;
                           memmove(commandHist[j].args, commandHist[j+1].args, sizeof(commandHist[j+1].args));
-                          fprintf(stderr, "shifted an element\n");
                         }
                         cmdHist = 9;
                       }
-                      fprintf(stderr,"copying ...\n");
                       int l;
                       if (background == 1)
                         commandHist[cmdHist].background = 1;
-                      for (l = 0; l < sizeof(hold)/2; l++)
+                      for (l = 0; l < sizeof(hold)/2; l++) //update new spot in history
                       {
                         if(hold[l] == NULL)
                         {
                           commandHist[cmdHist].args[l] = NULL;
                           break;
                         }else
-                        {
-                          fprintf(stderr, "qwe");
                           commandHist[cmdHist].args[l] = strdup(hold[l]);
-                        }
                       }
-                      int k;
-                      fprintf(stderr,"copying complete printing current history by first letter ...\n");
-                      for(k = cmdHist; k > -1; k--)
-                      {
-                        fprintf(stderr, "%c\n", commandHist[k].args[0][0]);
-                      }
-                      fprintf(stderr,"count is: %d", cmdHist);
                       break;
-
                     }
-
                   }
                 }
               }
-              if(found == 0 || commandHist[0].args[0] == NULL)
+              if(found == 0 || commandHist[0].args[0] == NULL) //if no match was found in the history
               {
-                fprintf(stderr,"no match found.\n");
+                fprintf(stderr,"No match found.\n");
 
               } else
               {
-                fprintf(stderr,"executing... \n");
                 if(commandHist[cmdHist].background == 1)
                 {
                   background = 1;
                 }
-                exec(commandHist[cmdHist].args,background);
+                exec(commandHist[cmdHist].args,background); //execute the command found in history
               }
 
-          }else
+          }else //if the user entered a command that was not a history lookup
           {
-            if (cmdHist < 10)
-            {
+            if (cmdHist < 10) //update counter
               cmdHist++;
-            }
-            fprintf(stderr,"entering command... \n");
-            if (cmdHist > 9)
+            if (cmdHist > 9) //if history is full shift over previous commands
             {
-              fprintf(stderr,"Shifting previous commands... \n");
               int i;
               for (i = 0; i < 9; i++)
               {
                 commandHist[i].background = commandHist[i+1].background;
                 memmove(commandHist[i].args,commandHist[i+1].args, sizeof(commandHist[i+1].args));
-                fprintf(stderr, "shifted an element\n");
               }
               cmdHist = 9;
             }
-
-            fprintf(stderr,"copying ...\n");
             int j;
             if (background = 1)
               commandHist[cmdHist].background = 1;
-            for (j = 0; j < sizeof(args)/4; j++)
+            for (j = 0; j < sizeof(args)/4; j++) //copy desired command into history
             {
               if(args[j] == NULL)
               {
@@ -302,43 +257,25 @@ int setup(char inputBuffer[], char *args[],int *background)
                 commandHist[cmdHist].args[j] = strdup(args[j]);
               }
             }
-
-
-            int i;
-            fprintf(stderr,"copying complete printing current history by first letter ...\n");
-
-            for(i = cmdHist; i > -1; i--)
-            {
-              fprintf(stderr, "%c\n", commandHist[i].args[0][0]);
-            }
-            fprintf(stderr,"count is: %d", cmdHist);
-            fprintf(stderr,"executing... \n");
-
-            exec(args,background);
+            exec(args,background); //execute current command
 
           }
         }
       }
 
-      void exec(char* args[],int background)
+      void exec(char* args[],int background) //function that is used to execute entered command
       {
         int i;
         pid_t pid;
         if (strcmp(args[0],"cd") == 0) //If command entered is 'cd' then change directory
         {
-          int ret;
-
+          int ret; //used to check for valid directory
           ret = chdir(args[1]);       //If directory entered is valid change directory otherwise print error
           if (ret != 0)
-          {
             fprintf(stderr, "Error, Not a valid directory.\n");
-
-          }
-
         }
         else if (strcmp(args[0], "history") == 0)  //If command entered is 'history' then print history
         {
-          fprintf(stderr, "printing command history...\n");
           for(int k = cmdHist; k > -1; k--)         //Prints history in most recent order of execution, including the history command itself
           {
             for (int j = 0; j < sizeof(commandHist[k].args); j++)
@@ -347,7 +284,7 @@ int setup(char inputBuffer[], char *args[],int *background)
               {
                 break;
               }else
-                fprintf(stderr, "%s ", commandHist[k].args[j]);
+                fprintf(stderr, "[]%d] %s ", k, commandHist[k].args[j]);
             }
             fprintf(stderr, "\n");
           }
@@ -360,11 +297,10 @@ int setup(char inputBuffer[], char *args[],int *background)
         {
           exit(0);
         }
-        else if(strcmp(args[0], "jobs") == 0)
+        else if(strcmp(args[0], "jobs") == 0) //print current jobs that are running (max 10)
         {
-          //fprintf(stderr, "test\n");
           int isJob = 0;
-          for (i= 0; i<= jobsIndex +1 ;i++)
+          for (i= 0; i<= jobsIndex +1 ;i++) //print all non-null jobs
           {
             if(jobs[i].name != NULL)
             {
@@ -375,28 +311,28 @@ int setup(char inputBuffer[], char *args[],int *background)
           if (isJob != 1)
             printf("No active jobs\n");
         }
-        else if(strcmp(args[0], "fg")==0)
+        else if(strcmp(args[0], "fg")==0) //move selected job from the background to the foreground
         {
           int isJob = 0;
-          int y = (int) strtol(args[1], NULL, 10);
+          int y = (int) strtol(args[1], NULL, 10); //collect desired job number
           fprintf(stderr, "%d\n", y);
           for (i= 0 ; i <= jobsIndex + 1; i++)
           {
             if (jobs[i].name != NULL && i == y)
             {
                 isJob = 1;
-                printf("Moving [%d] %s to foreground\n", y, jobs[i].name);
+                printf("Moving [%d] %s to foreground\n", y, jobs[i].name); //once job has been moved, free memory and update jobs list
                 waitpid(jobs[i].pid, NULL, 0);
                 free(jobs[i].name);
                 jobs[i].name = NULL;
                 jobsIndex--;
             }
           }
-          if (!isJob)
+          if (!isJob) //no matching ID for  jpb
           {
             fprintf(stderr, "No job matching ID found.\n");
           }
-        }else
+        }else //if the command entered shoudl be executed in the child fork and execute
         {
           pid = fork(); //(1) fork a child process using fork()
           if (pid == 0)
@@ -409,7 +345,7 @@ int setup(char inputBuffer[], char *args[],int *background)
               waitpid(0, NULL, 0);
             }else
             {
-              for (i= 0; i < 1 + jobsIndex; i++)
+              for (i= 0; i < 1 + jobsIndex; i++) //update jobs if the proces was requested to run in background
               {
                 if (jobs[i].name == NULL)
                 {
@@ -421,6 +357,7 @@ int setup(char inputBuffer[], char *args[],int *background)
               }
             }
           } else
-            printf("Error: Fork failed.\n");
+            perror("Error: Fork failed.\n"); //else fork failed exit
+            exit(-1); 
         }
       }
