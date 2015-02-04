@@ -87,7 +87,7 @@ int setup(char inputBuffer[], char *args[],int *background)
       }
     }
     args[ct] = NULL; /* just in case the input line was > 80 */
-    return ct;
+    return 1;
   }
   int main(void)
   {
@@ -102,6 +102,7 @@ int setup(char inputBuffer[], char *args[],int *background)
       for (i=0; i<10;i++)
       {
         jobs[i].name=NULL;    //initalize the jobs array
+        commandHist[i].background = 0; //initalize background.
       }
 
       while (1)
@@ -175,7 +176,7 @@ int setup(char inputBuffer[], char *args[],int *background)
                       found = 1;
                       int p;
                       if (commandHist[i].background == 1)
-                        background = 1;
+                         background = 1;
                       for (p = 0; p < sizeof(commandHist[i].args)/4; p++) //copy the found command over to the a temp args hold[]
                       {
                         if(commandHist[i].args[p] == NULL)
@@ -201,7 +202,10 @@ int setup(char inputBuffer[], char *args[],int *background)
                       }
                       int l;
                       if (background == 1)
+                      {
                         commandHist[cmdHist].background = 1;
+                        background = 0;
+                      }
                       for (l = 0; l < sizeof(hold)/2; l++) //update new spot in history
                       {
                         if(hold[l] == NULL)
@@ -222,11 +226,7 @@ int setup(char inputBuffer[], char *args[],int *background)
 
               } else
               {
-                if(commandHist[cmdHist].background == 1)
-                {
-                  background = 1;
-                }
-                exec(commandHist[cmdHist].args,background); //execute the command found in history
+                exec(commandHist[cmdHist].args,commandHist[cmdHist].background); //execute the command found in history
               }
 
           }else //if the user entered a command that was not a history lookup
@@ -244,8 +244,10 @@ int setup(char inputBuffer[], char *args[],int *background)
               cmdHist = 9;
             }
             int j;
-            if (background = 1)
+            if (background == 1)
               commandHist[cmdHist].background = 1;
+            else
+              commandHist[cmdHist].background = 0;
             for (j = 0; j < sizeof(args)/4; j++) //copy desired command into history
             {
               if(args[j] == NULL)
@@ -278,13 +280,14 @@ int setup(char inputBuffer[], char *args[],int *background)
         {
           for(int k = cmdHist; k > -1; k--)         //Prints history in most recent order of execution, including the history command itself
           {
+            fprintf(stderr, "[%d] ", k);
             for (int j = 0; j < sizeof(commandHist[k].args); j++)
             {
               if(commandHist[k].args[j] == NULL)
               {
                 break;
               }else
-                fprintf(stderr, "[]%d] %s ", k, commandHist[k].args[j]);
+                fprintf(stderr, "%s ", commandHist[k].args[j]);
             }
             fprintf(stderr, "\n");
           }
@@ -357,7 +360,9 @@ int setup(char inputBuffer[], char *args[],int *background)
               }
             }
           } else
+          {
             perror("Error: Fork failed.\n"); //else fork failed exit
-            exit(-1); 
+            exit(-1);
+          }
         }
       }
