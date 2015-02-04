@@ -294,7 +294,7 @@ int setup(char inputBuffer[], char *args[],int *background)
         }
         else if(strcmp(args[0], "pwd") == 0) //If command entered is 'pwd' print current directory
         {
-          fprintf(stderr, "%s\n", getcwd(NULL,NULL));
+          fprintf(stderr, "%s\n", getcwd(NULL,(int)NULL));
         }
         else if(strcmp(args[0], "exit") == 0) //If comand entered is 'exit' exit the shell
         {
