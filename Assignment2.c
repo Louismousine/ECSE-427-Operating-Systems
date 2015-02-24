@@ -15,6 +15,7 @@ static void *reader(void * args)
 
   for(int i = 0; i < loops; i++)
   {
+    float r = (float)rand();
     if(sem_wait(&mutex) == -1)
       exit(2);
     readCount++;
@@ -29,7 +30,7 @@ static void *reader(void * args)
       exit(2);
 
     printf("Current target value %d\n There are %d readers currently\n", target, readCount);
-    sleep(0.1);
+
 
     if(sem_wait(&mutex) == -1)
       exit(2);
@@ -43,13 +44,16 @@ static void *reader(void * args)
     }
     if(sem_post(&mutex) == -1)
       exit(2);
-}
+    ussleep((r%100));
+  }
 }
 
 static void *writer(void * args)
 {
   int loops = *((int *) args);
   int temp;
+
+  float r = (float) rand();
 
   for (int i = 0; i < loops; i++)
   {
@@ -60,9 +64,9 @@ static void *writer(void * args)
     temp = target;
     temp = temp+10;
     target = temp;
-    sleep(0.1);
     if(sem_post(&mutex_rw) == -1)
       exit(2);
+    ussleep(r%100);
   }
 }
 
@@ -71,6 +75,8 @@ int main(int argc, char *argv[])
   pthread_t readers[100],writers[10];
   int s;
   int loops = 100;
+
+  srand(time(NULL));
 
   if(sem_init(&mutex,0,1) == -1)
   {
