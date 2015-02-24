@@ -15,7 +15,7 @@ static void *reader(void * args)
 
   for(int i = 0; i < loops; i++)
   {
-    float r = (float)rand();
+    int r = rand();
     if(sem_wait(&mutex) == -1)
       exit(2);
     readCount++;
@@ -44,7 +44,7 @@ static void *reader(void * args)
     }
     if(sem_post(&mutex) == -1)
       exit(2);
-    ussleep((r%100));
+    ussleep((float)(r%100));
   }
 }
 
@@ -53,7 +53,7 @@ static void *writer(void * args)
   int loops = *((int *) args);
   int temp;
 
-  float r = (float) rand();
+  int r = rand();
 
   for (int i = 0; i < loops; i++)
   {
@@ -66,7 +66,7 @@ static void *writer(void * args)
     target = temp;
     if(sem_post(&mutex_rw) == -1)
       exit(2);
-    ussleep(r%100);
+    ussleep((float)(r%100));
   }
 }
 
