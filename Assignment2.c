@@ -44,7 +44,7 @@ static void *reader(void * args)
     }
     if(sem_post(&mutex) == -1)
       exit(2);
-    ussleep((float)(r%100));
+    usleep((float)(r%100));
   }
 }
 
@@ -66,7 +66,7 @@ static void *writer(void * args)
     target = temp;
     if(sem_post(&mutex_rw) == -1)
       exit(2);
-    ussleep((float)(r%100));
+    usleep((float)(r%100));
   }
 }
 
