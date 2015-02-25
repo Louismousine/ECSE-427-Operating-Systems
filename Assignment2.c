@@ -5,8 +5,6 @@
 #include <unistd.h>
 #include <time.h>
 
-#define _BSD_SOURCE
-
 static sem_t mutex;
 static sem_t mutex_rw;
 static int readCount = 0;
