@@ -81,8 +81,9 @@ int main(int argc, char *argv[])
   pthread_t readers[100],writers[10];
   int s;
   int loops = 100;
+  time_t t;
 
-  srand(time(NULL));
+  srand((unsigned)time(&t));
 
   if(sem_init(&mutex,0,1) == -1)
   {
