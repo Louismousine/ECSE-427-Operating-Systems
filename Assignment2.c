@@ -81,9 +81,9 @@ int main(int argc, char *argv[])
   pthread_t readers[100],writers[10];
   int s;
   int loops = 100;
-  time_t t;
 
-  srand((unsigned)time(&t));
+
+  srand(time(NULL));
 
   if(sem_init(&mutex,0,1) == -1)
   {
@@ -97,17 +97,17 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  for (int i = 0; i < 10; i++)
-  {
-    printf("creating writer thread\n");
-    s = pthread_create(&writers[i], NULL, &writer, &loops);
-    if(s !=0)
-    {
-      printf("Error creating writer exiting...\n");
-      exit(1);
-    }
-
-  }
+  // for (int i = 0; i < 10; i++)
+  // {
+  //   printf("creating writer thread\n");
+  //   s = pthread_create(&writers[i], NULL, &writer, &loops);
+  //   if(s !=0)
+  //   {
+  //     printf("Error creating writer exiting...\n");
+  //     exit(1);
+  //   }
+  //
+  // }
 
   for (int i = 0; i < 100; i++)
   {
@@ -118,6 +118,19 @@ int main(int argc, char *argv[])
       printf("Error creating reader exiting...\n");
       exit(1);
     }
+
+    for (int i = 0; i < 10; i++)
+    {
+      printf("creating writer thread\n");
+      s = pthread_create(&writers[i], NULL, &writer, &loops);
+      if(s !=0)
+      {
+        printf("Error creating writer exiting...\n");
+        exit(1);
+      }
+
+    }
+
 
   }
 
