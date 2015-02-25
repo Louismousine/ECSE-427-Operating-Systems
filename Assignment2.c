@@ -119,20 +119,21 @@ int main(int argc, char *argv[])
       exit(1);
     }
 
-    for (int i = 0; i < 10; i++)
-    {
-      printf("creating writer thread\n");
-      s = pthread_create(&writers[i], NULL, &writer, &loops);
-      if(s !=0)
-      {
-        printf("Error creating writer exiting...\n");
-        exit(1);
-      }
+  }
 
+  for (int i = 0; i < 10; i++)
+  {
+    printf("creating writer thread\n");
+    s = pthread_create(&writers[i], NULL, &writer, &loops);
+    if(s !=0)
+    {
+      printf("Error creating writer exiting...\n");
+      exit(1);
     }
 
-
   }
+
+
 
   for (int i = 0; i < 10; i++)
   {
