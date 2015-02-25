@@ -3,15 +3,21 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <time.h>
 
 static sem_t mutex;
 static sem_t mutex_rw;
 static int readCount = 0;
 static int target = 0;
+static int currentReader = 0;
+
+static float readerVal[100], writerVal[10];
 
 static void *reader(void * args)
 {
   int loops = *((int *) args);
+  float dTime, time1, time2;
+
 
   for(int i = 0; i < loops; i++)
   {
