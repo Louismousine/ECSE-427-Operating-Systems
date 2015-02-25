@@ -20,8 +20,8 @@ static void *reader(void * args)
   int loops = *((int *) args);
   float dTime, time1, time2;
 
-
-  for(int i = 0; i < loops; i++)
+  int i;
+  for(i = 0; i < loops; i++)
   {
     int r = rand();
     if(sem_wait(&mutex) == -1)
@@ -63,7 +63,8 @@ static void *writer(void * args)
 
   int r = rand();
 
-  for (int i = 0; i < loops; i++)
+  int i;
+  for (i = 0; i < loops; i++)
   {
     if (sem_wait(&mutex_rw) == -1)
       exit(2);
@@ -99,7 +100,8 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  for (int i = 0; i < 10; i++)
+  int i;
+  for (i = 0; i < 10; i++)
   {
     printf("creating writer thread\n");
     s = pthread_create(&writers[i], NULL, &writer, &loops);
@@ -111,10 +113,11 @@ int main(int argc, char *argv[])
 
   }
 
-  for (int i = 0; i < 100; i++)
+  int j;
+  for (j = 0; j < 100; j++)
   {
     printf("creating reader thread\n");
-    s = pthread_create(&readers[i], NULL, &reader, &loops);
+    s = pthread_create(&readers[j], NULL, &reader, &loops);
     if(s !=0)
     {
       printf("Error creating reader exiting...\n");
@@ -124,10 +127,10 @@ int main(int argc, char *argv[])
   }
 
 
-
-  for (int i = 0; i < 10; i++)
+  int k;
+  for (k = 0; k < 10; k++)
   {
-    s = pthread_join(writers[i], NULL);
+    s = pthread_join(writers[k], NULL);
     if (s != 0) {
       printf("Error, creating threads\n");
       exit(1);
@@ -135,9 +138,10 @@ int main(int argc, char *argv[])
 
   }
 
-  for (int i = 0; i < 100; i++)
+  int p;
+  for (p = 0; p < 100; p++)
   {
-    s = pthread_join(readers[i], NULL);
+    s = pthread_join(readers[p], NULL);
     if (s != 0) {
       printf("Error, creating threads\n");
       exit(1);
