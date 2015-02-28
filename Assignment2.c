@@ -208,13 +208,13 @@ int main(int argc, char *argv[])
   writeMin = findMin(writerVal, 10);
   writeAvg = findAvg(writerVal, 10);
 
-  printf("The maximum waiting time for the readers is: %ld microseconds\n", readMax);
-  printf("The minimum waiting time for the readers is: %ld microseconds\n", readMin);
-  printf("The average waiting time for the readers is: %ld microseconds\n", readAvg);
+  printf("The maximum waiting time for the readers is: %d microseconds\n", readMax);
+  printf("The minimum waiting time for the readers is: %d microseconds\n", readMin);
+  printf("The average waiting time for the readers is: %d microseconds\n", readAvg);
 
-  printf("The maximum waiting time for the writers is: %ld microseconds\n", writeMax);
-  printf("The minimum waiting time for the writers is: %ld microseconds\n", writeMin);
-  printf("The average waiting time for the writers is: %ld microseconds\n", writeAvg);
+  printf("The maximum waiting time for the writers is: %d microseconds\n", writeMax);
+  printf("The minimum waiting time for the writers is: %d microseconds\n", writeMin);
+  printf("The average waiting time for the writers is: %d microseconds\n", writeAvg);
 
 }
 
