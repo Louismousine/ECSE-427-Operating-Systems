@@ -13,18 +13,18 @@ static int target = 0;
 static int currentReader = 0;
 static int currentWriter = 0;
 
-static long readerVal[100], writerVal[10];
+static float readerVal[100], writerVal[10];
 
-long findMax(long array[], size_t size);
-long findMin(long array[], size_t size);
-long findAvg(long array[], size_t size);
+float findMax(float array[], size_t size);
+float findMin(float array[], size_t size);
+float findAvg(float array[], size_t size);
 
 static void *reader(void * args)
 {
   int loops = *((int *) args);
   struct timeval tv;
-  time_t timeIn, timeOut;
-  long dTime;
+  time_t dTime, timeIn, timeOut;
+
   dTime = 0;
   timeIn = 0;
   timeOut = 0;
@@ -97,8 +97,8 @@ static void *writer(void * args)
   int loops = *((int *) args);
   int temp;
   struct timeval tv;
-  time_t timeIn, timeOut;
-  long dTime;
+  time_t dTime, timeIn, timeOut;
+
   dTime = 0;
   timeIn = 0;
   timeOut = 0;
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
   int s;
   int loops = 100;
 
-  long  readMax, readMin, readAvg, writeMax, writeMin, writeAvg;
+  float  readMax, readMin, readAvg, writeMax, writeMin, writeAvg;
 
   srand(time(NULL));
 
@@ -208,19 +208,19 @@ int main(int argc, char *argv[])
   writeMin = findMin(writerVal, 10);
   writeAvg = findAvg(writerVal, 10);
 
-  printf("The maximum waiting time for the readers is: %d microseconds\n", readMax);
-  printf("The minimum waiting time for the readers is: %d microseconds\n", readMin);
-  printf("The average waiting time for the readers is: %d microseconds\n", readAvg);
+  printf("The maximum waiting time for the readers is: %f microseconds\n", readMax);
+  printf("The minimum waiting time for the readers is: %f microseconds\n", readMin);
+  printf("The average waiting time for the readers is: %f microseconds\n", readAvg);
 
-  printf("The maximum waiting time for the writers is: %d microseconds\n", writeMax);
-  printf("The minimum waiting time for the writers is: %d microseconds\n", writeMin);
-  printf("The average waiting time for the writers is: %d microseconds\n", writeAvg);
+  printf("The maximum waiting time for the writers is: %f microseconds\n", writeMax);
+  printf("The minimum waiting time for the writers is: %f microseconds\n", writeMin);
+  printf("The average waiting time for the writers is: %f microseconds\n", writeAvg);
 
 }
 
-long findMax(long array[], size_t size)
+float findMax(float array[], size_t size)
 {
-  long max = array[0];
+  float max = array[0];
   int i;
   for(i = 1; i < size; i++)
   {
@@ -231,9 +231,9 @@ long findMax(long array[], size_t size)
   return max;
 }
 
-long findMin(long array[], size_t size)
+float findMin(float array[], size_t size)
 {
-  long min = array[0];
+  float min = array[0];
   int i;
   for(i = 1; i < size; i++)
   {
@@ -244,15 +244,15 @@ long findMin(long array[], size_t size)
   return min;
 }
 
-long findAvg(long array[], size_t size)
+float findAvg(float array[], size_t size)
 {
-  long avg = 0;
-  long sum = 0;
+  float avg = 0;
+  float sum = 0;
   int i;
   for(i = 0; i < size; i++)
   {
     sum = sum + array[i];
   }
-  avg = sum/((long) size);
+  avg = sum/((float) size);
   return avg;
 }
