@@ -23,8 +23,10 @@ static void *reader(void * args)
 {
   int loops = *((int *) args);
   struct timeval tv;
-  time_t dTime;
+  time_t dTime, timeIn, timeOut;
   dTime = 0;
+  timeIn = 0;
+  timeOut = 0;
 
   int i;
 
@@ -32,22 +34,29 @@ static void *reader(void * args)
   {
     int r = rand();
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_sec;
+    timeIn = tv.tv_sec;
     if(sem_wait(&mutex) == -1)
       exit(2);
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_sec;
+    timeOut = tv.tv_sec;
+    dTime = dTime + (timeOut - timeIn);
+    timeOut = 0;
+    timeIn = 0;
     readCount++;
     if(readCount == 1)
     {
       gettimeofday(&tv, NULL);
-      dTime = dTime + tv.tv_sec;
+      timeIn = tv.tv_sec;
       if(sem_wait(&mutex_rw)==-1)
       {
         exit(2);
       }
       gettimeofday(&tv, NULL);
-      dTime = dTime + tv.tv_sec;
+      timeOut =  tv.tv_sec;
+
+      dTime = dTime + (timeOut - timeIn);
+      timeOut = 0;
+      timeIn = 0;
     }
     if(sem_post(&mutex) == -1)
       exit(2);
@@ -55,11 +64,14 @@ static void *reader(void * args)
     printf("Current target value %d\n There are %d readers currently\n", target, readCount);
 
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_sec;
+    timeIn = tv.tv_sec;
     if(sem_wait(&mutex) == -1)
       exit(2);
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_sec;
+    timeOut = tv.tv_sec;
+    dTime = dTime + (timeOut-timeIn);
+    timeOut = 0;
+    timeIn = 0;
 
     readCount--;
     if(readCount == 0)
@@ -84,8 +96,10 @@ static void *writer(void * args)
   int loops = *((int *) args);
   int temp;
   struct timeval tv;
-  time_t dTime;
+  time_t dTime, timeIn, timeOut;
   dTime = 0;
+  timeIn = 0;
+  timeOut = 0;
 
   int r = rand();
 
@@ -93,11 +107,14 @@ static void *writer(void * args)
   for (i = 0; i < loops; i++)
   {
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_sec;
+    timeIn = tv.tv_sec;
     if (sem_wait(&mutex_rw) == -1)
       exit(2);
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_sec;
+    timeOut = tv.tv_sec;
+    dTime = dTime + (timeOut - timeIn);
+    timeOut = 0;
+    timeIn = 0;
 
     printf("writing to target\n");
     temp = target;
