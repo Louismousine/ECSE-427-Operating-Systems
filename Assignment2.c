@@ -4,42 +4,63 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <time.h>
+#include <sys/time.h>
 
 static sem_t mutex;
 static sem_t mutex_rw;
 static int readCount = 0;
 static int target = 0;
 static int currentReader = 0;
+static int currentWriter = 0;
 
 static float readerVal[100], writerVal[10];
+
+float findMax(float array[], size_t size);
+float findMin(float array[], size_t size);
+float findAvg(float array[], size_t size);
 
 static void *reader(void * args)
 {
   int loops = *((int *) args);
-  float dTime, time1, time2;
+  struct timeval tv;
+  time_t dTime;
+  dTime = 0;
 
   int i;
+
   for(i = 0; i < loops; i++)
   {
     int r = rand();
+    gettimeofday(&tv, NULL);
+    dTime = dTime + tv.tv_usec;
     if(sem_wait(&mutex) == -1)
       exit(2);
+    gettimeofday(&tv, NULL);
+    dTime = dTime + tv.tv_usec;
     readCount++;
     if(readCount == 1)
     {
+      gettimeofday(&tv, NULL);
+      dTime = dTime + tv.tv_usec;
       if(sem_wait(&mutex_rw)==-1)
       {
         exit(2);
       }
+      gettimeofday(&tv, NULL);
+      dTime = dTime + tv.tv_usec;
     }
     if(sem_post(&mutex) == -1)
       exit(2);
 
     printf("Current target value %d\n There are %d readers currently\n", target, readCount);
 
-
+    gettimeofday(&tv, NULL);
+    dTime = dTime + tv.tv_usec;
     if(sem_wait(&mutex) == -1)
       exit(2);
+    gettimeofday(&tv, NULL);
+    dTime = dTime + tv.tv_usec;
+
     readCount--;
     if(readCount == 0)
     {
@@ -47,25 +68,36 @@ static void *reader(void * args)
       {
         exit(2);
       }
+
     }
     if(sem_post(&mutex) == -1)
       exit(2);
+
     usleep((float)(r%100));
   }
+  readerVal[currentReader] = dTime;
+  currentReader++;
 }
 
 static void *writer(void * args)
 {
   int loops = *((int *) args);
   int temp;
+  struct timeval tv;
+  time_t dTime;
+  dTime = 0;
 
   int r = rand();
 
   int i;
   for (i = 0; i < loops; i++)
   {
+    gettimeofday(&tv, NULL);
+    dTime = dTime + tv.tv_usec;
     if (sem_wait(&mutex_rw) == -1)
       exit(2);
+    gettimeofday(&tv, NULL);
+    dTime = dTime + tv.tv_usec;
 
     printf("writing to target\n");
     temp = target;
@@ -75,6 +107,8 @@ static void *writer(void * args)
       exit(2);
     usleep((float)(r%100));
   }
+  writerVal[currentWriter];
+  currentWriter++;
 }
 
 int main(int argc, char *argv[])
@@ -83,6 +117,8 @@ int main(int argc, char *argv[])
   int s;
   int loops = 100;
 
+  float  readMax, readMin, readAvg,
+      writeMax, writeMin, writeAvg;
 
   srand(time(NULL));
 
@@ -124,7 +160,6 @@ int main(int argc, char *argv[])
 
   }
 
-
   int k;
   for (k = 0; k < 10; k++)
   {
@@ -147,4 +182,59 @@ int main(int argc, char *argv[])
 
   }
 
+  readMax = findMax(readerVal, 100);
+  readMin = findMin(readerVal, 100);
+  readAvg = findAvg(readerVal, 100);
+
+  writeMax = findMax(writerVal, 10);
+  writeMin = findMin(writerVal, 10);
+  writeAvg = findAvg(writerVal, 10);
+
+  printf("The maximum waiting time for the readers is: %d\n", readMax);
+  printf("The minimum waiting time for the readers is: %d\n", readMin);
+  printf("The average waiting time for the readers is: %d\n", readAvg);
+
+  printf("The maximum waiting time for the writers is: %d\n", writeMax);
+  printf("The minimum waiting time for the writers is: %d\n", writeMin);
+  printf("The average waiting time for the writers is: %d\n", writeAvg);
+
+}
+
+float findMax(float array[], size_t size)
+{
+  float max = array[0];
+  int i;
+  for(i = 1; i < size; i++)
+  {
+    if(max < array[i])
+      max = array[i];
+  }
+
+  return max;
+}
+
+float findMin(float array[], size_t size)
+{
+  float min = array[0];
+  int i;
+  for(i = 1; i < size; i++)
+  {
+    if(min > array[i])
+      min = array[i];
+  }
+
+  return min;
+}
+
+float findAvg(float array[], size_t size)
+{
+  float avg = 0;
+  float sum = 0;
+  int i;
+  for(i = 0; i < size; i++)
+  {
+    sum = sum + array[i];
+  }
+  avg = sum/((float) size);
+  return avg;
 }
