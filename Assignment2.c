@@ -23,7 +23,8 @@ static void *reader(void * args)
 {
   int loops = *((int *) args);
   struct timeval tv;
-  time_t dTime, timeIn, timeOut;
+  time_t timeIn, timeOut;
+  long dTime;
   dTime = 0;
   timeIn = 0;
   timeOut = 0;
@@ -96,7 +97,8 @@ static void *writer(void * args)
   int loops = *((int *) args);
   int temp;
   struct timeval tv;
-  time_t dTime, timeIn, timeOut;
+  time_t timeIn, timeOut;
+  long dTime;
   dTime = 0;
   timeIn = 0;
   timeOut = 0;
