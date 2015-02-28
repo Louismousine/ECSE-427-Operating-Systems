@@ -13,11 +13,11 @@ static int target = 0;
 static int currentReader = 0;
 static int currentWriter = 0;
 
-static float readerVal[100], writerVal[10];
+static long readerVal[100], writerVal[10];
 
-float findMax(float array[], size_t size);
-float findMin(float array[], size_t size);
-float findAvg(float array[], size_t size);
+long findMax(long array[], size_t size);
+long findMin(long array[], size_t size);
+long findAvg(long array[], size_t size);
 
 static void *reader(void * args)
 {
@@ -34,11 +34,11 @@ static void *reader(void * args)
   {
     int r = rand();
     gettimeofday(&tv, NULL);
-    timeIn = tv.tv_usec;
+    timeIn = tv.tv_sec*1e6 + tv.tv_usec;
     if(sem_wait(&mutex) == -1)
       exit(2);
     gettimeofday(&tv, NULL);
-    timeOut = tv.tv_usec;
+    timeOut = tv.tv_sec*1e6 + tv.tv_usec;
     dTime = dTime + (timeOut - timeIn);
     timeOut = 0;
     timeIn = 0;
@@ -46,13 +46,13 @@ static void *reader(void * args)
     if(readCount == 1)
     {
       gettimeofday(&tv, NULL);
-      timeIn = tv.tv_usec;
+      timeIn = tv.tv_sec*1e6 + tv.tv_usec;
       if(sem_wait(&mutex_rw)==-1)
       {
         exit(2);
       }
       gettimeofday(&tv, NULL);
-      timeOut =  tv.tv_usec;
+      timeOut = tv.tv_sec*1e6 + tv.tv_usec;
 
       dTime = dTime + (timeOut - timeIn);
       timeOut = 0;
@@ -64,11 +64,11 @@ static void *reader(void * args)
     printf("Current target value %d\n There are %d readers currently\n", target, readCount);
 
     gettimeofday(&tv, NULL);
-    timeIn = tv.tv_usec;
+    timeIn = tv.tv_sec*1e6 + tv.tv_usec;
     if(sem_wait(&mutex) == -1)
       exit(2);
     gettimeofday(&tv, NULL);
-    timeOut = tv.tv_usec;
+    timeOut = tv.tv_sec*1e6 + tv.tv_usec;
     dTime = dTime + (timeOut-timeIn);
     timeOut = 0;
     timeIn = 0;
@@ -107,11 +107,11 @@ static void *writer(void * args)
   for (i = 0; i < loops; i++)
   {
     gettimeofday(&tv, NULL);
-    timeIn = tv.tv_usec;
+    timeIn = tv.tv_sec*1e6 + tv.tv_usec;
     if (sem_wait(&mutex_rw) == -1)
       exit(2);
     gettimeofday(&tv, NULL);
-    timeOut = tv.tv_usec;
+    timeOut = tv.tv_sec*1e6 + tv.tv_usec;
     dTime = dTime + (timeOut - timeIn);
     timeOut = 0;
     timeIn = 0;
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
   int s;
   int loops = 100;
 
-  float  readMax, readMin, readAvg, writeMax, writeMin, writeAvg;
+  long  readMax, readMin, readAvg, writeMax, writeMin, writeAvg;
 
   srand(time(NULL));
 
@@ -206,19 +206,19 @@ int main(int argc, char *argv[])
   writeMin = findMin(writerVal, 10);
   writeAvg = findAvg(writerVal, 10);
 
-  printf("The maximum waiting time for the readers is: %f microseconds\n", readMax);
-  printf("The minimum waiting time for the readers is: %f microseconds\n", readMin);
-  printf("The average waiting time for the readers is: %f microseconds\n", readAvg);
+  printf("The maximum waiting time for the readers is: %ld microseconds\n", readMax);
+  printf("The minimum waiting time for the readers is: %ld microseconds\n", readMin);
+  printf("The average waiting time for the readers is: %ld microseconds\n", readAvg);
 
-  printf("The maximum waiting time for the writers is: %f microseconds\n", writeMax);
-  printf("The minimum waiting time for the writers is: %f microseconds\n", writeMin);
-  printf("The average waiting time for the writers is: %f microseconds\n", writeAvg);
+  printf("The maximum waiting time for the writers is: %ld microseconds\n", writeMax);
+  printf("The minimum waiting time for the writers is: %ld microseconds\n", writeMin);
+  printf("The average waiting time for the writers is: %ld microseconds\n", writeAvg);
 
 }
 
-float findMax(float array[], size_t size)
+long findMax(long array[], size_t size)
 {
-  float max = array[0];
+  long max = array[0];
   int i;
   for(i = 1; i < size; i++)
   {
@@ -229,9 +229,9 @@ float findMax(float array[], size_t size)
   return max;
 }
 
-float findMin(float array[], size_t size)
+long findMin(long array[], size_t size)
 {
-  float min = array[0];
+  long min = array[0];
   int i;
   for(i = 1; i < size; i++)
   {
@@ -242,15 +242,15 @@ float findMin(float array[], size_t size)
   return min;
 }
 
-float findAvg(float array[], size_t size)
+long findAvg(long array[], size_t size)
 {
-  float avg = 0;
-  float sum = 0;
+  long avg = 0;
+  long sum = 0;
   int i;
   for(i = 0; i < size; i++)
   {
     sum = sum + array[i];
   }
-  avg = sum/((float) size);
+  avg = sum/((long) size);
   return avg;
 }
