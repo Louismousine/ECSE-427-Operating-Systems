@@ -134,8 +134,7 @@ int main(int argc, char *argv[])
   int s;
   int loops = 100;
 
-  float  readMax, readMin, readAvg,
-      writeMax, writeMin, writeAvg;
+  float  readMax, readMin, readAvg, writeMax, writeMin, writeAvg;
 
   srand(time(NULL));
 
@@ -207,13 +206,13 @@ int main(int argc, char *argv[])
   writeMin = findMin(writerVal, 10);
   writeAvg = findAvg(writerVal, 10);
 
-  printf("The maximum waiting time for the readers is: %f\n", readMax);
-  printf("The minimum waiting time for the readers is: %f\n", readMin);
-  printf("The average waiting time for the readers is: %f\n", readAvg);
+  printf("The maximum waiting time for the readers is: %f microseconds\n", readMax);
+  printf("The minimum waiting time for the readers is: %f microseconds\n", readMin);
+  printf("The average waiting time for the readers is: %f microseconds\n", readAvg);
 
-  printf("The maximum waiting time for the writers is: %f\n", writeMax);
-  printf("The minimum waiting time for the writers is: %f\n", writeMin);
-  printf("The average waiting time for the writers is: %f\n", writeAvg);
+  printf("The maximum waiting time for the writers is: %f microseconds\n", writeMax);
+  printf("The minimum waiting time for the writers is: %f microseconds\n", writeMin);
+  printf("The average waiting time for the writers is: %f microseconds\n", writeAvg);
 
 }
 
