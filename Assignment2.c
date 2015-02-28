@@ -32,22 +32,22 @@ static void *reader(void * args)
   {
     int r = rand();
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_usec;
+    dTime = dTime + tv.tv_sec;
     if(sem_wait(&mutex) == -1)
       exit(2);
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_usec;
+    dTime = dTime + tv.tv_sec;
     readCount++;
     if(readCount == 1)
     {
       gettimeofday(&tv, NULL);
-      dTime = dTime + tv.tv_usec;
+      dTime = dTime + tv.tv_sec;
       if(sem_wait(&mutex_rw)==-1)
       {
         exit(2);
       }
       gettimeofday(&tv, NULL);
-      dTime = dTime + tv.tv_usec;
+      dTime = dTime + tv.tv_sec;
     }
     if(sem_post(&mutex) == -1)
       exit(2);
@@ -55,11 +55,11 @@ static void *reader(void * args)
     printf("Current target value %d\n There are %d readers currently\n", target, readCount);
 
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_usec;
+    dTime = dTime + tv.tv_sec;
     if(sem_wait(&mutex) == -1)
       exit(2);
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_usec;
+    dTime = dTime + tv.tv_sec;
 
     readCount--;
     if(readCount == 0)
@@ -93,11 +93,11 @@ static void *writer(void * args)
   for (i = 0; i < loops; i++)
   {
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_usec;
+    dTime = dTime + tv.tv_sec;
     if (sem_wait(&mutex_rw) == -1)
       exit(2);
     gettimeofday(&tv, NULL);
-    dTime = dTime + tv.tv_usec;
+    dTime = dTime + tv.tv_sec;
 
     printf("writing to target\n");
     temp = target;
@@ -107,7 +107,7 @@ static void *writer(void * args)
       exit(2);
     usleep((float)(r%100));
   }
-  writerVal[currentWriter];
+  writerVal[currentWriter] = dTime;
   currentWriter++;
 }
 
