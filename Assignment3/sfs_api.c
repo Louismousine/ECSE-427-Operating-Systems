@@ -440,7 +440,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   char *diskBuffer = malloc(BLOCKSIZE);
 
   int block = (writeFile->writePointer)/BLOCKSIZE;  //get block location to write to
-  int bytes = (writeFile->writePointer)/BLOCKSIZE;   //get exact byte location to write to
+  int bytes = (writeFile->writePointer)%BLOCKSIZE;   //get exact byte location to write to
 
   //int i;
   unsigned int writeLoc;
@@ -470,7 +470,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     length -= (BLOCKSIZE - bytes);
     offset += (BLOCKSIZE - bytes);
     bytes = 0;
-
+    block++;
     if(length > 0)  //if there is data still to write update writeloc and allocate memory
     {
       int next = findFree();  //find next write location
@@ -478,7 +478,6 @@ int sfs_fwrite(int fileID, const char *buf, int length)
       if(next == -1)
         return -1;
       writeLoc = next;
-      block++;
       if(block > 11)          //update i-node associated with file
       {
         unsigned int *nextBuff = malloc(BLOCKSIZE);
@@ -525,7 +524,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
   char *diskBuffer = malloc(BLOCKSIZE);
 
   int block = (readFile->readPointer)/BLOCKSIZE;  //get block location to read from
-  int bytes = (readFile->readPointer)/BLOCKSIZE;   //get exact byte location to read from
+  int bytes = (readFile->readPointer)%BLOCKSIZE;   //get exact byte location to read from
 
   unsigned int readLoc;
   int offset = 0;
