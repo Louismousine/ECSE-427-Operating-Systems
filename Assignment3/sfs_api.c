@@ -271,7 +271,7 @@ int sfs_fopen(char *name)
       {
         descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry)));
         descriptorTable[numFiles] = (fileDescriptorEntry *) malloc(sizeof(fileDescriptorEntry));
-        entry = numFiles;
+        entry = numFiles++;
       }
 
       //allocate inode for new entry
