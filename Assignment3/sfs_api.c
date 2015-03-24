@@ -649,7 +649,7 @@ int findFree()
   for(i = 0; i < (BLOCKSIZE)/sizeof(unsigned int); i++)
   {
     int find = ffs(buff[i]);
-    if(find == 1)
+    if(find != 0)
     {
       return find + i*8*sizeof(unsigned int) - 1;
     }
