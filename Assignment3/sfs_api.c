@@ -337,6 +337,7 @@ int sfs_fclose(int fileID)
 
   free(descriptorTable[fileID]);
   descriptorTable[fileID] = NULL;
+  numFiles--;
   return 0;
 }
 
