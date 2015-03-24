@@ -271,7 +271,8 @@ int sfs_fopen(char *name)
       {
         descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry)));
         descriptorTable[numFiles] = (fileDescriptorEntry *) malloc(sizeof(fileDescriptorEntry));
-        entry = numFiles++;
+        entry = numFiles;
+        numFiles++;
       }
 
       //allocate inode for new entry
@@ -299,7 +300,7 @@ int sfs_fopen(char *name)
       }
       //find next free location to create new file in
       int writeLoc = findFree();
-      if(writeLoc != 0)
+      if(writeLoc == -1)
         return -1;
 
       setAlloc(writeLoc);
