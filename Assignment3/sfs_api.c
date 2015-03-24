@@ -468,7 +468,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     write_blocks(START + writeLoc, 1, diskBuffer);
 
     length -= (BLOCKSIZE - bytes);
-    offset += (BLOCKSIZE + bytes);
+    offset += (BLOCKSIZE - bytes);
     bytes = 0;
 
     if(length > 0)  //if there is data still to write update writeloc and allocate memory
