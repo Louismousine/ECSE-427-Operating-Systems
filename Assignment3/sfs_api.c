@@ -508,7 +508,6 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 {
   if(descriptorTable[fileID] == NULL || length < 0 || fileID >= numFiles)
   {
-    fprintf(stderr, descriptorTable[fileID]);
     fprintf(stderr, "fileID %d\n, numfiles %d\n, length %d\n", fileID,numFiles, length);
     fprintf(stderr, "Error in read request");
     return -1;
