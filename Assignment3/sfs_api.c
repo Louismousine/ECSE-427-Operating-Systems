@@ -10,7 +10,7 @@
 #define BLOCKSIZE 512 //M block size
 #define MAXFILENAME 15
 #define NUM_BLOCKS SUPERBLOCK_SIZE + FREELIST_SIZE + DIRECTORY_SIZE + INODE_TABLE_SIZE + BLOCKSIZE  //N blocks
-#define MAX_FILES 99
+#define MAX_FILES 100
 
 #define SUPERBLOCK 0
 #define SUPERBLOCK_SIZE 1
@@ -162,7 +162,7 @@ int mksfs(int fresh)
   rootDir = malloc(ALIGN(sizeof(directoryEntry)*MAX_FILES));
 
 
-  if(rootDir = 0)
+  if(rootDir == 0)
   {
     fprintf(stderr, "Error allocating main memory for directory");
     return -1;
