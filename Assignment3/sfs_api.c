@@ -24,6 +24,7 @@
 
 #define FILENAME "my.sfs"
 
+#define ALIGN(x)((x/BLOCKSIZE + 1) * BLOCKSIZE)
 
 typedef struct directoryEntry
 {
@@ -101,7 +102,7 @@ int mksfs(int fresh)
       return -1;
     }
 
-    inodeEntry *inode = malloc(MAX_FILES*sizeof(inodeEntry));
+    inodeEntry *inode = malloc(ALIGN(MAX_FILES*sizeof(inodeEntry)));
     read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inode);
     if(inode == 0)
     {
@@ -158,7 +159,7 @@ int mksfs(int fresh)
 
   read_blocks(SUPERBLOCK, SUPERBLOCK_SIZE, superblock);
 
-  rootDir = malloc(sizeof(directoryEntry)*MAX_FILES);
+  rootDir = malloc(ALIGN(sizeof(directoryEntry)*MAX_FILES));
 
 
   if(rootDir = 0)
@@ -169,7 +170,7 @@ int mksfs(int fresh)
 
   read_blocks(DIRECTORY_LOCATION, DIRECTORY_SIZE, rootDir);
 
-  inodeTable = malloc(sizeof(inodeEntry)*MAX_FILES);
+  inodeTable = malloc(ALIGN(sizeof(inodeEntry)*MAX_FILES));
 
   if(inodeTable == 0)
   {
@@ -681,7 +682,7 @@ int createSuperblock()
 
 int createRootDir()
 {
-  directoryEntry *buff = malloc(MAX_FILES*sizeof(directoryEntry));
+  directoryEntry *buff = malloc(ALIGN(MAX_FILES*sizeof(directoryEntry)));
 
   if(buff == 0)
   {
@@ -701,7 +702,7 @@ int createRootDir()
 
 int createInodeTable()
 {
-  inodeEntry *buff = malloc(MAX_FILES*sizeof(inodeEntry));
+  inodeEntry *buff = malloc(ALIGN(MAX_FILES*sizeof(inodeEntry)));
 
   if(buff == 0)
   {
