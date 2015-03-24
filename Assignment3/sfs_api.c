@@ -160,13 +160,14 @@ int mksfs(int fresh)
 
   rootDir = malloc(sizeof(directoryEntry)*MAX_FILES);
 
+
   if(rootDir = 0)
   {
     fprintf(stderr, "Error allocating main memory for directory");
     return -1;
   }
 
-  read_blocks(DIRECTORY_LOCATION,DIRECTORY_SIZE, rootDir);
+  read_blocks(DIRECTORY_LOCATION, DIRECTORY_SIZE, rootDir);
 
   inodeTable = malloc(sizeof(inodeEntry)*MAX_FILES);
 
