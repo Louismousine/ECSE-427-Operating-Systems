@@ -203,8 +203,9 @@ int sfs_fopen(char *name)
 
   for(i = 0; i < MAX_FILES; i++)
   {
-    if(strcmp(rootDir[i].filename, name) == 0)
+    if(strncmp(rootDir[i].filename, name, MAXFILENAME + 1) == 0)
     {
+      fprintf(stderr, "file found, opening");
       int j,entry = -1;
       //Check to see if file is already open
       for(j = 0; j < numFiles; j++)
@@ -217,7 +218,7 @@ int sfs_fopen(char *name)
       //create a file descriptor slot for file
       for(j = 0; j < numFiles; j++)
       {
-        if(descriptorTable[j] == NULL)
+        if(!descriptorTable[j])
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
