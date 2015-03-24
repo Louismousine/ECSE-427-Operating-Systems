@@ -426,7 +426,7 @@ int sfs_fseek(int fileID, int offset) //error if user tries to seek past eof or 
 int sfs_fwrite(int fileID, const char *buf, int length)
 {
   //if invalid file or requested return -1
-  if(fileID >= numFiles || descriptorTable[fileID] == NULL || buf == NULL || length < 0 || fileID < 0)
+  if(fileID >= numFiles || descriptorTable[fileID] == NULL || buf == NULL || length < 0)
   {
     fprintf(stderr, "Error in write request");
     return -1; //return -1 on failure
@@ -506,7 +506,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
 
 int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 {
-  if(descriptorTable[fileID] == NULL || length < 0 || fileID >= numFiles || fileID < 0)
+  if(descriptorTable[fileID] == NULL || length < 0 || fileID >= numFiles)
   {
     fprintf(stderr, "Error in read request");
     return -1;
