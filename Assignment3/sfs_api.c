@@ -170,7 +170,7 @@ int mksfs(int fresh)
 
   read_blocks(DIRECTORY_LOCATION, DIRECTORY_SIZE, rootDir);
 
-  inodeTable = malloc(ALIGN(sizeof(inodeEntry)*(MAX_FILES+1));
+  inodeTable = malloc(ALIGN(sizeof(inodeEntry)*(MAX_FILES+1)));
 
   if(inodeTable == 0)
   {
