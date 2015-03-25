@@ -568,7 +568,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
   int block = (readFile->readPointer)/BLOCKSIZE;  //get block location to read from
   int bytes = (readFile->readPointer)%BLOCKSIZE;   //get exact byte location to read from
-
+  int eofBlock = (inode->size)/BLOCKSIZE;
   unsigned int readLoc;
   int offset = 0;
   if(block > 139)
@@ -604,12 +604,14 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
     if(length > 0) //check to see if there is more to read;
     {
       block++;
+      if(eofBlock < block) //if trying to read past file return -1;
+        return -1;
+
       if(block > 139)
       {
         fprintf(stderr, "Error, read exceeded max file size\n");
         return -1;
-      }
-      if(block > 11)          //update i-node associated with file
+      }else if(block > 11)          //update i-node associated with file
       {
         unsigned int *nextBuff = malloc(BLOCKSIZE);
         read_blocks(inode->singleIndirectPtr, 1, nextBuff);
@@ -618,8 +620,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
       }else
         readLoc = inode->directptr[block];
 
-      if(readLoc == (int) NULL) //if trying to read past file return -1;
-        return -1;
+
     }
   }
 
