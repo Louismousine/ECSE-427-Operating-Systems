@@ -187,13 +187,13 @@ int mksfs(int fresh)
 //open or create file with given name
 int sfs_fopen(char *name)
 {
-  if(sizeof(name) > MAXFILENAME) //check to see if filename is of correct size
+  if(strlen(name) > MAXFILENAME) //check to see if filename is of correct size
   {
     fprintf(stderr, "File name too long\n");
     return -1;
   }
   //Check to see if filesystem has been setup
-  if(rootDir == 0)
+  if(rootDir == NULL)
   {
     fprintf(stderr, "File system not initiallized\n");
     return -1;
@@ -268,6 +268,7 @@ int sfs_fopen(char *name)
       {
         if(descriptorTable[j] == NULL)
         {
+          fprintf(stderr, "A\n");
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
           break;
@@ -276,6 +277,7 @@ int sfs_fopen(char *name)
       //create a new descriptor entry if required
       if(entry == -1)
       {
+        fprintf(stderr, "B\n");
         if (descriptorTable == NULL)
           descriptorTable = malloc(sizeof(fileDescriptorEntry*));
         else
