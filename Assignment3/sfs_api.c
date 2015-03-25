@@ -10,7 +10,7 @@
 #define BLOCKSIZE 512 //M block size
 #define MAXFILENAME 15
 #define NUM_BLOCKS SUPERBLOCK_SIZE + FREELIST_SIZE + DIRECTORY_SIZE + INODE_TABLE_SIZE + BLOCKSIZE  //N blocks
-#define MAX_FILES 100
+#define MAX_FILES 99
 
 #define SUPERBLOCK 0
 #define SUPERBLOCK_SIZE 1
@@ -102,7 +102,7 @@ int mksfs(int fresh)
       return -1;
     }
 
-    inodeEntry *inode = malloc(ALIGN(MAX_FILES*sizeof(inodeEntry)));
+    inodeEntry *inode = malloc(ALIGN((MAX_FILES+1)*sizeof(inodeEntry)));
     read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inode);
     if(inode == 0)
     {
@@ -159,7 +159,7 @@ int mksfs(int fresh)
 
   read_blocks(SUPERBLOCK, SUPERBLOCK_SIZE, superblock);
 
-  rootDir = malloc(ALIGN(sizeof(directoryEntry)*MAX_FILES));
+  rootDir = malloc(ALIGN(sizeof(directoryEntry)*(MAX_FILES));
 
 
   if(rootDir == 0)
@@ -170,7 +170,7 @@ int mksfs(int fresh)
 
   read_blocks(DIRECTORY_LOCATION, DIRECTORY_SIZE, rootDir);
 
-  inodeTable = malloc(ALIGN(sizeof(inodeEntry)*MAX_FILES));
+  inodeTable = malloc(ALIGN(sizeof(inodeEntry)*(MAX_FILES+1));
 
   if(inodeTable == 0)
   {
@@ -205,7 +205,7 @@ int sfs_fopen(char *name)
   {
     if(strncmp(rootDir[i].filename, name, MAXFILENAME + 1) == 0)
     {
-      fprintf(stderr, "file found, opening");
+      //fprintf(stderr, "file found, opening");
       int j,entry = -1;
       //Check to see if file is already open
       for(j = 0; j < numFiles; j++)
@@ -286,7 +286,7 @@ int sfs_fopen(char *name)
       }
       int inode = -1;
       int k;
-      for(k = 1; k < MAX_FILES; k++)
+      for(k = 1; k < MAX_FILES+1; k++)
       {
         if(inodeTable[k].mode == 0)
         {
@@ -704,7 +704,7 @@ int createRootDir()
 
 int createInodeTable()
 {
-  inodeEntry *buff = malloc(ALIGN(MAX_FILES*sizeof(inodeEntry)));
+  inodeEntry *buff = malloc(ALIGN((MAX_FILES+1)*sizeof(inodeEntry)));
 
   if(buff == 0)
   {
@@ -712,7 +712,7 @@ int createInodeTable()
   }
 
   int i;
-  for(i = 0; i < MAX_FILES; i++)
+  for(i = 0; i < MAX_FILES+1; i++)
   {
     buff[i].mode = 0;                                 //mode
     buff[i].linkCount = 0;                            //link count
