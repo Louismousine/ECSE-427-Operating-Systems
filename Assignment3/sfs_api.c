@@ -181,6 +181,7 @@ int mksfs(int fresh)
   read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inodeTable);
 
   numFiles = 0;
+  fileDescriptorTable = NULL;
   return 0;
 }
 //open or create file with given name
@@ -218,7 +219,7 @@ int sfs_fopen(char *name)
       //create a file descriptor slot for file
       for(j = 0; j < numFiles; j++)
       {
-        if(descriptorTable[j] == NULL)
+        if(!descriptorTable[j])
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
@@ -228,7 +229,10 @@ int sfs_fopen(char *name)
       //create a new descriptor entry if required
       if(entry == -1)
       {
-        descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry*)));
+        if (descriptorTable == NULL)
+          descriptorTable = malloc(sizeof(fileDescriptorEntry*));
+        else
+          descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry*)));
         descriptorTable[numFiles] = (fileDescriptorEntry *) malloc(sizeof(fileDescriptorEntry));
         entry = numFiles;
         numFiles++;
@@ -260,7 +264,7 @@ int sfs_fopen(char *name)
       //find a spot in descriptor table
       for(j = 0; j < numFiles; j++)
       {
-        if(descriptorTable[j] == NULL)
+        if(!descriptorTable[j])
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
@@ -271,7 +275,10 @@ int sfs_fopen(char *name)
       //if no slots left create a new one
       if(entry == -1)
       {
-        descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry)));
+        if (descriptorTable == NULL)
+          descriptorTable = malloc(sizeof(fileDescriptorEntry*));
+        else
+          descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry)));
         descriptorTable[numFiles] = (fileDescriptorEntry *) malloc(sizeof(fileDescriptorEntry));
         entry = numFiles;
         numFiles++;
