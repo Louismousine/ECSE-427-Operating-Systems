@@ -223,7 +223,6 @@ int sfs_fopen(char *name)
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
-          fprintf(stderr, "entry-o %d\n", entry);
           break;
         }
       }
@@ -249,6 +248,8 @@ int sfs_fopen(char *name)
       update->readPointer = 0;
       update->writePointer = inodeTable[rootDir[i].inode].size;
       update->inode = rootDir[i].inode;
+
+      fprintf(stderr, "entry-o %d\n", entry);
       return entry;
     }
   }
@@ -269,10 +270,10 @@ int sfs_fopen(char *name)
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
-          fprintf(stderr, "entry-c %d\n", entry);
           break;
         }
       }
+
       //if no slots left create a new one
       if(entry == -1)
       {
