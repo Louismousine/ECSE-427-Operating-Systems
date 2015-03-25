@@ -533,7 +533,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
   fileDescriptorEntry *readFile = descriptorTable[fileID];
 
-  fprintf(stderr, "inode:%d\n", readfile->inode);
+  fprintf(stderr, "inode:%d\n", readFile->inode);
   inodeEntry *inode = &(inodeTable[readFile->inode]);
 
   if(readFile->readPointer + length > inode->size)
