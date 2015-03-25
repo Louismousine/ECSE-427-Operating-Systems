@@ -450,7 +450,10 @@ int sfs_fwrite(int fileID, const char *buf, int length)
 
   fileDescriptorEntry *writeFile = descriptorTable[fileID];
   inodeEntry *inode = &(inodeTable[writeFile->inode]);
-
+  fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID,numFiles, length);
+  fprintf(stderr, "inode:%d\n", readFile->inode);
+  fprintf(stderr, "inode size:%d\n", inode->size);
+  
   char *diskBuffer = malloc(BLOCKSIZE);
 
   int block = (writeFile->writePointer)/BLOCKSIZE;  //get block location to write to
@@ -536,12 +539,12 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
     return -1;
   }
 
-  fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID,numFiles, length);
+
   fileDescriptorEntry *readFile = descriptorTable[fileID];
 
-  fprintf(stderr, "inode:%d\n", readFile->inode);
+
   inodeEntry *inode = &(inodeTable[readFile->inode]);
-  fprintf(stderr, "inode size:%d\n", inode->size);
+
   if(readFile->readPointer + length > inode->size)
   {
     length = inode->size - readFile->readPointer;
