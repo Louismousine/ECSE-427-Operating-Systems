@@ -219,7 +219,7 @@ int sfs_fopen(char *name)
       //create a file descriptor slot for file
       for(j = 0; j < numFiles; j++)
       {
-        if(!descriptorTable[j])
+        if(descriptorTable[j] == NULL)
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
@@ -266,7 +266,7 @@ int sfs_fopen(char *name)
       //find a spot in descriptor table
       for(j = 0; j < numFiles; j++)
       {
-        if(!descriptorTable[j])
+        if(descriptorTable[j] == NULL)
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
