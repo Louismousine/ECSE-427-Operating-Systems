@@ -280,6 +280,7 @@ int sfs_fopen(char *name)
           descriptorTable = malloc(sizeof(fileDescriptorEntry*));
         else
           descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry*)));
+
         descriptorTable[numFiles] = (fileDescriptorEntry *) malloc(sizeof(fileDescriptorEntry));
         entry = numFiles;
         numFiles++;

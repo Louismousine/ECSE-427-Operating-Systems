@@ -177,7 +177,6 @@ main(int argc, char **argv)
           fprintf(stderr, "ERROR: data error at offset %d in file %s (%d,%d)\n",
                   j+k, names[i], buffer[k], (char)(j+k));
           error_count++;
-          fprintf(stderr, "buffer: ")
           break;
         }
       }
