@@ -538,12 +538,13 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
   //fprintf(stderr, "inode:%d\n", readFile->inode);
   inodeEntry *inode = &(inodeTable[readFile->inode]);
+  int readLength = length;
 
   if(readFile->readPointer + length > inode->size)
   {
     length = inode->size - readFile->readPointer;
   }
-  int readLength = length;
+  // int readLength = length;
   char *diskBuffer = malloc(BLOCKSIZE);
 
   int block = (readFile->readPointer)/BLOCKSIZE;  //get block location to read from
