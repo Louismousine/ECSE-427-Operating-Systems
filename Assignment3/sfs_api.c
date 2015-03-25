@@ -248,8 +248,6 @@ int sfs_fopen(char *name)
       update->readPointer = 0;
       update->writePointer = inodeTable[rootDir[i].inode].size;
       update->inode = rootDir[i].inode;
-
-      fprintf(stderr, "entry-o %d\n", entry);
       return entry;
     }
   }
@@ -268,8 +266,8 @@ int sfs_fopen(char *name)
       {
         if(descriptorTable[j] == NULL)
         {
-          fprintf(stderr, "A\n");
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
+          assert(descriptorTable[j]);
           entry = j;
           break;
         }
@@ -277,7 +275,6 @@ int sfs_fopen(char *name)
       //create a new descriptor entry if required
       if(entry == -1)
       {
-        fprintf(stderr, "B\n");
         if (descriptorTable == NULL)
           descriptorTable = malloc(sizeof(fileDescriptorEntry*));
         else
@@ -332,7 +329,6 @@ int sfs_fopen(char *name)
       inodeTable[inode].mode = 1;
       inodeTable[inode].directptr[0] = writeLoc;
       write_blocks(INODE_TABLE,INODE_TABLE_SIZE,inodeTable);
-      fprintf(stderr, "entry-c %d\n", entry);
       return entry;
     }
   }
