@@ -514,6 +514,8 @@ int sfs_fwrite(int fileID, const char *buf, int length)
           free(nextBuff);
         }else
           inode->directptr[block] = writeLoc;
+
+        inode->linkCount++; //update link count
       }else
       {
         if(block > 11)          //update i-node associated with file
@@ -526,8 +528,6 @@ int sfs_fwrite(int fileID, const char *buf, int length)
           writeLoc = inode->directptr[block];
       }
 
-
-      inode->linkCount++; //update link count
     }
   }
   //update size of file in inode entry
