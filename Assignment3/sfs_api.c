@@ -249,6 +249,7 @@ int sfs_fopen(char *name)
       update->writePointer = inodeTable[rootDir[i].inode].size;
       update->inode = rootDir[i].inode;
       fprintf(stderr, "inode:%d\n", update->inode);
+      fprintf(stderr, "filename:%s\n", rootDir[i].filename);
       return entry;
     }
   }
@@ -330,7 +331,7 @@ int sfs_fopen(char *name)
       inodeTable[inode].mode = 1;
       inodeTable[inode].directptr[0] = writeLoc;
       write_blocks(INODE_TABLE,INODE_TABLE_SIZE,inodeTable);
-      fprintf(stderr, "inode:%d\n", newEntry->inode);
+      //fprintf(stderr, "inode:%d\n", newEntry->inode);
       return entry;
     }
   }
