@@ -332,6 +332,7 @@ int sfs_fopen(char *name)
       inodeTable[inode].mode = 1;
       inodeTable[inode].directptr[0] = writeLoc;
       write_blocks(INODE_TABLE,INODE_TABLE_SIZE,inodeTable);
+      fprintf(stderr, "entry-c %d\n", entry);
       return entry;
     }
   }
