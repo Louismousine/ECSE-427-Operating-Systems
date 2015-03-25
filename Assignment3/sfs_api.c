@@ -181,7 +181,7 @@ int mksfs(int fresh)
   read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inodeTable);
 
   numFiles = 0;
-  fileDescriptorTable = NULL;
+  descriptorTable = NULL;
   return 0;
 }
 //open or create file with given name
