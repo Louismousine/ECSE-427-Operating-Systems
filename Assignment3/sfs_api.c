@@ -446,7 +446,11 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   //int i;
   unsigned int writeLoc;
   int offset = 0;
-  if(block > 11)     //get location of block in located in single indirect pointers
+  if(block > 139)
+  {
+    fprintf(stderr, "Error, write exceeded max file size");
+    return -1;
+  }else if(block > 11)     //get location of block in located in single indirect pointers
   {
     unsigned int *indirectBuff = malloc(BLOCKSIZE);
     read_blocks(inode->singleIndirectPtr, 1, indirectBuff);
@@ -474,6 +478,11 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     block++;
     if(length > 0)  //if there is data still to write update writeloc and allocate memory
     {
+      if(block > 139)
+      {
+        fprintf(stderr, "Error, write exceeded max file size");
+        return -1;
+      }
       int next = findFree();  //find next write location
       setAlloc(next);
       if(next == -1)
