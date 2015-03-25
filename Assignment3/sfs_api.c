@@ -248,6 +248,7 @@ int sfs_fopen(char *name)
       update->readPointer = 0;
       update->writePointer = inodeTable[rootDir[i].inode].size;
       update->inode = rootDir[i].inode;
+      fprintf(stderr, "inode:%d\n", update->inode);
       return entry;
     }
   }
@@ -329,6 +330,7 @@ int sfs_fopen(char *name)
       inodeTable[inode].mode = 1;
       inodeTable[inode].directptr[0] = writeLoc;
       write_blocks(INODE_TABLE,INODE_TABLE_SIZE,inodeTable);
+      fprintf(stderr, "inode:%d\n", newEntry->inode);
       return entry;
     }
   }
@@ -533,7 +535,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
   fileDescriptorEntry *readFile = descriptorTable[fileID];
 
-  fprintf(stderr, "inode:%d\n", readFile->inode);
+  //fprintf(stderr, "inode:%d\n", readFile->inode);
   inodeEntry *inode = &(inodeTable[readFile->inode]);
 
   if(readFile->readPointer + length > inode->size)
