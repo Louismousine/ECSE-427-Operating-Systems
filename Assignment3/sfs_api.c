@@ -248,8 +248,8 @@ int sfs_fopen(char *name)
       update->readPointer = 0;
       update->writePointer = inodeTable[rootDir[i].inode].size;
       update->inode = rootDir[i].inode;
-      fprintf(stderr, "inode:%d\n", update->inode);
-      fprintf(stderr, "filename:%s\n", rootDir[i].filename);
+      //fprintf(stderr, "inode:%d\n", update->inode);
+      //fprintf(stderr, "filename:%s\n", rootDir[i].filename);
       return entry;
     }
   }
