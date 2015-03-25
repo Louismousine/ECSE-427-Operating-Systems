@@ -104,7 +104,7 @@ int mksfs(int fresh)
 
     inodeEntry *inode = malloc(ALIGN((MAX_FILES+1)*sizeof(inodeEntry)));
     read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inode);
-    if(inode == 0)
+    if(inode == NULL)
     {
       return -1;
     }
@@ -151,7 +151,7 @@ int mksfs(int fresh)
   //allocate main memory for filesystem data structures
   int *superblock = malloc(BLOCKSIZE*SUPERBLOCK_SIZE);
 
-  if(superblock == 0)
+  if(superblock == NULL)
   {
     fprintf(stderr, "Error allocating main memory for superblock\n");
     return -1;
@@ -162,7 +162,7 @@ int mksfs(int fresh)
   rootDir = malloc(ALIGN(sizeof(directoryEntry)*MAX_FILES));
 
 
-  if(rootDir == 0)
+  if(rootDir == NULL)
   {
     fprintf(stderr, "Error allocating main memory for directory\n");
     return -1;
@@ -172,7 +172,7 @@ int mksfs(int fresh)
 
   inodeTable = malloc(ALIGN(sizeof(inodeEntry)*(MAX_FILES+1)));
 
-  if(inodeTable == 0)
+  if(inodeTable == NULL)
   {
     fprintf(stderr, "Error allocating main memory for i-node cache\n");
     return -1;
@@ -633,7 +633,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 int createFreeList()
 {
   unsigned int *buff = malloc(BLOCKSIZE);
-  if (buff == 0)
+  if (buff == NULL)
   {
     return -1;
   }
@@ -655,7 +655,7 @@ void setFree(unsigned int index)
 
   unsigned int *buff = malloc(BLOCKSIZE);
 
-  if(buff == 0)
+  if(buff == NULL)
   {
     fprintf(stderr, "Error assigning free bit\n");
     return;
@@ -673,7 +673,7 @@ void setAlloc(unsigned int index) //set index to allocated in FREELIST
 
   unsigned int *buff = malloc(BLOCKSIZE);
 
-  if(buff == 0)
+  if(buff == NULL)
   {
     fprintf(stderr, "Error assigning allocated bit\n");
     return;
@@ -688,7 +688,7 @@ int findFree()
 {
   unsigned int *buff = malloc(BLOCKSIZE);
 
-  if(buff == 0)
+  if(buff == NULL)
   {
     fprintf(stderr, "Error finding free bit\n");
     return -1;
@@ -713,7 +713,7 @@ int createSuperblock()
 {
   unsigned int *buff = malloc(BLOCKSIZE);
 
-  if(buff == 0)
+  if(buff == NULL)
   {
     return -1;
   }
@@ -736,7 +736,7 @@ int createRootDir()
 {
   directoryEntry *buff = malloc(ALIGN(MAX_FILES*sizeof(directoryEntry)));
 
-  if(buff == 0)
+  if(buff == NULL)
   {
     return -1;
   }
@@ -756,7 +756,7 @@ int createInodeTable()
 {
   inodeEntry *buff = malloc(ALIGN((MAX_FILES+1)*sizeof(inodeEntry)));
 
-  if(buff == 0)
+  if(buff == NULL)
   {
     return -1;
   }
