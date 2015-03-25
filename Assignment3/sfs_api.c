@@ -159,7 +159,7 @@ int mksfs(int fresh)
 
   read_blocks(SUPERBLOCK, SUPERBLOCK_SIZE, superblock);
 
-  rootDir = malloc(ALIGN(sizeof(directoryEntry)*(MAX_FILES));
+  rootDir = malloc(ALIGN(sizeof(directoryEntry)*MAX_FILES));
 
 
   if(rootDir == 0)
