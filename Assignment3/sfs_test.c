@@ -191,179 +191,179 @@ main(int argc, char **argv)
     }
   }
 
-  /* Now try to close the files. Don't
-   * care about the return codes, really, but just want to make sure
-   * this doesn't cause a problem.
-   */
-  for (i = 0; i < 2; i++) {
-    if (sfs_fclose(fds[i]) == 0) {
-      fprintf(stderr, "Warning: closing already closed file %s\n", names[i]);
-    }
-  }
-
-  /* Now just try to open up a bunch of files.
-   */
-  ncreate = 0;
-  for (i = 0; i < MAX_FD; i++) {
-    names[i] = rand_name();
-    fds[i] = sfs_fopen(names[i]);
-    if (fds[i] < 0) {
-      break;
-    }
-    sfs_fclose(fds[i]);
-    ncreate++;
-  }
-
-  fprintf(stderr, "Created %d files in the root directory\n", ncreate);
-
-  nopen = 0;
-  for (i = 0; i < ncreate; i++) {
-    fds[i] = sfs_fopen(names[i]);
-    if (fds[i] < 0) {
-      break;
-    }
-    nopen++;
-  }
-  fprintf(stderr, "Simultaneously opened %d files\n", nopen);
-
-  for (i = 0; i < nopen; i++) {
-    tmp = sfs_fwrite(fds[i], test_str, strlen(test_str));
-    if (tmp != strlen(test_str)) {
-      fprintf(stderr, "ERROR: Tried to write %d, returned %d\n",
-              (int)strlen(test_str), tmp);
-      error_count++;
-    }
-    if (sfs_fclose(fds[i]) != 0) {
-      fprintf(stderr, "ERROR: close of handle %d failed\n", fds[i]);
-      error_count++;
-    }
-  }
-
-  /* Re-open in reverse order */
-  for (i = nopen-1; i >= 0; i--) {
-    fds[i] = sfs_fopen(names[i]);
-    if (fds[i] < 0) {
-      fprintf(stderr, "ERROR: can't re-open file %s\n", names[i]);
-    }
-  }
-
-  /* Now test the file contents.
-   */
-  for (j = 0; j < strlen(test_str); j++) {
-    for (i = 0; i < nopen; i++) {
-      char ch;
-
-      if (sfs_fread(fds[i], &ch, 1) != 1) {
-        fprintf(stderr, "ERROR: Failed to read 1 character\n");
-        error_count++;
-      }
-      if (ch != test_str[j]) {
-        fprintf(stderr, "ERROR: Read wrong byte from %s at %d (%d,%d)\n",
-                names[i], j, ch, test_str[j]);
-        error_count++;
-        break;
-      }
-    }
-  }
-
-  /* Now close all of the open file handles.
-   */
-  for (i = 0; i < nopen; i++) {
-    if (sfs_fclose(fds[i]) != 0) {
-      fprintf(stderr, "ERROR: close of handle %d failed\n", fds[i]);
-      error_count++;
-    }
-  }
-
-  /* Now we try to re-initialize the system.
-   */
-  mksfs(0);
-
-  for (i = 0; i < nopen; i++) {
-    fds[i] = sfs_fopen(names[i]);
-    if (fds[i] >= 0) {
-      readsize = sfs_fread(fds[i], fixedbuf, sizeof(fixedbuf));
-      if (readsize != strlen(test_str)) {
-        fprintf(stderr, "ERROR: Read wrong number of bytes\n");
-        error_count++;
-      }
-
-      for (j = 0; j < strlen(test_str); j++) {
-        if (test_str[j] != fixedbuf[j]) {
-          fprintf(stderr, "ERROR: Wrong byte in %s at %d (%d,%d)\n",
-                  names[i], j, fixedbuf[j], test_str[j]);
-          error_count++;
-          break;
-        }
-      }
-
-      if (sfs_fclose(fds[i]) != 0) {
-        fprintf(stderr, "ERROR: close of handle %d failed\n", fds[i]);
-        error_count++;
-      }
-    }
-  }
-
-  fprintf(stderr, "Trying to fill up the disk with repeated writes to %s.\n", names[0]);
-  fprintf(stderr, "(This may take a while).\n");
-
-  /* Now try opening the first file, and just write a huge bunch of junk.
-   * This is just to try to fill up the disk, to see what happens.
-   */
-  fds[0] = sfs_fopen(names[0]);
-  if (fds[0] >= 0) {
-    for (i = 0; i < 100000; i++) {
-      int x;
-
-      if ((i % 100) == 0) {
-        fprintf(stderr, "%d\r", i);
-      }
-
-      memset(fixedbuf, (char)i, sizeof(fixedbuf));
-      x = sfs_fwrite(fds[0], fixedbuf, sizeof(fixedbuf));
-      if (x != sizeof(fixedbuf)) {
-        /* Sooner or later, this write should fail. The only thing is that
-         * it should fail gracefully, without any catastrophic errors.
-         */
-        fprintf(stderr, "Write failed after %d iterations.\n", i);
-        fprintf(stderr, "If the emulated disk contains just over %d bytes, this is OK\n",
-               (i * (int)sizeof(fixedbuf)));
-        break;
-      }
-    }
-    sfs_fclose(fds[0]);
-  }
-  else {
-    fprintf(stderr, "ERROR: re-opening file %s\n", names[0]);
-  }
-
-  /* Now, having filled up the disk, try one more time to read the
-   * contents of the files we created.
-   */
-  for (i = 0; i < nopen; i++) {
-    fds[i] = sfs_fopen(names[i]);
-    if (fds[i] >= 0) {
-      readsize = sfs_fread(fds[i], fixedbuf, sizeof(fixedbuf));
-      if (readsize < strlen(test_str)) {
-        fprintf(stderr, "ERROR: Read wrong number of bytes\n");
-        error_count++;
-      }
-
-      for (j = 0; j < strlen(test_str); j++) {
-        if (test_str[j] != fixedbuf[j]) {
-          fprintf(stderr, "ERROR: Wrong byte in %s at position %d (%d,%d)\n",
-                  names[i], j, fixedbuf[j], test_str[j]);
-          error_count++;
-          break;
-        }
-      }
-
-      if (sfs_fclose(fds[i]) != 0) {
-        fprintf(stderr, "ERROR: close of handle %d failed\n", fds[i]);
-        error_count++;
-      }
-    }
-  }
+  // /* Now try to close the files. Don't
+  //  * care about the return codes, really, but just want to make sure
+  //  * this doesn't cause a problem.
+  //  */
+  // for (i = 0; i < 2; i++) {
+  //   if (sfs_fclose(fds[i]) == 0) {
+  //     fprintf(stderr, "Warning: closing already closed file %s\n", names[i]);
+  //   }
+  // }
+  //
+  // /* Now just try to open up a bunch of files.
+  //  */
+  // ncreate = 0;
+  // for (i = 0; i < MAX_FD; i++) {
+  //   names[i] = rand_name();
+  //   fds[i] = sfs_fopen(names[i]);
+  //   if (fds[i] < 0) {
+  //     break;
+  //   }
+  //   sfs_fclose(fds[i]);
+  //   ncreate++;
+  // }
+  //
+  // fprintf(stderr, "Created %d files in the root directory\n", ncreate);
+  //
+  // nopen = 0;
+  // for (i = 0; i < ncreate; i++) {
+  //   fds[i] = sfs_fopen(names[i]);
+  //   if (fds[i] < 0) {
+  //     break;
+  //   }
+  //   nopen++;
+  // }
+  // fprintf(stderr, "Simultaneously opened %d files\n", nopen);
+  //
+  // for (i = 0; i < nopen; i++) {
+  //   tmp = sfs_fwrite(fds[i], test_str, strlen(test_str));
+  //   if (tmp != strlen(test_str)) {
+  //     fprintf(stderr, "ERROR: Tried to write %d, returned %d\n",
+  //             (int)strlen(test_str), tmp);
+  //     error_count++;
+  //   }
+  //   if (sfs_fclose(fds[i]) != 0) {
+  //     fprintf(stderr, "ERROR: close of handle %d failed\n", fds[i]);
+  //     error_count++;
+  //   }
+  // }
+  //
+  // /* Re-open in reverse order */
+  // for (i = nopen-1; i >= 0; i--) {
+  //   fds[i] = sfs_fopen(names[i]);
+  //   if (fds[i] < 0) {
+  //     fprintf(stderr, "ERROR: can't re-open file %s\n", names[i]);
+  //   }
+  // }
+  //
+  // /* Now test the file contents.
+  //  */
+  // for (j = 0; j < strlen(test_str); j++) {
+  //   for (i = 0; i < nopen; i++) {
+  //     char ch;
+  //
+  //     if (sfs_fread(fds[i], &ch, 1) != 1) {
+  //       fprintf(stderr, "ERROR: Failed to read 1 character\n");
+  //       error_count++;
+  //     }
+  //     if (ch != test_str[j]) {
+  //       fprintf(stderr, "ERROR: Read wrong byte from %s at %d (%d,%d)\n",
+  //               names[i], j, ch, test_str[j]);
+  //       error_count++;
+  //       break;
+  //     }
+  //   }
+  // }
+  //
+  // /* Now close all of the open file handles.
+  //  */
+  // for (i = 0; i < nopen; i++) {
+  //   if (sfs_fclose(fds[i]) != 0) {
+  //     fprintf(stderr, "ERROR: close of handle %d failed\n", fds[i]);
+  //     error_count++;
+  //   }
+  // }
+  //
+  // /* Now we try to re-initialize the system.
+  //  */
+  // mksfs(0);
+  //
+  // for (i = 0; i < nopen; i++) {
+  //   fds[i] = sfs_fopen(names[i]);
+  //   if (fds[i] >= 0) {
+  //     readsize = sfs_fread(fds[i], fixedbuf, sizeof(fixedbuf));
+  //     if (readsize != strlen(test_str)) {
+  //       fprintf(stderr, "ERROR: Read wrong number of bytes\n");
+  //       error_count++;
+  //     }
+  //
+  //     for (j = 0; j < strlen(test_str); j++) {
+  //       if (test_str[j] != fixedbuf[j]) {
+  //         fprintf(stderr, "ERROR: Wrong byte in %s at %d (%d,%d)\n",
+  //                 names[i], j, fixedbuf[j], test_str[j]);
+  //         error_count++;
+  //         break;
+  //       }
+  //     }
+  //
+  //     if (sfs_fclose(fds[i]) != 0) {
+  //       fprintf(stderr, "ERROR: close of handle %d failed\n", fds[i]);
+  //       error_count++;
+  //     }
+  //   }
+  // }
+  //
+  // fprintf(stderr, "Trying to fill up the disk with repeated writes to %s.\n", names[0]);
+  // fprintf(stderr, "(This may take a while).\n");
+  //
+  // /* Now try opening the first file, and just write a huge bunch of junk.
+  //  * This is just to try to fill up the disk, to see what happens.
+  //  */
+  // fds[0] = sfs_fopen(names[0]);
+  // if (fds[0] >= 0) {
+  //   for (i = 0; i < 100000; i++) {
+  //     int x;
+  //
+  //     if ((i % 100) == 0) {
+  //       fprintf(stderr, "%d\r", i);
+  //     }
+  //
+  //     memset(fixedbuf, (char)i, sizeof(fixedbuf));
+  //     x = sfs_fwrite(fds[0], fixedbuf, sizeof(fixedbuf));
+  //     if (x != sizeof(fixedbuf)) {
+  //       /* Sooner or later, this write should fail. The only thing is that
+  //        * it should fail gracefully, without any catastrophic errors.
+  //        */
+  //       fprintf(stderr, "Write failed after %d iterations.\n", i);
+  //       fprintf(stderr, "If the emulated disk contains just over %d bytes, this is OK\n",
+  //              (i * (int)sizeof(fixedbuf)));
+  //       break;
+  //     }
+  //   }
+  //   sfs_fclose(fds[0]);
+  // }
+  // else {
+  //   fprintf(stderr, "ERROR: re-opening file %s\n", names[0]);
+  // }
+  //
+  // /* Now, having filled up the disk, try one more time to read the
+  //  * contents of the files we created.
+  //  */
+  // for (i = 0; i < nopen; i++) {
+  //   fds[i] = sfs_fopen(names[i]);
+  //   if (fds[i] >= 0) {
+  //     readsize = sfs_fread(fds[i], fixedbuf, sizeof(fixedbuf));
+  //     if (readsize < strlen(test_str)) {
+  //       fprintf(stderr, "ERROR: Read wrong number of bytes\n");
+  //       error_count++;
+  //     }
+  //
+  //     for (j = 0; j < strlen(test_str); j++) {
+  //       if (test_str[j] != fixedbuf[j]) {
+  //         fprintf(stderr, "ERROR: Wrong byte in %s at position %d (%d,%d)\n",
+  //                 names[i], j, fixedbuf[j], test_str[j]);
+  //         error_count++;
+  //         break;
+  //       }
+  //     }
+  //
+  //     if (sfs_fclose(fds[i]) != 0) {
+  //       fprintf(stderr, "ERROR: close of handle %d failed\n", fds[i]);
+  //       error_count++;
+  //     }
+  //   }
+  // }
 
   fprintf(stderr, "Test program exiting with %d errors\n", error_count);
   return (error_count);

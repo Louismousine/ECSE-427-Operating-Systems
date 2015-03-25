@@ -248,8 +248,8 @@ int sfs_fopen(char *name)
       update->readPointer = 0;
       update->writePointer = inodeTable[rootDir[i].inode].size;
       update->inode = rootDir[i].inode;
-      //fprintf(stderr, "inode:%d\n", update->inode);
-      //fprintf(stderr, "filename:%s\n", rootDir[i].filename);
+      fprintf(stderr, "inode:%d\n", update->inode);
+      fprintf(stderr, "filename:%s\n", rootDir[i].filename);
       return entry;
     }
   }
@@ -535,9 +535,11 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
     return -1;
   }
 
+  fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID,numFiles, length);
   fileDescriptorEntry *readFile = descriptorTable[fileID];
 
-  //fprintf(stderr, "inode:%d\n", readFile->inode);
+  fprintf(stderr, "inode:%d\n", readFile->inode);
+  fprintf(stderr, "inode size:%d\n", inode->size);
   inodeEntry *inode = &(inodeTable[readFile->inode]);
 
   if(readFile->readPointer + length > inode->size)
