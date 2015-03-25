@@ -331,7 +331,8 @@ int sfs_fopen(char *name)
       inodeTable[inode].mode = 1;
       inodeTable[inode].directptr[0] = writeLoc;
       write_blocks(INODE_TABLE,INODE_TABLE_SIZE,inodeTable);
-      //fprintf(stderr, "inode:%d\n", newEntry->inode);
+      fprintf(stderr, "inode:%d\n", newEntry->inode);
+      fprintf(stderr, "filename:%s\n", rootDir[i].filename);
       return entry;
     }
   }
@@ -538,13 +539,12 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
   //fprintf(stderr, "inode:%d\n", readFile->inode);
   inodeEntry *inode = &(inodeTable[readFile->inode]);
-  int readLength = length;
 
   if(readFile->readPointer + length > inode->size)
   {
     length = inode->size - readFile->readPointer;
   }
-  // int readLength = length;
+  int readLength = length;
   char *diskBuffer = malloc(BLOCKSIZE);
 
   int block = (readFile->readPointer)/BLOCKSIZE;  //get block location to read from
