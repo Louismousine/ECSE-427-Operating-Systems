@@ -104,7 +104,7 @@ main(int argc, char **argv)
     }
   }
 
-  printf("Two files created with zero length:\n");
+  fprintf(stderr, "Two files created with zero length:\n");
 
   for (i = 0; i < 2; i++) {
     for (j = 0; j < filesize[i]; j += chunksize) {
@@ -143,7 +143,7 @@ main(int argc, char **argv)
     error_count++;
   }
 
-  printf("File %s now has length %d and %s now has length %d:\n",
+  fprintf(stderr, "File %s now has length %d and %s now has length %d:\n",
          names[0], filesize[0], names[1], filesize[1]);
 
   /* Just to be cruel - attempt to read from a closed file handle.
@@ -177,6 +177,7 @@ main(int argc, char **argv)
           fprintf(stderr, "ERROR: data error at offset %d in file %s (%d,%d)\n",
                   j+k, names[i], buffer[k], (char)(j+k));
           error_count++;
+          fprintf(stderr, "buffer: ")
           break;
         }
       }
@@ -214,7 +215,7 @@ main(int argc, char **argv)
     ncreate++;
   }
 
-  printf("Created %d files in the root directory\n", ncreate);
+  fprintf(stderr, "Created %d files in the root directory\n", ncreate);
 
   nopen = 0;
   for (i = 0; i < ncreate; i++) {
@@ -224,7 +225,7 @@ main(int argc, char **argv)
     }
     nopen++;
   }
-  printf("Simultaneously opened %d files\n", nopen);
+  fprintf(stderr, "Simultaneously opened %d files\n", nopen);
 
   for (i = 0; i < nopen; i++) {
     tmp = sfs_fwrite(fds[i], test_str, strlen(test_str));
@@ -304,8 +305,8 @@ main(int argc, char **argv)
     }
   }
 
-  printf("Trying to fill up the disk with repeated writes to %s.\n", names[0]);
-  printf("(This may take a while).\n");
+  fprintf(stderr, "Trying to fill up the disk with repeated writes to %s.\n", names[0]);
+  fprintf(stderr, "(This may take a while).\n");
 
   /* Now try opening the first file, and just write a huge bunch of junk.
    * This is just to try to fill up the disk, to see what happens.
@@ -325,8 +326,8 @@ main(int argc, char **argv)
         /* Sooner or later, this write should fail. The only thing is that
          * it should fail gracefully, without any catastrophic errors.
          */
-        printf("Write failed after %d iterations.\n", i);
-        printf("If the emulated disk contains just over %d bytes, this is OK\n",
+        fprintf(stderr, "Write failed after %d iterations.\n", i);
+        fprintf(stderr, "If the emulated disk contains just over %d bytes, this is OK\n",
                (i * (int)sizeof(fixedbuf)));
         break;
       }
