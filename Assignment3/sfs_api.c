@@ -218,7 +218,7 @@ int sfs_fopen(char *name)
       //create a file descriptor slot for file
       for(j = 0; j < numFiles; j++)
       {
-        if(!descriptorTable[j])
+        if(descriptorTable[j] == NULL)
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
@@ -582,7 +582,6 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
         unsigned int *nextBuff = malloc(BLOCKSIZE);
         read_blocks(inode->singleIndirectPtr, 1, nextBuff);
         readLoc = nextBuff[block - 12];
-        write_blocks(inode->singleIndirectPtr, 1, nextBuff);
         free(nextBuff);
       }else
         readLoc = inode->directptr[block];
