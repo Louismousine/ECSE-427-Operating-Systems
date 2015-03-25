@@ -263,7 +263,7 @@ int sfs_fopen(char *name)
       int entry = -1;
 
       int j;
-      //find a spot in descriptor table
+      //create a file descriptor slot for file
       for(j = 0; j < numFiles; j++)
       {
         if(descriptorTable[j] == NULL)
@@ -273,15 +273,13 @@ int sfs_fopen(char *name)
           break;
         }
       }
-
-      //if no slots left create a new one
+      //create a new descriptor entry if required
       if(entry == -1)
       {
         if (descriptorTable == NULL)
           descriptorTable = malloc(sizeof(fileDescriptorEntry*));
         else
           descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry*)));
-
         descriptorTable[numFiles] = (fileDescriptorEntry *) malloc(sizeof(fileDescriptorEntry));
         entry = numFiles;
         numFiles++;
