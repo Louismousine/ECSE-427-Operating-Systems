@@ -458,7 +458,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
 
   int block = (writeFile->writePointer)/BLOCKSIZE;  //get block location to write to
   int bytes = (writeFile->writePointer)%BLOCKSIZE;   //get exact byte location to write to
-
+  int eofBlock = (inode->size)/BLOCKSIZE;
   //int i;
   unsigned int writeLoc;
   int offset = 0;
@@ -498,21 +498,34 @@ int sfs_fwrite(int fileID, const char *buf, int length)
       {
         fprintf(stderr, "Error, write exceeded max file size\n");
         return -1;
-      }
-      int next = findFree();  //find next write location
-      setAlloc(next);
-      if(next == -1)
-        return -1;
-      writeLoc = next;
-      if(block > 11)          //update i-node associated with file
+      }else if(eofBlock < block)
       {
-        unsigned int *nextBuff = malloc(BLOCKSIZE);
-        read_blocks(inode->singleIndirectPtr, 1, nextBuff);
-        nextBuff[block - 12] = writeLoc;
-        write_blocks(inode->singleIndirectPtr, 1, nextBuff);
-        free(nextBuff);
+        int next = findFree();  //find next write location
+        setAlloc(next);
+        if(next == -1)
+          return -1;
+        writeLoc = next;
+        if(block > 11)          //update i-node associated with file
+        {
+          unsigned int *nextBuff = malloc(BLOCKSIZE);
+          read_blocks(inode->singleIndirectPtr, 1, nextBuff);
+          nextBuff[block - 12] = writeLoc;
+          write_blocks(inode->singleIndirectPtr, 1, nextBuff);
+          free(nextBuff);
+        }else
+          inode->directptr[block] = writeLoc;
       }else
-        inode->directptr[block] = writeLoc;
+      {
+        if(block > 11)          //update i-node associated with file
+        {
+          unsigned int *nextBuff = malloc(BLOCKSIZE);
+          read_blocks(inode->singleIndirectPtr, 1, nextBuff);
+          writeLoc = nextBuff[block - 12];
+          free(nextBuff);
+        }else
+          writeLoc = inode->directptr[block];
+      }
+
 
       inode->linkCount++; //update link count
     }
