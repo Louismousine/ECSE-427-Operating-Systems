@@ -223,6 +223,7 @@ int sfs_fopen(char *name)
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
+          fprintf(stderr, "entry-o %d\n", entry);
           break;
         }
       }
@@ -239,7 +240,7 @@ int sfs_fopen(char *name)
       }
       //fill table slot with required infomation
       fileDescriptorEntry *update = descriptorTable[entry];
-      if(update == 0)
+      if(update == NULL)
       {
         fprintf(stderr, "Error opening requested file\n");
         return -1;
@@ -268,7 +269,7 @@ int sfs_fopen(char *name)
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
-          fprintf(stderr, "entry %d\n", entry);
+          fprintf(stderr, "entry-c %d\n", entry);
           break;
         }
       }
@@ -278,7 +279,7 @@ int sfs_fopen(char *name)
         if (descriptorTable == NULL)
           descriptorTable = malloc(sizeof(fileDescriptorEntry*));
         else
-          descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry)));
+          descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry*)));
         descriptorTable[numFiles] = (fileDescriptorEntry *) malloc(sizeof(fileDescriptorEntry));
         entry = numFiles;
         numFiles++;
@@ -287,7 +288,7 @@ int sfs_fopen(char *name)
       //allocate inode for new entry
       fileDescriptorEntry *newEntry = descriptorTable[entry];
 
-      if(newEntry == 0)
+      if(newEntry == NULL)
       {
         fprintf(stderr, "Error creating new file\n");
         return -1;
