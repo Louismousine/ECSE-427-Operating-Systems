@@ -524,7 +524,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
 
 int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 {
-  if(descriptorTable[fileID] == NULL || length < 0 || fileID >= numFiles)
+  if(descriptorTable[fileID] == NULL || length < 0 || fileID >= numFiles || buf == NULL)
   {
     fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID,numFiles, length);
     fprintf(stderr, "Error in read request\n");
@@ -533,6 +533,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
   fileDescriptorEntry *readFile = descriptorTable[fileID];
 
+  fprintf(stderr, "inode:%d\n", readfile->inode);
   inodeEntry *inode = &(inodeTable[readFile->inode]);
 
   if(readFile->readPointer + length > inode->size)
