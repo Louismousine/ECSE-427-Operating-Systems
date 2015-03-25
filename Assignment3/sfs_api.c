@@ -264,6 +264,7 @@ int sfs_fopen(char *name)
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
           entry = j;
+          fprintf(stderr, "entry %d\n", entry);
           break;
         }
       }
