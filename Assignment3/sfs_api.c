@@ -72,7 +72,7 @@ int mksfs(int fresh)
 
     if(init_fresh_disk(FILENAME, BLOCKSIZE, NUM_BLOCKS) != 0)
     {
-      fprintf(stderr, "Error creating fresh file system");
+      fprintf(stderr, "Error creating fresh file system\n");
       return -1;
     }
 
@@ -84,13 +84,13 @@ int mksfs(int fresh)
 
     if(createFreeList() != 0)
     {
-      fprintf(stderr, "Error creating free list");
+      fprintf(stderr, "Error creating free list\n");
       return -1;
     }
 
     if(createRootDir() != 0)
     {
-      fprintf(stderr, "Error creating root directory");
+      fprintf(stderr, "Error creating root directory\n");
       return -1;
     }
 
@@ -98,7 +98,7 @@ int mksfs(int fresh)
 
     if(createInodeTable() != 0)
     {
-      fprintf(stderr, "Error creating i-node table");
+      fprintf(stderr, "Error creating i-node table\n");
       return -1;
     }
 
@@ -144,7 +144,7 @@ int mksfs(int fresh)
   {
     if(init_disk(FILENAME, BLOCKSIZE, NUM_BLOCKS) != 0)
     {
-      fprintf(stderr, "Error initializing disk");
+      fprintf(stderr, "Error initializing disk\n");
       return -1;
     }
   }
@@ -153,7 +153,7 @@ int mksfs(int fresh)
 
   if(superblock == 0)
   {
-    fprintf(stderr, "Error allocating main memory for superblock");
+    fprintf(stderr, "Error allocating main memory for superblock\n");
     return -1;
   }
 
@@ -164,7 +164,7 @@ int mksfs(int fresh)
 
   if(rootDir == 0)
   {
-    fprintf(stderr, "Error allocating main memory for directory");
+    fprintf(stderr, "Error allocating main memory for directory\n");
     return -1;
   }
 
@@ -174,7 +174,7 @@ int mksfs(int fresh)
 
   if(inodeTable == 0)
   {
-    fprintf(stderr, "Error allocating main memory for i-node cache");
+    fprintf(stderr, "Error allocating main memory for i-node cache\n");
     return -1;
   }
 
@@ -188,13 +188,13 @@ int sfs_fopen(char *name)
 {
   if(sizeof(name) > MAXFILENAME) //check to see if filename is of correct size
   {
-    fprintf(stderr, "File name too long");
+    fprintf(stderr, "File name too long\n");
     return -1;
   }
   //Check to see if filesystem has been setup
   if(rootDir == 0)
   {
-    fprintf(stderr, "File system not initiallized");
+    fprintf(stderr, "File system not initiallized\n");
     return -1;
   }
 
@@ -237,7 +237,7 @@ int sfs_fopen(char *name)
       fileDescriptorEntry *update = descriptorTable[entry];
       if(update == 0)
       {
-        fprintf(stderr, "Error opening requested file");
+        fprintf(stderr, "Error opening requested file\n");
         return -1;
       }
 
@@ -281,7 +281,7 @@ int sfs_fopen(char *name)
 
       if(newEntry == 0)
       {
-        fprintf(stderr, "Error creating new file");
+        fprintf(stderr, "Error creating new file\n");
         return -1;
       }
       int inode = -1;
@@ -296,7 +296,7 @@ int sfs_fopen(char *name)
       }
       if(inode == -1)
       {
-        fprintf(stderr, "Error, i-node Table full");
+        fprintf(stderr, "Error, i-node Table full\n");
         return -1;
       }
       //find next free location to create new file in
@@ -332,7 +332,7 @@ int sfs_fclose(int fileID)
   //check file is open and has not already been closed
   if(fileID >= numFiles || descriptorTable[fileID] == NULL)
   {
-    fprintf(stderr, "File has already been closed");
+    fprintf(stderr, "File has already been closed\n");
     return -1;
   }
 
@@ -381,7 +381,7 @@ int sfs_remove(char *file) //remove file from disk
         return 0;
     }
   }
-  fprintf(stderr, "Not file of that name found"); //if no mactching file return -1
+  fprintf(stderr, "Not file of that name found\n"); //if no mactching file return -1
   return -1;
 }
 
@@ -415,7 +415,7 @@ int sfs_fseek(int fileID, int offset) //error if user tries to seek past eof or 
 {
   if(fileID >= numFiles || descriptorTable[fileID] == NULL || inodeTable[descriptorTable[fileID]->inode].size < offset )
   {
-    fprintf(stderr, "Error, seeking to requested location in requested file");
+    fprintf(stderr, "Error, seeking to requested location in requested file\n");
     return -1;
   }
 
@@ -430,7 +430,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   //if invalid file or requested return -1
   if(fileID >= numFiles || descriptorTable[fileID] == NULL || buf == NULL || length < 0)
   {
-    fprintf(stderr, "Error in write request");
+    fprintf(stderr, "Error in write request\n");
     return -1; //return -1 on failure
   }
   int writeLength = length;
@@ -448,7 +448,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   int offset = 0;
   if(block > 139)
   {
-    fprintf(stderr, "Error, write exceeded max file size");
+    fprintf(stderr, "Error, write exceeded max file size\n");
     return -1;
   }else if(block > 11)     //get location of block in located in single indirect pointers
   {
@@ -480,7 +480,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     {
       if(block > 139)
       {
-        fprintf(stderr, "Error, write exceeded max file size");
+        fprintf(stderr, "Error, write exceeded max file size\n");
         return -1;
       }
       int next = findFree();  //find next write location
@@ -518,8 +518,8 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 {
   if(descriptorTable[fileID] == NULL || length < 0 || fileID >= numFiles)
   {
-    fprintf(stderr, "fileID %d\n, numfiles %d\n, length %d\n", fileID,numFiles, length);
-    fprintf(stderr, "Error in read request");
+    fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID,numFiles, length);
+    fprintf(stderr, "Error in read request\n");
     return -1;
   }
 
@@ -539,7 +539,11 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
   unsigned int readLoc;
   int offset = 0;
-  if(block > 11)     //get location of block in located in single indirect pointers
+  if(block > 139)
+  {
+    fprintf(stderr, "Error, read exceeded max file size\n");
+    return -1;
+  }else if(block > 11)     //get location of block in located in single indirect pointers
   {
     unsigned int *indirectBuff = malloc(BLOCKSIZE);
     read_blocks(inode->singleIndirectPtr, 1, indirectBuff);
@@ -568,6 +572,11 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
     if(length > 0) //check to see if there is more to read;
     {
       block++;
+      if(block > 139)
+      {
+        fprintf(stderr, "Error, read exceeded max file size\n");
+        return -1;
+      }
       if(block > 11)          //update i-node associated with file
       {
         unsigned int *nextBuff = malloc(BLOCKSIZE);
@@ -616,7 +625,7 @@ void setFree(unsigned int index)
 
   if(buff == 0)
   {
-    fprintf(stderr, "Error assigning free bit");
+    fprintf(stderr, "Error assigning free bit\n");
     return;
   }
 
@@ -634,7 +643,7 @@ void setAlloc(unsigned int index) //set index to allocated in FREELIST
 
   if(buff == 0)
   {
-    fprintf(stderr, "Error assigning allocated bit");
+    fprintf(stderr, "Error assigning allocated bit\n");
     return;
   }
 
@@ -649,7 +658,7 @@ int findFree()
 
   if(buff == 0)
   {
-    fprintf(stderr, "Error finding free bit");
+    fprintf(stderr, "Error finding free bit\n");
     return -1;
   }
 
