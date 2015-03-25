@@ -250,6 +250,7 @@ int sfs_fopen(char *name)
       update->inode = rootDir[i].inode;
       fprintf(stderr, "inode:%d\n", update->inode);
       fprintf(stderr, "filename:%s\n", rootDir[i].filename);
+      fprintf(stderr, "fileID%d\n", entry)
       return entry;
     }
   }
