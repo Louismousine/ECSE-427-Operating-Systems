@@ -367,7 +367,7 @@ main(int argc, char **argv)
           fprintf(stderr, "ERROR: Wrong byte in %s at position %d (%d,%d)\n",
                   names[i], j, fixedbuf[j], test_str[j]);
           error_count++;
-          break;
+          //break;
         }
       }
 
