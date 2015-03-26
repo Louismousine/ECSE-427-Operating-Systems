@@ -112,8 +112,8 @@ int mksfs(int fresh)
 
     if(DIRECTORY_SIZE > 12)     //check to see if we need to use singleindirectptr
     {
-      inode[0].singleIndirectPtr = findfree();
-      setAlloc(inode[0].singleIndirectPtr);
+      inode[0].singleIndirectPtr = 0;
+      setAlloc(0);
       unsigned int *buff = malloc(BLOCKSIZE);
       write_blocks(inode[0].singleIndirectPtr, 1, buff);
       free(buff);
@@ -498,6 +498,12 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         return -1;
       }else if(eofBlock < block)
       {
+        if(block == 12)
+        {
+          int indirPtr = findFree();
+          setAlloc(indirPtr);
+          inode->singleIndirectPtr = indirPtr;
+        }
         int next = findFree();  //find next write location
         setAlloc(next);
         if(next == -1)
