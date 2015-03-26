@@ -591,7 +591,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
     }else
       bytesRead = length;
 
-    memcpy(&buf[offset+1], &diskBuffer[bytes], bytesRead);
+    memcpy(&buf[offset], &diskBuffer[bytes+1], bytesRead);
 
     length -= (bytesRead);
     offset += (bytesRead);
