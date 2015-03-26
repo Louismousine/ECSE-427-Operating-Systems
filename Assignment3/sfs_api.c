@@ -453,7 +453,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   int i;
   for(i = 0; i < sizeof(buf); i++)
   {
-    fprintf(stderr, " %d is %s", i, (char) buf[i]);
+    fprintf(stderr, " %d is %c", i, (char)(buf[i]));
   }
   char *diskBuffer = malloc(BLOCKSIZE);
 
