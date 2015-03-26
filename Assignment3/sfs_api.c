@@ -112,8 +112,8 @@ int mksfs(int fresh)
 
     if(DIRECTORY_SIZE > 12)     //check to see if we need to use singleindirectptr
     {
-      inode[0].singleIndirectPtr = 0;
-      setAlloc(0);
+      inode[0].singleIndirectPtr = START;
+      setAlloc(START);
       unsigned int *buff = malloc(BLOCKSIZE);
       write_blocks(inode[0].singleIndirectPtr, 1, buff);
       free(buff);
