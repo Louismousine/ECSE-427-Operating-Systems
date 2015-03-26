@@ -287,7 +287,7 @@ main(int argc, char **argv)
 
   /* Now we try to re-initialize the system.
    */
-  mksfs(0);
+  //mksfs(0);
 
   for (i = 0; i < nopen; i++) {
     fds[i] = sfs_fopen(names[i]);
