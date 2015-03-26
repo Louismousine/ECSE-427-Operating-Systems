@@ -93,8 +93,6 @@ int mksfs(int fresh)
       return -1;
     }
 
-    //unsigned int *updateBuff = malloc(BLOCKSIZE);
-
     if(createInodeTable() != 0)
     {
       fprintf(stderr, "Error creating i-node table\n");
@@ -700,7 +698,7 @@ int findFree()
     int find = ffs(buff[i]);
     if(find)
     {
-      return find + i*8*sizeof(unsigned int) - 1;
+      return START + find + i*8*sizeof(unsigned int) - 1;
     }
   }
 
