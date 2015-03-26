@@ -112,8 +112,8 @@ int mksfs(int fresh)
 
     if(DIRECTORY_SIZE > 12)     //check to see if we need to use singleindirectptr
     {
-      inode[0].singleIndirectPtr = START;
-      setAlloc(START);
+      inode[0].singleIndirectPtr = findFree();
+      setAlloc(inode[0].singleIndirectPtr);
       unsigned int *buff = malloc(BLOCKSIZE);
       write_blocks(inode[0].singleIndirectPtr, 1, buff);
       free(buff);
@@ -184,7 +184,7 @@ int mksfs(int fresh)
 //open or create file with given name
 int sfs_fopen(char *name)
 {
-  setAlloc(5000);
+  // setAlloc(5000);
   if(strlen(name) > MAXFILENAME) //check to see if filename is of correct size
   {
     fprintf(stderr, "File name too long\n");
