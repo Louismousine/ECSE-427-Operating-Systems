@@ -655,6 +655,11 @@ int createFreeList()
 
 void setFree(unsigned int index)
 {
+  if(index > BLOCKSIZE)
+  {
+    fprintf(stderr, "Error, bad allocation attempt")
+    return;
+  }
   int byte = index / (8*sizeof(unsigned int));
   int bit = index % (8*sizeof(unsigned int));
 
@@ -674,6 +679,11 @@ void setFree(unsigned int index)
 
 void setAlloc(unsigned int index) //set index to allocated in FREELIST
 {
+  if(index > BLOCKSIZE)
+  {
+    fprintf(stderr, "Error, bad allocation attempt")
+    return;
+  }
   int byte = index / (8*sizeof(unsigned int));  //find byte to change
   int bit = index % (8*sizeof(unsigned int));   //find bit to change
 
