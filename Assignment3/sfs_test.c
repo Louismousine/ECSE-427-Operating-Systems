@@ -131,9 +131,9 @@ main(int argc, char **argv)
       free(buffer);
     }
   }
-  char *readTest = (char)malloc(filesize[0]);
+  char *readTest = (char*)malloc(filesize[0]);
   sfs_fread(0, *readTest, filesize[0]);
-  fprintf(stderr, "%s/n", *readTest);
+  fprintf(stderr, "%s/n", (char*) *readTest);
   if (sfs_fclose(fds[1]) != 0) {
     fprintf(stderr, "ERROR: close of handle %d failed\n", fds[1]);
     error_count++;
