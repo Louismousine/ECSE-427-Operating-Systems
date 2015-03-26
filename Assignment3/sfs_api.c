@@ -698,7 +698,7 @@ int findFree()
     int find = ffs(buff[i]);
     if(find)
     {
-      return START + find + i*8*sizeof(unsigned int) - 1;
+      return START + find + i*8*sizeof(unsigned int);
     }
   }
 

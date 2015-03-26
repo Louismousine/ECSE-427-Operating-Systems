@@ -289,7 +289,7 @@ main(int argc, char **argv)
    */
   mksfs(0);
 
-  for (i = 0; i < 68; i++) {
+  for (i = 0; i < nopen; i++) {
     fds[i] = sfs_fopen(names[i]);
     sfs_fseek(fds[i], 0);
     if (fds[i] >= 0) {
