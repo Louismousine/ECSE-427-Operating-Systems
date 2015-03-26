@@ -86,9 +86,9 @@ int mksfs(int fresh)
       fprintf(stderr, "Error creating free list\n");
       return -1;
     }
-    int k;
-    for(k = 0; k < START; k++);
-      setAlloc(k);
+    int t;
+    for(t = 0; t < START; t++);
+      setAlloc(t);
 
     if(createRootDir() != 0)
     {
