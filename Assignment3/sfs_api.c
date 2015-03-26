@@ -470,8 +470,9 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   }else             //if not get location of block in direct pointers
     writeLoc = inode->directptr[block];
 
-  if(writeLoc == -1) return -1;
-  
+  if(writeLoc == -1)
+    return -1;
+
   while(length > 0)
   {
     read_blocks(START + writeLoc, 1, diskBuffer);
@@ -696,10 +697,10 @@ int findFree()
   read_blocks(FREELIST, FREELIST_SIZE, buff);
 
   int i;
-  for(i = 0; i < (BLOCKSIZE)/sizeof(unsigned int) && i < BLOCKSIZE; i++)
+  for(i = 0; i < (BLOCKSIZE)/sizeof(unsigned int); i++)
   {
     int find = ffs(buff[i]);
-    if(find)
+    if(find && find < BLOCKSIZE)
     {
       return START + find + i*8*sizeof(unsigned int) - 1;
     }
