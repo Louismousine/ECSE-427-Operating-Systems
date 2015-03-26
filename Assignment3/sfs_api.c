@@ -244,9 +244,9 @@ int sfs_fopen(char *name)
 
       update->rwPointer = inodeTable[rootDir[i].inode].size;
       update->inode = rootDir[i].inode;
-      fprintf(stderr, "inode:%d\n", update->inode);
-      fprintf(stderr, "filename:%s\n", rootDir[i].filename);
-      fprintf(stderr, "fileID%d\n", entry);
+      //fprintf(stderr, "inode:%d\n", update->inode);
+      //fprintf(stderr, "filename:%s\n", rootDir[i].filename);
+      //fprintf(stderr, "fileID%d\n", entry);
       return entry;
     }
   }
@@ -327,8 +327,8 @@ int sfs_fopen(char *name)
       inodeTable[inode].mode = 1;
       inodeTable[inode].directptr[0] = writeLoc;
       write_blocks(INODE_TABLE,INODE_TABLE_SIZE,inodeTable);
-      fprintf(stderr, "inode:%d\n", newEntry->inode);
-      fprintf(stderr, "filename:%s\n", rootDir[i].filename);
+      //fprintf(stderr, "inode:%d\n", newEntry->inode);
+      //fprintf(stderr, "filename:%s\n", rootDir[i].filename);
       return entry;
     }
   }
@@ -444,9 +444,9 @@ int sfs_fwrite(int fileID, const char *buf, int length)
 
   fileDescriptorEntry *writeFile = descriptorTable[fileID];
   inodeEntry *inode = &(inodeTable[writeFile->inode]);
-  fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID, numFiles, length);
-  fprintf(stderr, "inode:%d\n", writeFile->inode);
-  fprintf(stderr, "inode size:%d\n", inode->size);
+  //fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID, numFiles, length);
+  //fprintf(stderr, "inode:%d\n", writeFile->inode);
+  //fprintf(stderr, "inode size:%d\n", inode->size);
 
   char *diskBuffer = malloc(BLOCKSIZE);
 
@@ -549,9 +549,9 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
   fileDescriptorEntry *readFile = descriptorTable[fileID];
   inodeEntry *inode = &(inodeTable[readFile->inode]);
-  fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID, numFiles, length);
-  fprintf(stderr, "inode:%d\n", readFile->inode);
-  fprintf(stderr, "inode size:%d\n", inode->size);
+  //fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID, numFiles, length);
+  //fprintf(stderr, "inode:%d\n", readFile->inode);
+  //fprintf(stderr, "inode size:%d\n", inode->size);
 
   if(readFile->rwPointer + length > inode->size)
   {
