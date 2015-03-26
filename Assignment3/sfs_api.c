@@ -481,7 +481,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     }else
       byteWrite = length;
 
-    memcpy(&diskBuffer[bytes+1], &buf[offset], byteWrite);
+    memcpy(&diskBuffer[bytes], &buf[offset], byteWrite);
     write_blocks(START + writeLoc, 1, diskBuffer);
 
     length -= (byteWrite);
@@ -591,7 +591,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
     }else
       bytesRead = length;
 
-    memcpy(&buf[offset], &diskBuffer[bytes+1], bytesRead);
+    memcpy(&buf[offset], &diskBuffer[bytes], bytesRead);
 
     length -= (bytesRead);
     offset += (bytesRead);
