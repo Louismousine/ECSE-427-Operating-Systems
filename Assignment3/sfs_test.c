@@ -131,7 +131,7 @@ main(int argc, char **argv)
       free(buffer);
     }
   }
-  char *readTest = malloc(filesize[0]);
+  char *readTest = (char)malloc(filesize[0]);
   sfs_fread(0, *readTest, filesize[0]);
   fprintf(stderr, "%s/n", *readTest);
   if (sfs_fclose(fds[1]) != 0) {
