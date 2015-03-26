@@ -484,8 +484,8 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     memcpy(&diskBuffer[bytes], &buf[offset], byteWrite);
     write_blocks(START + writeLoc, 1, diskBuffer);
 
-    length -= (BLOCKSIZE - bytes);
-    offset += (BLOCKSIZE - bytes);
+    length -= (byteWrite);
+    offset += (byteWrite);
     bytes = 0;
     block++;
     if(length > 0)  //if there is data still to write update writeloc and allocate memory
@@ -593,8 +593,8 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
     memcpy(&buf[offset], &diskBuffer[bytes], bytesRead);
 
-    length -= (BLOCKSIZE - bytes);
-    offset += (BLOCKSIZE - bytes);
+    length -= (bytesRead);
+    offset += (bytesRead);
     bytes = 0;
 
     if(length > 0) //check to see if there is more to read;
