@@ -449,6 +449,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID, numFiles, length);
   fprintf(stderr, "inode:%d\n", writeFile->inode);
   fprintf(stderr, "inode size:%d\n", inode->size);
+  fprintf(stderr, "buffer:%s\n", buf);
 
   char *diskBuffer = malloc(BLOCKSIZE);
 
@@ -621,7 +622,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
   }
 
   free(diskBuffer);
-  //update read pointer in descriptor table
+  //update r/w pointer in descriptor table
   readFile->rwPointer += readLength;
   return readLength;
 }
