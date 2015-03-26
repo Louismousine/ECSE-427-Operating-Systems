@@ -177,6 +177,11 @@ int mksfs(int fresh)
 
   read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inodeTable);
 
+  int t;
+  for(t = 0; t < START, t++)
+  {
+    setAlloc(t);
+  }
   numFiles = 0;
   descriptorTable = NULL;
   return 0;
@@ -698,7 +703,7 @@ int findFree()
     int find = ffs(buff[i]);
     if(find)
     {
-      return START + find + i*8*sizeof(unsigned int) - 1;
+      return find + i*8*sizeof(unsigned int) - 1;
     }
   }
 
