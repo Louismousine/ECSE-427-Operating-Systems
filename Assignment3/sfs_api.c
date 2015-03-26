@@ -451,9 +451,9 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   fprintf(stderr, "inode size:%d\n", inode->size);
 
   int i;
-  for(i = 0; i < sizeof(buf); i++)
+  for(i = 0; i < length; i++)
   {
-    fprintf(stderr, " %d is %c", i, (char)(buf[i]));
+    fprintf(stderr, " %d is %c", i, buf[i]);
   }
   char *diskBuffer = malloc(BLOCKSIZE);
 
