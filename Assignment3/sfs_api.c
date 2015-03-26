@@ -449,8 +449,12 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID, numFiles, length);
   fprintf(stderr, "inode:%d\n", writeFile->inode);
   fprintf(stderr, "inode size:%d\n", inode->size);
-  fprintf(stderr, "buffer:%s\n", *buf);
 
+  int i;
+  for(i = 0; i < strlen(buf); i++)
+  {
+    fprintf(stderr, " %d is %s", i, buf[i]);
+  }
   char *diskBuffer = malloc(BLOCKSIZE);
 
   int block = (writeFile->rwPointer)/BLOCKSIZE;  //get block location to write to
