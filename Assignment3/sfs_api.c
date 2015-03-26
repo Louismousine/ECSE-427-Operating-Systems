@@ -449,7 +449,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID, numFiles, length);
   fprintf(stderr, "inode:%d\n", writeFile->inode);
   fprintf(stderr, "inode size:%d\n", inode->size);
-  fprintf(stderr, "buffer:%s\n", buf);
+  fprintf(stderr, "buffer:%s\n", *buf);
 
   char *diskBuffer = malloc(BLOCKSIZE);
 
