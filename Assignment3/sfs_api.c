@@ -93,7 +93,7 @@ int mksfs(int fresh)
       return -1;
     }
 
-    unsigned int *updateBuff = malloc(BLOCKSIZE);
+    //unsigned int *updateBuff = malloc(BLOCKSIZE);
 
     if(createInodeTable() != 0)
     {
