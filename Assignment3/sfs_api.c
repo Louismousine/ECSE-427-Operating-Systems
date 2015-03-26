@@ -697,12 +697,12 @@ int findFree()
   read_blocks(FREELIST, FREELIST_SIZE, buff);
 
   int i;
-  for(i = 0; i < (BLOCKSIZE)/sizeof(unsigned int); i++)
+  for(i = START; i < (BLOCKSIZE)/sizeof(unsigned int); i++)
   {
     int find = ffs(buff[i]);
     if(find && find < BLOCKSIZE)
     {
-      return START + find + i*8*sizeof(unsigned int) - 1;
+      return find + i*8*sizeof(unsigned int) - 1;
     }
   }
 
