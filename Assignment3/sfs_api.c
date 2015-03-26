@@ -660,6 +660,7 @@ void setFree(unsigned int index)
   read_blocks(FREELIST, FREELIST_SIZE, buff);
   buff[byte] |= 1 << bit; //sets bit
   write_blocks(FREELIST, FREELIST_SIZE, buff);
+  free(buff);
 }
 
 void setAlloc(unsigned int index) //set index to allocated in FREELIST
@@ -678,6 +679,7 @@ void setAlloc(unsigned int index) //set index to allocated in FREELIST
   read_blocks(FREELIST, FREELIST_SIZE, buff);
   buff[byte] &= ~(1 << bit);
   write_blocks(FREELIST, FREELIST_SIZE, buff);
+  free(buff);
 }
 
 int findFree()
