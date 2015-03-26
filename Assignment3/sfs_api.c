@@ -178,7 +178,7 @@ int mksfs(int fresh)
   read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inodeTable);
 
   int t;
-  for(t = 0; t < START, t++)
+  for(t = 0; t < START; t++)
   {
     setAlloc(t);
   }
