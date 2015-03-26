@@ -44,8 +44,7 @@ typedef struct inodeEntry
 typedef struct fileDescriptorEntry
 {
   unsigned int inode;
-  unsigned int readPointer;
-  unsigned int writePointer;
+  unsigned int rwPointer;
 } fileDescriptorEntry;
 
 int createInodeTable();
@@ -245,8 +244,7 @@ int sfs_fopen(char *name)
         return -1;
       }
 
-      update->readPointer = 0;
-      update->writePointer = inodeTable[rootDir[i].inode].size;
+      update->rwPointer = inodeTable[rootDir[i].inode].size;
       update->inode = rootDir[i].inode;
       fprintf(stderr, "inode:%d\n", update->inode);
       fprintf(stderr, "filename:%s\n", rootDir[i].filename);
@@ -317,8 +315,7 @@ int sfs_fopen(char *name)
 
       setAlloc(writeLoc);
 
-      newEntry->writePointer = 0;
-      newEntry->readPointer = 0;
+      newEntry->rwPointer = 0;
       newEntry->inode = inode;
 
       //update rootDir
@@ -433,8 +430,7 @@ int sfs_fseek(int fileID, int offset) //error if user tries to seek past eof or 
   }
 
   //shift read and write pointers to offset return 0 for success
-  descriptorTable[fileID]->writePointer = offset;
-  descriptorTable[fileID]->readPointer = offset;
+  descriptorTable[fileID]->rwPointer = offset;
   return 0;
 }
 
@@ -456,8 +452,8 @@ int sfs_fwrite(int fileID, const char *buf, int length)
 
   char *diskBuffer = malloc(BLOCKSIZE);
 
-  int block = (writeFile->writePointer)/BLOCKSIZE;  //get block location to write to
-  int bytes = (writeFile->writePointer)%BLOCKSIZE;   //get exact byte location to write to
+  int block = (writeFile->rwPointer)/BLOCKSIZE;  //get block location to write to
+  int bytes = (writeFile->rwPointer)%BLOCKSIZE;   //get exact byte location to write to
   int eofBlock = (inode->size)/BLOCKSIZE;
   //int i;
   unsigned int writeLoc;
@@ -505,7 +501,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         if(next == -1)
           return -1;
         writeLoc = next;
-        if(block > 11)          //update i-node associated with file
+        if(block > 11)         //update i-node associated with file
         {
           unsigned int *nextBuff = malloc(BLOCKSIZE);
           read_blocks(inode->singleIndirectPtr, 1, nextBuff);
@@ -531,12 +527,12 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     }
   }
   //update size of file in inode entry
-  if(writeFile->writePointer + writeLength > inode->size)
+  if(writeFile->rwPointer + writeLength > inode->size)
   {
-    inode->size = writeFile->writePointer + writeLength;
+    inode->size = writeFile->rwPointer + writeLength;
   }
   //update writer pointer in file descriptor entry
-  writeFile->writePointer += writeLength;
+  writeFile->rwPointer += writeLength;
   //upodate inode table on disk
   write_blocks(INODE_TABLE, INODE_TABLE_SIZE, inodeTable);
   free(diskBuffer);
@@ -559,15 +555,15 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
   fprintf(stderr, "inode:%d\n", readFile->inode);
   fprintf(stderr, "inode size:%d\n", inode->size);
 
-  if(readFile->readPointer + length > inode->size)
+  if(readFile->rwPointer + length > inode->size)
   {
-    length = inode->size - readFile->readPointer;
+    length = inode->size - readFile->rwPointer;
   }
   int readLength = length;
   char *diskBuffer = malloc(BLOCKSIZE);
 
-  int block = (readFile->readPointer)/BLOCKSIZE;  //get block location to read from
-  int bytes = (readFile->readPointer)%BLOCKSIZE;   //get exact byte location to read from
+  int block = (readFile->rwPointer)/BLOCKSIZE;  //get block location to read from
+  int bytes = (readFile->rwPointer)%BLOCKSIZE;   //get exact byte location to read from
   int eofBlock = (inode->size)/BLOCKSIZE;
   unsigned int readLoc;
   int offset = 0;
@@ -626,7 +622,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
   free(diskBuffer);
   //update read pointer in descriptor table
-  readFile->readPointer += readLength;
+  readFile->rwPointer += readLength;
   return readLength;
 }
 
