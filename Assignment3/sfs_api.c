@@ -455,7 +455,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   int bytes = (writeFile->rwPointer)%BLOCKSIZE;   //get exact byte location to write to
   int eofBlock = (inode->size)/BLOCKSIZE;
   //int i;
-  unsigned int writeLoc;
+  unsigned int writeLoc=-1;
   int offset = 0;
   if(block > 139)
   {
@@ -470,6 +470,8 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   }else             //if not get location of block in direct pointers
     writeLoc = inode->directptr[block];
 
+  if(writeLoc == -1) return -1;
+  
   while(length > 0)
   {
     read_blocks(START + writeLoc, 1, diskBuffer);
@@ -483,8 +485,8 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     memcpy(&diskBuffer[bytes], &buf[offset], byteWrite);
     write_blocks(START + writeLoc, 1, diskBuffer);
 
-    length -= (BLOCKSIZE - bytes);
-    offset += (BLOCKSIZE - bytes);
+    length -= (byteWrite);
+    offset += (byteWrite);
     bytes = 0;
     block++;
     if(length > 0)  //if there is data still to write update writeloc and allocate memory
