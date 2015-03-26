@@ -54,7 +54,7 @@ int createFreelist();               //create a freelist as bitmap
 void setFree(unsigned int index);   //set index to free in FREELIST
 void setAlloc(unsigned int index);  //set index to allocated in FREELIST
 int findFree();                     //find next free block in sfs
-int findFreeSeq(unsigned int size); //find next free block sequence for required size
+
 
 int dirLoc = 0;
 int numFiles;
@@ -177,11 +177,6 @@ int mksfs(int fresh)
 
   read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inodeTable);
 
-  int t;
-  for(t = 0; t < START; t++)
-  {
-    setAlloc(t);
-  }
   numFiles = 0;
   descriptorTable = NULL;
   return 0;
@@ -271,7 +266,7 @@ int sfs_fopen(char *name)
         if(descriptorTable[j] == NULL)
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
-          assert(descriptorTable[j]);
+          // assert(descriptorTable[j]);
           entry = j;
           break;
         }
@@ -302,6 +297,7 @@ int sfs_fopen(char *name)
       {
         if(inodeTable[k].mode == 0)
         {
+          inodeTable[k].mode == 1;
           inode = k;
           break;
         }
@@ -428,7 +424,7 @@ int sfs_fseek(int fileID, int offset) //error if user tries to seek past eof or 
 {
   if(fileID >= numFiles || descriptorTable[fileID] == NULL || inodeTable[descriptorTable[fileID]->inode].size < offset )
   {
-    fprintf(stderr, "Error, seeking to requested location in requested file\n");
+    fprintf(stderr, "Error seeking to requested location in requested file\n");
     return -1;
   }
 
@@ -703,7 +699,7 @@ int findFree()
     int find = ffs(buff[i]);
     if(find)
     {
-      return find + i*8*sizeof(unsigned int) - 1;
+      return START + find + i*8*sizeof(unsigned int) - 1;
     }
   }
 
