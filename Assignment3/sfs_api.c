@@ -86,9 +86,6 @@ int mksfs(int fresh)
       fprintf(stderr, "Error creating free list\n");
       return -1;
     }
-    int t;
-    for(t = 0; t <= START; t++)
-      setAlloc(t);
 
     if(createRootDir() != 0)
     {
@@ -701,7 +698,7 @@ int findFree()
     int find = ffs(buff[i]);
     if(find)
     {
-      return + find + i*8*sizeof(unsigned int) - 1;
+      return START + find + i*8*sizeof(unsigned int) - 2;
     }
   }
 
