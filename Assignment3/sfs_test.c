@@ -337,7 +337,7 @@ main(int argc, char **argv)
         /* Sooner or later, this write should fail. The only thing is that
          * it should fail gracefully, without any catastrophic errors.
          */
-        fprintf(stderr"Write failed after %d iterations.\n", i);
+        fprintf(stderr,"Write failed after %d iterations.\n", i);
         fprintf(stderr, "If the emulated disk contains just over %d bytes, this is OK\n",
                (i * (int)sizeof(fixedbuf)));
         break;
