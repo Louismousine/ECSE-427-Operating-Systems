@@ -87,7 +87,7 @@ int mksfs(int fresh)
       return -1;
     }
     int t;
-    for(t = 0; t < START; t++);
+    for(t = 0; t < START; t++)
       setAlloc(t);
 
     if(createRootDir() != 0)
