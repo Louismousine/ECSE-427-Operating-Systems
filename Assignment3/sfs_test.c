@@ -132,7 +132,7 @@ main(int argc, char **argv)
     }
   }
   char readTest[filesize[0]];
-  sfs_fread(0, &readTest, filesize[0]);
+  sfs_fread(0, *readTest, filesize[0]);
   fprintf(stderr, "%s\n", readTest);
   if (sfs_fclose(fds[1]) != 0) {
     fprintf(stderr, "ERROR: close of handle %d failed\n", fds[1]);
