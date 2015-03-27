@@ -472,8 +472,10 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     writeLoc = inode->directptr[block];
 
   if(writeLoc == -1)
+  {
+    fprintf(stderr, "Error, -1 writeLoc");
     return -1;
-
+  }
   while(length > 0)
   {
     read_blocks(START + writeLoc, 1, diskBuffer);
