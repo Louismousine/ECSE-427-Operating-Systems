@@ -786,12 +786,12 @@ int createInodeTable()
     buff[i].mode = 0;                                 //mode
     buff[i].linkCount = 0;                            //link count
     buff[i].size = 0;                                 //size
-    buff[i].singleIndirectPtr = 5000;       //indirect pointers
+    buff[i].singleIndirectPtr = (int) NULL;       //indirect pointers
 
     int j;
     for(j = 0; j < 12; j++)
     {
-      buff[i].directptr[j] = 5000;
+      buff[i].directptr[j] = (int) NULL;
     }
   }
 
