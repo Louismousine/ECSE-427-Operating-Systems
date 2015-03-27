@@ -184,7 +184,7 @@ int mksfs(int fresh)
 //open or create file with given name
 int sfs_fopen(char *name)
 {
-  // setAlloc(5000);
+  setAlloc(5000);
   if(strlen(name) > MAXFILENAME) //check to see if filename is of correct size
   {
     fprintf(stderr, "File name too long\n");
@@ -719,7 +719,7 @@ int findFree()
     int find = ffs(buff[i]);
     if(find && find < BLOCKSIZE)
     {
-      return find + i*8*sizeof(unsigned int) - 1;
+      return START + find + i*8*sizeof(unsigned int) - 1;
     }
   }
 
