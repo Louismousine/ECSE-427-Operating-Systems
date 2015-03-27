@@ -699,7 +699,7 @@ void setAlloc(unsigned int index) //set index to allocated in FREELIST
   }
 
   read_blocks(FREELIST, FREELIST_SIZE, buff);
-  if(index > NUM_BLOCKS || buff[index / (8*sizeof(unsigned int)+index % (8*sizeof(unsigned int))] == 0)
+  if(index > NUM_BLOCKS || buff[index / (8*sizeof(unsigned int))+index % (8*sizeof(unsigned int))] == 0)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
