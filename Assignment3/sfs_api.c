@@ -101,7 +101,7 @@ int mksfs(int fresh)
       return -1;
     }
     int p;
-    for(p = INODE_TABLE; p < INODE_TABLE + INODE_TABLE_SIZE; p++)
+    for(p = 0; p < START; p++)
     {
       setAlloc(p);
     }
