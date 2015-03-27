@@ -686,11 +686,7 @@ void setFree(unsigned int index)
 
 void setAlloc(unsigned int index) //set index to allocated in FREELIST
 {
-  if(index > NUM_BLOCKS || index % (8*sizeof(unsigned int)) == 0)
-  {
-    fprintf(stderr, "Error, bad allocation attempt");
-    return;
-  }
+
   int byte = index / (8*sizeof(unsigned int));  //find byte to change
   int bit = index % (8*sizeof(unsigned int));   //find bit to change
 
@@ -703,6 +699,11 @@ void setAlloc(unsigned int index) //set index to allocated in FREELIST
   }
 
   read_blocks(FREELIST, FREELIST_SIZE, buff);
+  if(index > NUM_BLOCKS || buff[index / (8*sizeof(unsigned int)+index % (8*sizeof(unsigned int))] == 0)
+  {
+    fprintf(stderr, "Error, bad allocation attempt");
+    return;
+  }
   buff[byte] &= ~(1 << bit);
   write_blocks(FREELIST, FREELIST_SIZE, buff);
   free(buff);
