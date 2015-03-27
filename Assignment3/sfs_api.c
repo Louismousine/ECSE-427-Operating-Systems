@@ -118,7 +118,7 @@ int mksfs(int fresh)
       inode[0].singleIndirectPtr = findFree();
       setAlloc(inode[0].singleIndirectPtr);
       unsigned int *buff = malloc(BLOCKSIZE);
-      write_blocks(inode[0].singleIndirectPtr, 1, buff);
+      write_blocks(START + inode[0].singleIndirectPtr, 1, buff);
       free(buff);
     }
     //assign the pointers the location of directory files
@@ -128,9 +128,9 @@ int mksfs(int fresh)
       if(k > 11)
       {
         unsigned int *buff = malloc(BLOCKSIZE);
-        read_blocks(inode[0].singleIndirectPtr, 1, buff);
+        read_blocks(START+ inode[0].singleIndirectPtr, 1, buff);
         buff[k - 12] = DIRECTORY_LOCATION + k;
-        write_blocks(inode[0].singleIndirectPtr, 1, buff);
+        write_blocks(START+ inode[0].singleIndirectPtr, 1, buff);
         free(buff);
         //setAlloc(DIRECTORY_LOCATION + k);
       } else {
@@ -379,7 +379,7 @@ int sfs_remove(char *file) //remove file from disk
         if(inodeRemove->linkCount > 12) //update i-node data
         {
           unsigned int *buff = malloc(BLOCKSIZE);
-          read_blocks(inodeRemove->singleIndirectPtr, 1, buff);
+          read_blocks(START+ inodeRemove->singleIndirectPtr, 1, buff);
 
           for(k = 0; k < inodeRemove->linkCount - 12; k++)
           {
@@ -483,7 +483,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   }else if(block > 11)     //get location of block in located in single indirect pointers
   {
     unsigned int *indirectBuff = malloc(BLOCKSIZE);
-    read_blocks(inode->singleIndirectPtr, 1, indirectBuff);
+    read_blocks(START+ inode->singleIndirectPtr, 1, indirectBuff);
     writeLoc = indirectBuff[block - 12];
     free(indirectBuff);
   }else             //if not get location of block in direct pointers
@@ -533,9 +533,9 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         if(block > 11)         //update i-node associated with file
         {
           unsigned int *nextBuff = malloc(BLOCKSIZE);
-          read_blocks(inode->singleIndirectPtr, 1, nextBuff);
+          read_blocks(START+ inode->singleIndirectPtr, 1, nextBuff);
           nextBuff[block - 12] = writeLoc;
-          write_blocks(inode->singleIndirectPtr, 1, nextBuff);
+          write_blocks(START+ inode->singleIndirectPtr, 1, nextBuff);
           free(nextBuff);
         }else
           inode->directptr[block] = writeLoc;
@@ -546,7 +546,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         if(block > 11)          //update i-node associated with file
         {
           unsigned int *nextBuff = malloc(BLOCKSIZE);
-          read_blocks(inode->singleIndirectPtr, 1, nextBuff);
+          read_blocks(START+ inode->singleIndirectPtr, 1, nextBuff);
           writeLoc = nextBuff[block - 12];
           free(nextBuff);
         }else
@@ -609,7 +609,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
   }else if(block > 11)     //get location of block in located in single indirect pointers
   {
     unsigned int *indirectBuff = malloc(BLOCKSIZE);
-    read_blocks(inode->singleIndirectPtr, 1, indirectBuff);
+    read_blocks(START + inode->singleIndirectPtr, 1, indirectBuff);
     readLoc = indirectBuff[block - 12];
     free(indirectBuff);
   }else             //if not get location of block in direct pointers
@@ -645,7 +645,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
       }else if(block > 11)
       {
         unsigned int *nextBuff = malloc(BLOCKSIZE);
-        read_blocks(inode->singleIndirectPtr, 1, nextBuff);
+        read_blocks(START + inode->singleIndirectPtr, 1, nextBuff);
         readLoc = nextBuff[block - 12];
         free(nextBuff);
       }else
@@ -716,7 +716,7 @@ void setAlloc(unsigned int index) //set index to allocated in FREELIST
     fprintf(stderr, "Error assigning allocated bit\n");
     return;
   }
-  if(index > BLOCKSIZE)
+  if(index >= BLOCKSIZE)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
