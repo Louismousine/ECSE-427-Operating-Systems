@@ -332,6 +332,8 @@ int sfs_fopen(char *name)
       inodeTable[inode].linkCount = 1;
       inodeTable[inode].mode = 1;
       inodeTable[inode].directptr[0] = writeLoc;
+      setAlloc(inodeTable[inode].singleIndirectPtr = findFree());
+
       write_blocks(INODE_TABLE,INODE_TABLE_SIZE,inodeTable);
       //fprintf(stderr, "inode:%d\n", newEntry->inode);
       //fprintf(stderr, "filename:%s\n", rootDir[i].filename);
@@ -506,12 +508,12 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         return -1;
       }else if(eofBlock < block)
       {
-        if(block == 12)
-        {
-          int indirPtr = findFree();
-          setAlloc(indirPtr);
-          inode->singleIndirectPtr = indirPtr;
-        }
+        // if(block == 12)
+        // {
+        //   int indirPtr = findFree();
+        //   setAlloc(indirPtr);
+        //   inode->singleIndirectPtr = indirPtr;
+        // }
         int next = findFree();  //find next write location
         setAlloc(next);
         if(next == -1)
