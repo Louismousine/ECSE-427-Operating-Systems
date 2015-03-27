@@ -80,14 +80,14 @@ int mksfs(int fresh)
       fprintf(stderr, "Error creating superblock");
       return -1;
     }
-    setAlloc(SUPERBLOCK);
+    setAlloc(1);
 
     if(createFreeList() != 0)
     {
       fprintf(stderr, "Error creating free list\n");
       return -1;
     }
-    setAlloc(FREELIST);
+    setAlloc(2);
 
     if(createRootDir() != 0)
     {
