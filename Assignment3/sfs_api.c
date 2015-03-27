@@ -80,14 +80,12 @@ int mksfs(int fresh)
       fprintf(stderr, "Error creating superblock");
       return -1;
     }
-    setAlloc(1);
 
     if(createFreeList() != 0)
     {
       fprintf(stderr, "Error creating free list\n");
       return -1;
     }
-    setAlloc(2);
 
     if(createRootDir() != 0)
     {
@@ -183,6 +181,9 @@ int mksfs(int fresh)
 
   numFiles = 0;
   descriptorTable = NULL;
+  setAlloc(SUPERBLOCK);
+
+  setAlloc(FREELIST);
   return 0;
 }
 //open or create file with given name
