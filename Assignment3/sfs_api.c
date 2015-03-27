@@ -667,7 +667,7 @@ int createFreeList()
 
 void setFree(unsigned int index)
 {
-  if(index > NUM_BLOCKS)
+  if(index > NUM_BLOCKS - 1)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
@@ -691,7 +691,7 @@ void setFree(unsigned int index)
 
 void setAlloc(unsigned int index) //set index to allocated in FREELIST
 {
-  if(index > NUM_BLOCKS)
+  if(index > NUM_BLOCKS - 1)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
