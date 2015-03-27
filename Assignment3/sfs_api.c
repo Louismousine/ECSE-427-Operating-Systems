@@ -23,7 +23,6 @@
 #define START INODE_TABLE + INODE_TABLE_SIZE
 
 #define FILENAME "my.sfs"
-
 #define ALIGN(x)((x/BLOCKSIZE + 1) * BLOCKSIZE)
 
 typedef struct directoryEntry
@@ -47,15 +46,15 @@ typedef struct fileDescriptorEntry
   unsigned int rwPointer;
 } fileDescriptorEntry;
 
-int createInodeTable();
-int createRootDir();
-int createSuperblock();
+int createInodeTable();             //create i-node table
+int createRootDir();                //create a root directory
+int createSuperblock();             //create a superblock
 int createFreelist();               //create a freelist as bitmap
 void setFree(unsigned int index);   //set index to free in FREELIST
 void setAlloc(unsigned int index);  //set index to allocated in FREELIST
 int findFree();                     //find next free block in sfs
 
-
+//set up global data structures and variables
 int dirLoc = 0;
 int numFiles;
 directoryEntry *rootDir;
@@ -66,7 +65,7 @@ int mksfs(int fresh)
 {
   if(fresh == 1)
   {
-    if(access(FILENAME, F_OK) != -1)
+    if(access(FILENAME, F_OK) != -1)  //if filesystem already exists delete it
       unlink(FILENAME);
 
     if(init_fresh_disk(FILENAME, BLOCKSIZE, NUM_BLOCKS) != 0)
@@ -75,33 +74,31 @@ int mksfs(int fresh)
       return -1;
     }
 
-    if(createSuperblock() != 0)
+    if(createSuperblock() != 0)   //create superblock
     {
       fprintf(stderr, "Error creating superblock");
       return -1;
     }
 
 
-    if(createFreeList() != 0)
+    if(createFreeList() != 0)     //create freelist
     {
       fprintf(stderr, "Error creating free list\n");
       return -1;
     }
-    //setAlloc(SUPERBLOCK);
-    //setAlloc(FREELIST);
 
-    if(createRootDir() != 0)
+    if(createRootDir() != 0)      //create root directory
     {
       fprintf(stderr, "Error creating root directory\n");
       return -1;
     }
 
-    if(createInodeTable() != 0)
+    if(createInodeTable() != 0)   //create i-node table
     {
       fprintf(stderr, "Error creating i-node table\n");
       return -1;
     }
-
+    //allocate memory for directory i-node
     inodeEntry *inode = malloc(ALIGN((MAX_FILES+1)*sizeof(inodeEntry)));
     read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inode);
     if(inode == NULL)
@@ -132,10 +129,8 @@ int mksfs(int fresh)
         buff[k - 12] = DIRECTORY_LOCATION + k;
         write_blocks(START+ inode[0].singleIndirectPtr, 1, buff);
         free(buff);
-        //setAlloc(DIRECTORY_LOCATION + k);
       } else {
         inode[0].directptr[k] = DIRECTORY_LOCATION + k;
-        //setAlloc(DIRECTORY_LOCATION + k);
       }
     }
     //update the inode and free main memory
@@ -160,7 +155,7 @@ int mksfs(int fresh)
   }
 
   read_blocks(SUPERBLOCK, SUPERBLOCK_SIZE, superblock);
-
+  //allocate main memory for directory
   rootDir = malloc(ALIGN(sizeof(directoryEntry)*MAX_FILES));
 
 
@@ -171,7 +166,7 @@ int mksfs(int fresh)
   }
 
   read_blocks(DIRECTORY_LOCATION, DIRECTORY_SIZE, rootDir);
-
+  //allocate memory for i-node table
   inodeTable = malloc(ALIGN(sizeof(inodeEntry)*(MAX_FILES+1)));
 
   if(inodeTable == NULL)
@@ -189,7 +184,6 @@ int mksfs(int fresh)
 //open or create file with given name
 int sfs_fopen(char *name)
 {
-  // setAlloc(5000);
   if(strlen(name) > MAXFILENAME) //check to see if filename is of correct size
   {
     fprintf(stderr, "File name too long\n");
@@ -201,11 +195,8 @@ int sfs_fopen(char *name)
     fprintf(stderr, "File system not initiallized\n");
     return -1;
   }
-
-
   //search for file
   int i;
-
   for(i = 0; i < MAX_FILES; i++)
   {
     if(strncmp(rootDir[i].filename, name, MAXFILENAME + 1) == 0 )
@@ -215,7 +206,6 @@ int sfs_fopen(char *name)
         fprintf(stderr, "Error bad inode link");
         return -1;
       }
-      //fprintf(stderr, "file found, opening");
       int j,entry = -1;
       //Check to see if file is already open
       for(j = 0; j < numFiles; j++)
@@ -253,12 +243,9 @@ int sfs_fopen(char *name)
         fprintf(stderr, "Error opening requested file\n");
         return -1;
       }
-
+      //update file descriptor data
       update->rwPointer = inodeTable[rootDir[i].inode].size;
       update->inode = rootDir[i].inode;
-      //fprintf(stderr, "inode:%d\n", update->inode);
-      //fprintf(stderr, "filename:%s\n", rootDir[i].filename);
-      //fprintf(stderr, "fileID%d\n", entry);
       return entry;
     }
   }
@@ -278,7 +265,6 @@ int sfs_fopen(char *name)
         if(descriptorTable[j] == NULL)
         {
           descriptorTable[j] = malloc(sizeof(fileDescriptorEntry));
-          // assert(descriptorTable[j]);
           entry = j;
           break;
         }
@@ -306,7 +292,7 @@ int sfs_fopen(char *name)
       }
       int inode = -1;
       int k;
-      for(k = 1; k < MAX_FILES+1; k++)
+      for(k = 1; k < MAX_FILES+1; k++)  //find free i-node
       {
         if(inodeTable[k].mode == 0)
         {
@@ -326,7 +312,7 @@ int sfs_fopen(char *name)
         return -1;
 
       setAlloc(writeLoc);
-
+      //update file descriptor entry
       newEntry->rwPointer = 0;
       newEntry->inode = inode;
 
@@ -341,12 +327,10 @@ int sfs_fopen(char *name)
       inodeTable[inode].mode = 1;
       inodeTable[inode].directptr[0] = writeLoc;
       write_blocks(INODE_TABLE,INODE_TABLE_SIZE,inodeTable);
-      //fprintf(stderr, "inode:%d\n", newEntry->inode);
-      //fprintf(stderr, "filename:%s\n", rootDir[i].filename);
       return entry;
     }
   }
-  return -1;
+  return -1;  //return -1 on failure
 }
 
 int sfs_fclose(int fileID)
@@ -380,7 +364,7 @@ int sfs_remove(char *file) //remove file from disk
         {
           unsigned int *buff = malloc(BLOCKSIZE);
           read_blocks(START+ inodeRemove->singleIndirectPtr, 1, buff);
-
+          //update i-node link count
           for(k = 0; k < inodeRemove->linkCount - 12; k++)
           {
             setFree(buff[k]);
@@ -396,7 +380,7 @@ int sfs_remove(char *file) //remove file from disk
           setFree(inodeRemove->directptr[k]);
           inodeRemove->directptr[k] = 5000;
         }
-
+        //update i-node data
         inodeRemove->mode = 0;
         inodeRemove->linkCount = 0;
         inodeRemove->size = 0;
@@ -459,10 +443,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
 
   fileDescriptorEntry *writeFile = descriptorTable[fileID];
   inodeEntry *inode = &(inodeTable[writeFile->inode]);
-  //fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID, numFiles, length);
-  //fprintf(stderr, "inode:%d\n", writeFile->inode);
-  //fprintf(stderr, "inode size:%d\n", inode->size);
-
+  //check for valid file descriptor entry
   if(writeFile->inode == 5000)
   {
     fprintf(stderr, "Error, bad inode link");
@@ -470,13 +451,13 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   }
   char *diskBuffer = malloc(BLOCKSIZE);
 
-  int block = (writeFile->rwPointer)/BLOCKSIZE;  //get block location to write to
+  int block = (writeFile->rwPointer)/BLOCKSIZE;   //get block location to write to
   int bytes = (writeFile->rwPointer)%BLOCKSIZE;   //get exact byte location to write to
-  int eofBlock = (inode->size)/BLOCKSIZE;
-  //int i;
+  int eofBlock = (inode->size)/BLOCKSIZE;         //get end of file block
+
   unsigned int writeLoc;
   int offset = 0;
-  if(block > 139)
+  if(block > 139) //if we have reached max file size return error
   {
     fprintf(stderr, "Error, write exceeded max file size\n");
     return -1;
@@ -494,11 +475,11 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     fprintf(stderr, "Error, -1 writeLoc");
     return -1;
   }
-  while(length > 0)
+  while(length > 0) //perform write and shift data if still data to write
   {
     read_blocks(START + writeLoc, 1, diskBuffer);
     int byteWrite;
-    if(BLOCKSIZE - bytes < length)
+    if(BLOCKSIZE - bytes < length)  //check how much to write to block
     {
       byteWrite = BLOCKSIZE - bytes;
     }else
@@ -518,7 +499,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         fprintf(stderr, "Error, write exceeded max file size\n");
         return -1;
       }else if(eofBlock < block)
-      {
+      { //set up single indirect pointer, if there is not one set up set
         if(block == 12 && inode->singleIndirectPtr == 5000)
         {
           int indirPtr = findFree();
@@ -580,10 +561,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
   fileDescriptorEntry *readFile = descriptorTable[fileID];
   inodeEntry *inode = &(inodeTable[readFile->inode]);
-  //fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID, numFiles, length);
-  //fprintf(stderr, "inode:%d\n", readFile->inode);
-  //fprintf(stderr, "inode size:%d\n", inode->size);
-
+  //check to see if file descriptor is valid
   if(readFile->inode == 5000)
   {
     fprintf(stderr, "Error, bad inode request");
@@ -620,7 +598,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
     read_blocks(START + readLoc, 1, diskBuffer);
     int bytesRead;
 
-    if(BLOCKSIZE - bytes < length)
+    if(BLOCKSIZE - bytes < length)  //check to see how much to read
     {
       bytesRead = BLOCKSIZE - bytes;
     }else
@@ -628,7 +606,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
 
     memcpy(&buf[offset], &diskBuffer[bytes], bytesRead);
 
-    length -= (bytesRead);
+    length -= (bytesRead);  //update read counters
     offset += (bytesRead);
     bytes = 0;
 
@@ -661,7 +639,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
   return readLength;
 }
 
-int createFreeList()
+int createFreeList()    //creates free list
 {
   unsigned int *buff = malloc(BLOCKSIZE);
   if (buff == NULL)
@@ -671,7 +649,7 @@ int createFreeList()
   int i;
   for(i = 0; i < (BLOCKSIZE)/sizeof(unsigned int); i++)
   {
-    buff[i] = ~0;
+    buff[i] = ~0;   //set all bits to 1
   }
 
   write_blocks(FREELIST, FREELIST_SIZE, buff);
@@ -679,14 +657,14 @@ int createFreeList()
   return 0;
 }
 
-void setFree(unsigned int index)
+void setFree(unsigned int index)  //sets bit to free
 {
   if(index > NUM_BLOCKS)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
   }
-  int byte = index / (8*sizeof(unsigned int));
+  int byte = index / (8*sizeof(unsigned int));  //find exact location
   int bit = index % (8*sizeof(unsigned int));
 
   unsigned int *buff = malloc(BLOCKSIZE);
@@ -698,7 +676,7 @@ void setFree(unsigned int index)
   }
 
   read_blocks(FREELIST, FREELIST_SIZE, buff);
-  buff[byte] |= 1 << bit; //sets bit
+  buff[byte] |= 1 << bit; //sets bit to 1(free)
   write_blocks(FREELIST, FREELIST_SIZE, buff);
   free(buff);
 }
@@ -722,12 +700,12 @@ void setAlloc(unsigned int index) //set index to allocated in FREELIST
     return;
   }
   read_blocks(FREELIST, FREELIST_SIZE, buff);
-  buff[byte] &= ~(1 << bit);
+  buff[byte] &= ~(1 << bit);    //set bit to 0 (allocated)
   write_blocks(FREELIST, FREELIST_SIZE, buff);
   free(buff);
 }
 
-int findFree()
+int findFree() //find next free bit in bitmap
 {
   unsigned int *buff = malloc(BLOCKSIZE);
 
@@ -744,15 +722,16 @@ int findFree()
   {
     int find = ffs(buff[i]);
     if(find)
-    {
-      return find + i*8*sizeof(unsigned int) - 1;
+    { //check to see the block that is free is actually in file system
+      if(find + i*8*sizeof(unsigned int) - 1 < BLOCKSIZE)
+        return find + i*8*sizeof(unsigned int) - 1;       //return correct value
     }
   }
 
-  return -1;
+  return -1;  //if invalid return -1 (failure)
 }
 
-int createSuperblock()
+int createSuperblock()  //corretc
 {
   unsigned int *buff = malloc(BLOCKSIZE);
 
