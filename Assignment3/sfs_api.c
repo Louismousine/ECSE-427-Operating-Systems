@@ -129,8 +129,10 @@ int mksfs(int fresh)
         buff[k - 12] = DIRECTORY_LOCATION + k;
         write_blocks(inode[0].singleIndirectPtr, 1, buff);
         free(buff);
+        setAlloc(DIRECTORY_LOCATION + k);
       } else {
         inode[0].directptr[k] = DIRECTORY_LOCATION + k;
+        setAlloc(DIRECTORY_LOCATION + k);
       }
     }
     //update the inode and free main memory
@@ -658,7 +660,7 @@ int createFreeList()
 
 void setFree(unsigned int index)
 {
-  if(index > BLOCKSIZE)
+  if(index > NUM_BLOCKS)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
@@ -682,7 +684,7 @@ void setFree(unsigned int index)
 
 void setAlloc(unsigned int index) //set index to allocated in FREELIST
 {
-  if(index > BLOCKSIZE)
+  if(index > NUM_BLOCKS)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
