@@ -456,7 +456,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   int bytes = (writeFile->rwPointer)%BLOCKSIZE;   //get exact byte location to write to
   int eofBlock = (inode->size)/BLOCKSIZE;
   //int i;
-  unsigned int writeLoc=-1;
+  unsigned int writeLoc;
   int offset = 0;
   if(block > 139)
   {
