@@ -332,8 +332,6 @@ int sfs_fopen(char *name)
       inodeTable[inode].linkCount = 1;
       inodeTable[inode].mode = 1;
       inodeTable[inode].directptr[0] = writeLoc;
-      setAlloc(inodeTable[inode].singleIndirectPtr = findFree());
-
       write_blocks(INODE_TABLE,INODE_TABLE_SIZE,inodeTable);
       //fprintf(stderr, "inode:%d\n", newEntry->inode);
       //fprintf(stderr, "filename:%s\n", rootDir[i].filename);
@@ -508,12 +506,12 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         return -1;
       }else if(eofBlock < block)
       {
-        // if(block == 12)
-        // {
-        //   int indirPtr = findFree();
-        //   setAlloc(indirPtr);
-        //   inode->singleIndirectPtr = indirPtr;
-        // }
+        if(block == 12)
+        {
+          int indirPtr = findFree();
+          setAlloc(indirPtr);
+          inode->singleIndirectPtr = indirPtr;
+        }
         int next = findFree();  //find next write location
         setAlloc(next);
         if(next == -1)
@@ -664,7 +662,7 @@ int createFreeList()
 
 void setFree(unsigned int index)
 {
-  if(index > NUM_BLOCKS - 1)
+  if(index > NUM_BLOCKS)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
@@ -688,7 +686,7 @@ void setFree(unsigned int index)
 
 void setAlloc(unsigned int index) //set index to allocated in FREELIST
 {
-  if(index > NUM_BLOCKS - 1)
+  if(index > NUM_BLOCKS || index % (8*sizeof(unsigned int)) == 0)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
