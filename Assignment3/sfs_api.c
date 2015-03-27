@@ -87,8 +87,8 @@ int mksfs(int fresh)
       fprintf(stderr, "Error creating free list\n");
       return -1;
     }
-    //setAlloc(SUPERBLOCK);
-    //setAlloc(FREELIST);
+    setAlloc(SUPERBLOCK);
+    setAlloc(FREELIST);
 
     if(createRootDir() != 0)
     {
@@ -700,7 +700,7 @@ void setAlloc(unsigned int index) //set index to allocated in FREELIST
   }
 
   read_blocks(FREELIST, FREELIST_SIZE, buff);
-  if(index > NUM_BLOCKS || buff[index / (8*sizeof(unsigned int))+index % (8*sizeof(unsigned int))] == 0)
+  if(index > NUM_BLOCKS)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
@@ -794,6 +794,7 @@ int createInodeTable()
     buff[i].linkCount = 0;                            //link count
     buff[i].size = 0;                                 //size
     buff[i].singleIndirectPtr = (int) NULL;       //indirect pointers
+    setAlloc(INODE_TABLE + i);
 
     int j;
     for(j = 0; j < 12; j++)
