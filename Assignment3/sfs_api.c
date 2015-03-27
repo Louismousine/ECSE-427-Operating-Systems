@@ -499,12 +499,12 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         return -1;
       }else if(eofBlock < block)
       {
-        if(block == 12)
-        {
-          int indirPtr = findFree();
-          setAlloc(indirPtr);
-          inode->singleIndirectPtr = indirPtr;
-        }
+        // if(block == 12)
+        // {
+        //   int indirPtr = findFree();
+        //   setAlloc(indirPtr);
+        //   inode->singleIndirectPtr = indirPtr;
+        // }
         int next = findFree();  //find next write location
         setAlloc(next);
         if(next == -1)
