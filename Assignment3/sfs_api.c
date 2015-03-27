@@ -376,6 +376,7 @@ int sfs_remove(char *file) //remove file from disk
           free(buff);
 
           inodeRemove->linkCount = inodeRemove->linkCount - 12;
+          setFree(singleIndirectPtr);
           inodeRemove->singleIndirectPtr = (int) NULL;
         }
         for(k = 0; k < 12; k++)
@@ -386,7 +387,7 @@ int sfs_remove(char *file) //remove file from disk
 
         inodeRemove->mode = 0;
         inodeRemove->linkCount = 0;
-
+        inodeRemove->size = 0;
         write_blocks(INODE_TABLE, INODE_TABLE_SIZE, inodeTable); //update inode data on disk
         return 0;
     }
@@ -501,12 +502,12 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         return -1;
       }else if(eofBlock < block)
       {
-        // if(block == 12)
-        // {
-        //   int indirPtr = findFree();
-        //   setAlloc(indirPtr);
-        //   inode->singleIndirectPtr = indirPtr;
-        // }
+        if(block == 12)
+        {
+          int indirPtr = findFree();
+          setAlloc(indirPtr);
+          inode->singleIndirectPtr = indirPtr;
+        }
         int next = findFree();  //find next write location
         setAlloc(next);
         if(next == -1)
@@ -786,12 +787,12 @@ int createInodeTable()
     buff[i].mode = 0;                                 //mode
     buff[i].linkCount = 0;                            //link count
     buff[i].size = 0;                                 //size
-    buff[i].singleIndirectPtr = (int) NULL;       //indirect pointers
+    buff[i].singleIndirectPtr = 5000;       //indirect pointers
 
     int j;
     for(j = 0; j < 12; j++)
     {
-      buff[i].directptr[j] = (int) NULL;
+      buff[i].directptr[j] = 5000;
     }
   }
 
