@@ -80,12 +80,14 @@ int mksfs(int fresh)
       fprintf(stderr, "Error creating superblock");
       return -1;
     }
+    setAlloc(SUPERBLOCK);
 
     if(createFreeList() != 0)
     {
       fprintf(stderr, "Error creating free list\n");
       return -1;
     }
+    setAlloc(FREELIST);
 
     if(createRootDir() != 0)
     {
@@ -97,6 +99,11 @@ int mksfs(int fresh)
     {
       fprintf(stderr, "Error creating i-node table\n");
       return -1;
+    }
+    int p;
+    for(p = INODE_TABLE; p < INODE_TABLE + INODE_TABLE_SIZE; p++)
+    {
+      setAlloc(p);
     }
 
     inodeEntry *inode = malloc(ALIGN((MAX_FILES+1)*sizeof(inodeEntry)));
@@ -621,7 +628,7 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
       {
         fprintf(stderr, "Error, read exceeded max file size\n");
         return -1;
-      }else if(block > 11)          //update i-node associated with file
+      }else if(block > 11)
       {
         unsigned int *nextBuff = malloc(BLOCKSIZE);
         read_blocks(inode->singleIndirectPtr, 1, nextBuff);
