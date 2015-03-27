@@ -290,6 +290,7 @@ int sfs_fopen(char *name)
           descriptorTable = malloc(sizeof(fileDescriptorEntry*));
         else
           descriptorTable = realloc(descriptorTable, (1+numFiles)*(sizeof(fileDescriptorEntry*)));
+
         descriptorTable[numFiles] = (fileDescriptorEntry *) malloc(sizeof(fileDescriptorEntry));
         entry = numFiles;
         numFiles++;
@@ -518,7 +519,7 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         return -1;
       }else if(eofBlock < block)
       {
-        if(block == 12)
+        if(block == 12 && inode->singleIndirectPtr == 5000)
         {
           int indirPtr = findFree();
           setAlloc(indirPtr);
