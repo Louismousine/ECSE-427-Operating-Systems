@@ -106,89 +106,89 @@ main(int argc, char **argv)
 
   fprintf(stderr, "Two files created with zero length:\n");
 
-  // for (i = 0; i < 2; i++) {
-  //   for (j = 0; j < filesize[i]; j += chunksize) {
-  //     if ((filesize[i] - j) < 10) {
-  //       chunksize = filesize[i] - j;
-  //     }
-  //     else {
-  //       chunksize = (rand() % (filesize[i] - j)) + 1;
-  //     }
-  //
-  //     if ((buffer = malloc(chunksize)) == NULL) {
-  //       fprintf(stderr, "ABORT: Out of memory!\n");
-  //       exit(-1);
-  //     }
-  //     for (k = 0; k < chunksize; k++) {
-  //       buffer[k] = (char) (j+k);
-  //     }
-  //     tmp = sfs_fwrite(fds[i], buffer, chunksize);
-  //     if (tmp != chunksize) {
-  //       fprintf(stderr, "ERROR: Tried to write %d bytes, but wrote %d\n",
-  //               chunksize, tmp);
-  //       error_count++;
-  //     }
-  //     free(buffer);
-  //   }
-  // }
-  // // char readTest[filesize[0]];
-  // // sfs_fread(0, &readTest, filesize[0]);
-  // // fprintf(stderr, "%s\n", readTest);
-  // if (sfs_fclose(fds[1]) != 0) {
-  //   fprintf(stderr, "ERROR: close of handle %d failed\n", fds[1]);
-  //   error_count++;
-  // }
-  //
-  // /* Sneaky attempt to close already closed file handle. */
-  // if (sfs_fclose(fds[1]) == 0) {
-  //   fprintf(stderr, "ERROR: close of stale handle %d succeeded\n", fds[1]);
-  //   error_count++;
-  // }
-  //
-  // fprintf(stderr, "File %s now has length %d and %s now has length %d:\n",
-  //        names[0], filesize[0], names[1], filesize[1]);
-  //
-  // /* Just to be cruel - attempt to read from a closed file handle.
-  //  */
-  // if (sfs_fread(fds[1], fixedbuf, sizeof(fixedbuf)) > 0) {
-  //   fprintf(stderr, "ERROR: read from a closed file handle?\n");
-  //   error_count++;
-  // }
-  //
-  // fds[1] = sfs_fopen(names[1]);
-  //
-  // sfs_fseek(0, 0);
-  // sfs_fseek(1, 0);
-  //
-  // for (i = 0; i < 2; i++) {
-  //   for (j = 0; j < filesize[i]; j += chunksize) {
-  //     if ((filesize[i] - j) < 10) {
-  //       chunksize = filesize[i] - j;
-  //     }
-  //     else {
-  //       chunksize = (rand() % (filesize[i] - j)) + 1;
-  //     }
-  //     if ((buffer = malloc(chunksize)) == NULL) {
-  //       fprintf(stderr, "ABORT: Out of memory!\n");
-  //       exit(-1);
-  //     }
-  //     readsize = sfs_fread(fds[i], buffer, chunksize);
-  //
-  //     if (readsize != chunksize) {
-  //       fprintf(stderr, "ERROR: Requested %d bytes, read %d\n", chunksize, readsize);
-  //       readsize = chunksize;
-  //     }
-  //     for (k = 0; k < readsize; k++) {
-  //       if (buffer[k] != (char)(j+k)) {
-  //         fprintf(stderr, "ERROR: data error at offset %d in file %s (%d,%d)\n",
-  //                 j+k, names[i], buffer[k], (char)(j+k));
-  //         error_count++;
-  //         //break;
-  //       }
-  //     }
-  //     free(buffer);
-  //   }
-  // }
+  for (i = 0; i < 2; i++) {
+    for (j = 0; j < filesize[i]; j += chunksize) {
+      if ((filesize[i] - j) < 10) {
+        chunksize = filesize[i] - j;
+      }
+      else {
+        chunksize = (rand() % (filesize[i] - j)) + 1;
+      }
+
+      if ((buffer = malloc(chunksize)) == NULL) {
+        fprintf(stderr, "ABORT: Out of memory!\n");
+        exit(-1);
+      }
+      for (k = 0; k < chunksize; k++) {
+        buffer[k] = (char) (j+k);
+      }
+      tmp = sfs_fwrite(fds[i], buffer, chunksize);
+      if (tmp != chunksize) {
+        fprintf(stderr, "ERROR: Tried to write %d bytes, but wrote %d\n",
+                chunksize, tmp);
+        error_count++;
+      }
+      free(buffer);
+    }
+  }
+  // char readTest[filesize[0]];
+  // sfs_fread(0, &readTest, filesize[0]);
+  // fprintf(stderr, "%s\n", readTest);
+  if (sfs_fclose(fds[1]) != 0) {
+    fprintf(stderr, "ERROR: close of handle %d failed\n", fds[1]);
+    error_count++;
+  }
+
+  /* Sneaky attempt to close already closed file handle. */
+  if (sfs_fclose(fds[1]) == 0) {
+    fprintf(stderr, "ERROR: close of stale handle %d succeeded\n", fds[1]);
+    error_count++;
+  }
+
+  fprintf(stderr, "File %s now has length %d and %s now has length %d:\n",
+         names[0], filesize[0], names[1], filesize[1]);
+
+  /* Just to be cruel - attempt to read from a closed file handle.
+   */
+  if (sfs_fread(fds[1], fixedbuf, sizeof(fixedbuf)) > 0) {
+    fprintf(stderr, "ERROR: read from a closed file handle?\n");
+    error_count++;
+  }
+
+  fds[1] = sfs_fopen(names[1]);
+
+  sfs_fseek(0, 0);
+  sfs_fseek(1, 0);
+
+  for (i = 0; i < 2; i++) {
+    for (j = 0; j < filesize[i]; j += chunksize) {
+      if ((filesize[i] - j) < 10) {
+        chunksize = filesize[i] - j;
+      }
+      else {
+        chunksize = (rand() % (filesize[i] - j)) + 1;
+      }
+      if ((buffer = malloc(chunksize)) == NULL) {
+        fprintf(stderr, "ABORT: Out of memory!\n");
+        exit(-1);
+      }
+      readsize = sfs_fread(fds[i], buffer, chunksize);
+
+      if (readsize != chunksize) {
+        fprintf(stderr, "ERROR: Requested %d bytes, read %d\n", chunksize, readsize);
+        readsize = chunksize;
+      }
+      for (k = 0; k < readsize; k++) {
+        if (buffer[k] != (char)(j+k)) {
+          fprintf(stderr, "ERROR: data error at offset %d in file %s (%d,%d)\n",
+                  j+k, names[i], buffer[k], (char)(j+k));
+          error_count++;
+          //break;
+        }
+      }
+      free(buffer);
+    }
+  }
 
   for (i = 0; i < 2; i++) {
     if (sfs_fclose(fds[i]) != 0) {
