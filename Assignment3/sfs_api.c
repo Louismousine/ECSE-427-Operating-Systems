@@ -81,11 +81,14 @@ int mksfs(int fresh)
       return -1;
     }
 
+
     if(createFreeList() != 0)
     {
       fprintf(stderr, "Error creating free list\n");
       return -1;
     }
+    setAlloc(SUPERBLOCK);
+    setAlloc(FREELIST);
 
     if(createRootDir() != 0)
     {
@@ -181,9 +184,6 @@ int mksfs(int fresh)
 
   numFiles = 0;
   descriptorTable = NULL;
-  setAlloc(SUPERBLOCK);
-
-  setAlloc(FREELIST);
   return 0;
 }
 //open or create file with given name
@@ -700,7 +700,7 @@ void setAlloc(unsigned int index) //set index to allocated in FREELIST
   }
 
   read_blocks(FREELIST, FREELIST_SIZE, buff);
-  if(index > NUM_BLOCKS || buff[index] == 0)
+  if(index > NUM_BLOCKS || buff[index / (8*sizeof(unsigned int))+index % (8*sizeof(unsigned int))] == 0)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
