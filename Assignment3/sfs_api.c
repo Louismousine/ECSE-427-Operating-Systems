@@ -100,11 +100,6 @@ int mksfs(int fresh)
       fprintf(stderr, "Error creating i-node table\n");
       return -1;
     }
-    int p;
-    for(p = 0; p < START; p++)
-    {
-      setAlloc(p);
-    }
 
     inodeEntry *inode = malloc(ALIGN((MAX_FILES+1)*sizeof(inodeEntry)));
     read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inode);
