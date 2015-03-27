@@ -214,7 +214,7 @@ int sfs_fopen(char *name)
       //Check to see if file is already open
       for(j = 0; j < numFiles; j++)
       {
-        if(descriptorTable[j] && rootDir[i].inode == descriptorTable[j]->inode)
+        if(descriptorTable[j] && rootDir[i].inode == descriptorTable[j]->inode && rootDir[i].inode != 5000)
         {
           return j;
         }
@@ -367,7 +367,7 @@ int sfs_remove(char *file) //remove file from disk
       int inode = removeEntry->inode;
       strcpy(removeEntry->filename, "\0");
       inodeEntry *inodeRemove = &(inodeTable[inode]);
-      removeEntry->inode = (int) NULL;
+      removeEntry->inode = 5000;
       int k;
         if(inodeRemove->linkCount > 12) //update i-node data
         {
@@ -382,12 +382,12 @@ int sfs_remove(char *file) //remove file from disk
 
           inodeRemove->linkCount = inodeRemove->linkCount - 12;
           setFree(inodeRemove->singleIndirectPtr);
-          inodeRemove->singleIndirectPtr = (int) NULL;
+          inodeRemove->singleIndirectPtr = 5000;
         }
         for(k = 0; k < 12; k++)
         {
           setFree(inodeRemove->directptr[k]);
-          inodeRemove->directptr[k] = (int) NULL;
+          inodeRemove->directptr[k] = 5000;
         }
 
         inodeRemove->mode = 0;
@@ -770,7 +770,7 @@ int createRootDir()
   int i;
   for(i = 0; i < MAX_FILES; i++)
   {
-    buff[i] = (directoryEntry){.filename = "\0",.inode = (int) NULL};
+    buff[i] = (directoryEntry){.filename = "\0",.inode = 5000};
   }
 
   write_blocks(DIRECTORY_LOCATION, DIRECTORY_SIZE, buff);
@@ -793,13 +793,13 @@ int createInodeTable()
     buff[i].mode = 0;                                 //mode
     buff[i].linkCount = 0;                            //link count
     buff[i].size = 0;                                 //size
-    buff[i].singleIndirectPtr = (int) NULL;       //indirect pointers
+    buff[i].singleIndirectPtr = 5000;       //indirect pointers
     setAlloc(INODE_TABLE + i);
 
     int j;
     for(j = 0; j < 12; j++)
     {
-      buff[i].directptr[j] = (int) NULL;
+      buff[i].directptr[j] = 5000;
     }
   }
 
