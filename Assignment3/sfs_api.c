@@ -376,7 +376,7 @@ int sfs_remove(char *file) //remove file from disk
           free(buff);
 
           inodeRemove->linkCount = inodeRemove->linkCount - 12;
-          setFree(singleIndirectPtr);
+          setFree(inodeRemove->singleIndirectPtr);
           inodeRemove->singleIndirectPtr = (int) NULL;
         }
         for(k = 0; k < 12; k++)
