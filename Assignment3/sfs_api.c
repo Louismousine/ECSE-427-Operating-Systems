@@ -87,8 +87,8 @@ int mksfs(int fresh)
       fprintf(stderr, "Error creating free list\n");
       return -1;
     }
-    setAlloc(SUPERBLOCK);
-    setAlloc(FREELIST);
+    //setAlloc(SUPERBLOCK);
+    //setAlloc(FREELIST);
 
     if(createRootDir() != 0)
     {
