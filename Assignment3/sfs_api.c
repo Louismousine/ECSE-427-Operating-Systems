@@ -23,15 +23,15 @@
 #define START INODE_TABLE + INODE_TABLE_SIZE
 
 #define FILENAME "my.sfs"
-#define ALIGN(x)((x/BLOCKSIZE + 1) * BLOCKSIZE)
+#define ALIGN(x)((x/BLOCKSIZE + 1) * BLOCKSIZE) //align x to next largest block size
 
-typedef struct directoryEntry
+typedef struct directoryEntry       //data type for directories
 {
   char filename[MAXFILENAME + 1];
   unsigned int inode;
 } directoryEntry;
 
-typedef struct inodeEntry
+typedef struct inodeEntry           //data type for inodes
 {
   unsigned int mode;
   unsigned int linkCount;
@@ -40,7 +40,7 @@ typedef struct inodeEntry
   unsigned int singleIndirectPtr;
 } inodeEntry;
 
-typedef struct fileDescriptorEntry
+typedef struct fileDescriptorEntry  //data type for file descriptors
 {
   unsigned int inode;
   unsigned int rwPointer;
@@ -136,7 +136,6 @@ int mksfs(int fresh)
     //update the inode and free main memory
     write_blocks(INODE_TABLE, INODE_TABLE_SIZE, inode);
     free(inode);
-
   }else if(fresh == 0) // initialize file system from an already existing file system
   {
     if(init_disk(FILENAME, BLOCKSIZE, NUM_BLOCKS) != 0)
@@ -153,18 +152,15 @@ int mksfs(int fresh)
     fprintf(stderr, "Error allocating main memory for superblock\n");
     return -1;
   }
-
   read_blocks(SUPERBLOCK, SUPERBLOCK_SIZE, superblock);
   //allocate main memory for directory
   rootDir = malloc(ALIGN(sizeof(directoryEntry)*MAX_FILES));
-
 
   if(rootDir == NULL)
   {
     fprintf(stderr, "Error allocating main memory for directory\n");
     return -1;
   }
-
   read_blocks(DIRECTORY_LOCATION, DIRECTORY_SIZE, rootDir);
   //allocate memory for i-node table
   inodeTable = malloc(ALIGN(sizeof(inodeEntry)*(MAX_FILES+1)));
@@ -176,7 +172,6 @@ int mksfs(int fresh)
   }
 
   read_blocks(INODE_TABLE, INODE_TABLE_SIZE, inodeTable);
-
   numFiles = 0;
   descriptorTable = NULL;
   return 0;
@@ -249,7 +244,6 @@ int sfs_fopen(char *name)
       return entry;
     }
   }
-
   //since file does not exist create new one
   for(i = 0; i < MAX_FILES; i++)
   {
@@ -257,7 +251,6 @@ int sfs_fopen(char *name)
     if(strncmp(rootDir[i].filename, "\0", 1) == 0 && rootDir[i].inode == 5000)
     {
       int entry = -1;
-
       int j;
       //create a file descriptor slot for file
       for(j = 0; j < numFiles; j++)
@@ -281,7 +274,6 @@ int sfs_fopen(char *name)
         entry = numFiles;
         numFiles++;
       }
-
       //allocate inode for new entry
       fileDescriptorEntry *newEntry = descriptorTable[entry];
 
@@ -341,7 +333,6 @@ int sfs_fclose(int fileID)
     fprintf(stderr, "File has already been closed\n");
     return -1;
   }
-
   free(descriptorTable[fileID]);
   descriptorTable[fileID] = NULL;
   return 0;
@@ -425,7 +416,6 @@ int sfs_fseek(int fileID, int offset) //error if user tries to seek past eof or 
     fprintf(stderr, "Error seeking to requested location in requested file\n");
     return -1;
   }
-
   //shift read and write pointers to offset return 0 for success
   descriptorTable[fileID]->rwPointer = offset;
   return 0;
@@ -450,7 +440,6 @@ int sfs_fwrite(int fileID, const char *buf, int length)
     return -1;
   }
   char *diskBuffer = malloc(BLOCKSIZE);
-
   int block = (writeFile->rwPointer)/BLOCKSIZE;   //get block location to write to
   int bytes = (writeFile->rwPointer)%BLOCKSIZE;   //get exact byte location to write to
   int eofBlock = (inode->size)/BLOCKSIZE;         //get end of file block
@@ -533,7 +522,6 @@ int sfs_fwrite(int fileID, const char *buf, int length)
         }else
           writeLoc = inode->directptr[block];
       }
-
     }
   }
   //update size of file in inode entry
@@ -557,8 +545,6 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
     fprintf(stderr, "Error in read request\n");
     return -1;
   }
-
-
   fileDescriptorEntry *readFile = descriptorTable[fileID];
   inodeEntry *inode = &(inodeTable[readFile->inode]);
   //check to see if file descriptor is valid
@@ -567,7 +553,6 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
     fprintf(stderr, "Error, bad inode request");
     return -1;
   }
-
   if(readFile->rwPointer + length > inode->size)
   {
     length = inode->size - readFile->rwPointer;
@@ -628,11 +613,8 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
         free(nextBuff);
       }else
         readLoc = inode->directptr[block];
-
-
     }
   }
-
   free(diskBuffer);
   //update r/w pointer in descriptor table
   readFile->rwPointer += readLength;
@@ -651,7 +633,6 @@ int createFreeList()    //creates free list
   {
     buff[i] = ~0;   //set all bits to 1
   }
-
   write_blocks(FREELIST, FREELIST_SIZE, buff);
   free(buff);
   return 0;
@@ -666,7 +647,6 @@ void setFree(unsigned int index)  //sets bit to free
   }
   int byte = index / (8*sizeof(unsigned int));  //find exact location
   int bit = index % (8*sizeof(unsigned int));
-
   unsigned int *buff = malloc(BLOCKSIZE);
 
   if(buff == NULL)
@@ -674,7 +654,6 @@ void setFree(unsigned int index)  //sets bit to free
     fprintf(stderr, "Error assigning free bit\n");
     return;
   }
-
   read_blocks(FREELIST, FREELIST_SIZE, buff);
   buff[byte] |= 1 << bit; //sets bit to 1(free)
   write_blocks(FREELIST, FREELIST_SIZE, buff);
@@ -683,10 +662,8 @@ void setFree(unsigned int index)  //sets bit to free
 
 void setAlloc(unsigned int index) //set index to allocated in FREELIST
 {
-
   int byte = index / (8*sizeof(unsigned int));  //find byte to change
   int bit = index % (8*sizeof(unsigned int));   //find bit to change
-
   unsigned int *buff = malloc(BLOCKSIZE);
 
   if(buff == NULL)
@@ -716,7 +693,6 @@ int findFree() //find next free bit in bitmap
   }
 
   read_blocks(FREELIST, FREELIST_SIZE, buff);
-
   int i;
   for(i = 0; i < (BLOCKSIZE)/sizeof(unsigned int); i++)
   {
@@ -727,11 +703,10 @@ int findFree() //find next free bit in bitmap
         return find + i*8*sizeof(unsigned int) - 1;       //return correct value
     }
   }
-
   return -1;  //if invalid return -1 (failure)
 }
 
-int createSuperblock()  //corretc
+int createSuperblock()  //create superblock
 {
   unsigned int *buff = malloc(BLOCKSIZE);
 
@@ -739,6 +714,7 @@ int createSuperblock()  //corretc
   {
     return -1;
   }
+  //set up all important superblock data
   buff[0] = MAGIC_NUMBER;
   buff[1] = BLOCKSIZE;
   buff[2] = NUM_BLOCKS;
@@ -754,7 +730,7 @@ int createSuperblock()  //corretc
   return 0;
 }
 
-int createRootDir()
+int createRootDir() //create root directory
 {
   directoryEntry *buff = malloc(ALIGN(MAX_FILES*sizeof(directoryEntry)));
 
@@ -762,19 +738,18 @@ int createRootDir()
   {
     return -1;
   }
-
   int i;
   for(i = 0; i < MAX_FILES; i++)
   {
+    //set up directory values
     buff[i] = (directoryEntry){.filename = "\0",.inode = 5000};
   }
-
   write_blocks(DIRECTORY_LOCATION, DIRECTORY_SIZE, buff);
   free(buff);
   return 0;
 }
 
-int createInodeTable()
+int createInodeTable()  //create i-node table
 {
   inodeEntry *buff = malloc(ALIGN((MAX_FILES+1)*sizeof(inodeEntry)));
 
@@ -782,23 +757,20 @@ int createInodeTable()
   {
     return -1;
   }
-
   int i;
+  //set up i-node table
   for(i = 0; i < MAX_FILES+1; i++)
   {
-    buff[i].mode = 0;                                 //mode
-    buff[i].linkCount = 0;                            //link count
-    buff[i].size = 0;                                 //size
+    buff[i].mode = 0;                       //mode
+    buff[i].linkCount = 0;                  //link count
+    buff[i].size = 0;                       //size
     buff[i].singleIndirectPtr = 5000;       //indirect pointers
-    //setAlloc(INODE_TABLE + i);
-
     int j;
     for(j = 0; j < 12; j++)
     {
-      buff[i].directptr[j] = 5000;
+      buff[i].directptr[j] = 5000;         //direct pointers
     }
   }
-
   write_blocks(INODE_TABLE, INODE_TABLE_SIZE, buff);
   free(buff);
   return 0;
