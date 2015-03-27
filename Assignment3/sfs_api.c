@@ -202,13 +202,19 @@ int sfs_fopen(char *name)
     return -1;
   }
 
+
   //search for file
   int i;
 
   for(i = 0; i < MAX_FILES; i++)
   {
-    if(strncmp(rootDir[i].filename, name, MAXFILENAME + 1) == 0)
+    if(strncmp(rootDir[i].filename, name, MAXFILENAME + 1) == 0 )
     {
+      if(rootDir[i].inode == 5000)
+      {
+        fprintf(stderr, "Error bad inode link");
+        return -1;
+      }
       //fprintf(stderr, "file found, opening");
       int j,entry = -1;
       //Check to see if file is already open
@@ -261,7 +267,7 @@ int sfs_fopen(char *name)
   for(i = 0; i < MAX_FILES; i++)
   {
     //find spot in directory
-    if(strncmp(rootDir[i].filename, "\0", 1) == 0)
+    if(strncmp(rootDir[i].filename, "\0", 1) == 0 && rootDir[i].inode == 5000)
     {
       int entry = -1;
 
@@ -361,7 +367,7 @@ int sfs_remove(char *file) //remove file from disk
   int i;  //seatch for desginated file
   for(i = 0; i < MAX_FILES; i++);
   {
-    if(strncmp(rootDir[i].filename, file, MAXFILENAME + 1) == 0)  //if we find the file remove data and set space to free
+    if(strncmp(rootDir[i].filename, file, MAXFILENAME + 1) == 0 && rootDir[i].inode != 5000)  //if we find the file remove data and set space to free
     {
       directoryEntry *removeEntry = &(rootDir[i]);  //update root directory
       int inode = removeEntry->inode;
@@ -456,6 +462,11 @@ int sfs_fwrite(int fileID, const char *buf, int length)
   //fprintf(stderr, "inode:%d\n", writeFile->inode);
   //fprintf(stderr, "inode size:%d\n", inode->size);
 
+  if(writeFile->inode == 5000)
+  {
+    fprintf(stderr, "Error, bad inode link");
+    return -1;
+  }
   char *diskBuffer = malloc(BLOCKSIZE);
 
   int block = (writeFile->rwPointer)/BLOCKSIZE;  //get block location to write to
@@ -571,6 +582,12 @@ int sfs_fread(int fileID, char *buf, int length) //returns -1 for failure
   //fprintf(stderr, "fileID %d\n numfiles %d\n length %d\n", fileID, numFiles, length);
   //fprintf(stderr, "inode:%d\n", readFile->inode);
   //fprintf(stderr, "inode size:%d\n", inode->size);
+
+  if(readFile->inode == 5000)
+  {
+    fprintf(stderr, "Error, bad inode request");
+    return -1;
+  }
 
   if(readFile->rwPointer + length > inode->size)
   {
