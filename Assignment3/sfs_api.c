@@ -87,8 +87,8 @@ int mksfs(int fresh)
       fprintf(stderr, "Error creating free list\n");
       return -1;
     }
-    setAlloc(SUPERBLOCK);
-    setAlloc(FREELIST);
+    //setAlloc(SUPERBLOCK);
+    //setAlloc(FREELIST);
 
     if(createRootDir() != 0)
     {
@@ -132,10 +132,10 @@ int mksfs(int fresh)
         buff[k - 12] = DIRECTORY_LOCATION + k;
         write_blocks(inode[0].singleIndirectPtr, 1, buff);
         free(buff);
-        setAlloc(DIRECTORY_LOCATION + k);
+        //setAlloc(DIRECTORY_LOCATION + k);
       } else {
         inode[0].directptr[k] = DIRECTORY_LOCATION + k;
-        setAlloc(DIRECTORY_LOCATION + k);
+        //setAlloc(DIRECTORY_LOCATION + k);
       }
     }
     //update the inode and free main memory
@@ -716,13 +716,12 @@ void setAlloc(unsigned int index) //set index to allocated in FREELIST
     fprintf(stderr, "Error assigning allocated bit\n");
     return;
   }
-
-  read_blocks(FREELIST, FREELIST_SIZE, buff);
-  if(index > NUM_BLOCKS)
+  if(index > BLOCKSIZE)
   {
     fprintf(stderr, "Error, bad allocation attempt");
     return;
   }
+  read_blocks(FREELIST, FREELIST_SIZE, buff);
   buff[byte] &= ~(1 << bit);
   write_blocks(FREELIST, FREELIST_SIZE, buff);
   free(buff);
@@ -812,7 +811,7 @@ int createInodeTable()
     buff[i].linkCount = 0;                            //link count
     buff[i].size = 0;                                 //size
     buff[i].singleIndirectPtr = 5000;       //indirect pointers
-    setAlloc(INODE_TABLE + i);
+    //setAlloc(INODE_TABLE + i);
 
     int j;
     for(j = 0; j < 12; j++)
