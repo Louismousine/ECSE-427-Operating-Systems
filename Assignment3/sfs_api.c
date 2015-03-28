@@ -1,3 +1,13 @@
+/*
+Simple File System API: I-Nodes for Unix system
+------------------------------------------------------
+Stephen Carter (C) 2015
+
+Contact: stephen.carter@mail.mcgill.ca; ID: 260500858
+
+Last Edited: March 28th 2015
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
