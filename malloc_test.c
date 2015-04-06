@@ -39,8 +39,6 @@ int main(int argc, char* argv[])
 
   buffer = my_malloc(512);
   buffer_check = malloc(512);
-  int i = 0;
-  int k = 0;
   for(i = 0; i < 512/sizeof(int); i++)
   {
     buffer[i] = i+k;
