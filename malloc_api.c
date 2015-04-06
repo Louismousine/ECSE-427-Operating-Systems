@@ -57,7 +57,7 @@ void *my_malloc(int size)
       {
         if(nextUp->size >= size)
         {   //TODO: need to modify to cut the extra space into another free list entry
-          if(nextUp-> != NULL)
+          if(nextUp->next != NULL)
             nextUp->next->prev = nextUp->prev;
           *nextAddr = nextUp->next;
           //*nextAddr->prev = &(nextUp->prev);
