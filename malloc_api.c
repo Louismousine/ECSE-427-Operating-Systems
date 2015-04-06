@@ -342,7 +342,7 @@ void my_free(void *ptr)
         *prevAddr = previous->prev;
         fprintf(stdout, "previous startTag: %d\nprevious endTag: %d\nprevious size: %d\n", previous->startTag, previous->endTag, previous->size);
       }
-      if(previous->previous == NULL)
+      if(previous->prev == NULL)
         break;
     }
 
