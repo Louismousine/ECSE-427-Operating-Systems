@@ -78,7 +78,7 @@ void *my_malloc(int size)
               nextUp->next->prev = &(newSpace);
             if(nextUp->prev != NULL)
               nextUp->prev->next = &(newSpace);
-            *nextAddr = nextUp->next;
+            *nextAddr = &(newSpace.next);
 
             nextUp->next == NULL;
             nextUp->prev == NULL;
@@ -118,7 +118,7 @@ void *my_malloc(int size)
               previous->prev->next = &(newSpace);
             if(previous->next != NULL)
               previous->next->prev = &(newSpace);
-            *prevAddr = previous->prev;
+            *prevAddr = &(newSpace.prev);
 
             previous->prev == NULL;
             previous->next == NULL;
@@ -231,7 +231,7 @@ void *my_malloc(int size)
               next->next->prev = &(newSpace);
             if(next->prev != NULL)
               next->prev->next = &(newSpace);
-            *nextOne = next->next;
+            *nextOne = &(newSpace.next);
 
             next->next == NULL;
             next->prev == NULL;
@@ -273,7 +273,7 @@ void *my_malloc(int size)
               prev->prev->next = &(newSpace);
             if(prev->next != NULL)
               prev->next->prev = &(newSpace);
-            *prevOne = prev->prev;
+            *prevOne = &(newSpace->prev);
 
             prev->next == NULL;
             prev->prev == NULL;
