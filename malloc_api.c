@@ -98,8 +98,8 @@ void *my_malloc(int size)
               nextUp->prev->next = nextUp->next;
             *nextAddr = nextUp->next;
 
-            next->next == NULL;
-            next->prev == NULL;
+            nextUp->next == NULL;
+            nextUp->prev == NULL;
 
             return ((void*) nextUp) + sizeof(freeListNode);
 
