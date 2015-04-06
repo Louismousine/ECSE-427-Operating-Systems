@@ -92,6 +92,9 @@ void *my_malloc(int size)
     nextNew->size = size + sizeof(freeListNode);
     nextNew->next = NULL;
     nextNew->prev = NULL;
+
+    fprintf(stdout, "nextNew startTag: %d\n nextNew endTag: %d\n", nextNew->startTag, nextNew->endTag);
+
     //put extra allocated memory into free list
     int newLoc = (int)sbrk(0);
     freeListNode *newNext = (freeListNode*)sbrk(correctSize -(size + sizeof(freeListNode)));
@@ -102,6 +105,9 @@ void *my_malloc(int size)
       newNext->next->prev = newNext;
     newNext->prev = &(freeListHead);
     freeListHead.next = newNext;
+
+    fprintf(stdout, "newNext startTag: %d\n newNext endTag: %d\n", newNext->startTag, newNext->endTag);
+
 
     return ((void*)nextNew) + sizeof(freeListNode);
   }else if(previous == NULL)
@@ -114,6 +120,9 @@ void *my_malloc(int size)
     prevNew->size = size + sizeof(freeListNode);
     prevNew->next = NULL;
     prevNew->prev = NULL;
+
+    fprintf(stdout, "prevNew startTag: %d\n prevNew endTag: %d\n", prevNew->startTag, prevNew->endTag);
+
     //put extra allocated memory into free list
     int newLoc = (int)sbrk(0);
     freeListNode *newPrev = (freeListNode*)sbrk(correctSize -(size + sizeof(freeListNode)));
@@ -124,6 +133,9 @@ void *my_malloc(int size)
       newPrev->prev->next = newPrev;
     newPrev->next = &(freeListHead);
     freeListHead.next = newPrev;
+
+    fprintf(stdout, "newPrev startTag: %d\n newPrev endTag: %d\n", newPrev->startTag, newPrev->endTag);
+
 
     return ((void*)prevNew) + sizeof(freeListNode);
   }
