@@ -101,6 +101,7 @@ void *my_malloc(int size)
     if(newNext->next != NULL)
       newNext->next->prev = newNext;
     newNext->prev = &(freeListHead);
+    freeListHead.next = newNext;
 
     return ((void*)nextNew) + sizeof(freeListNode);
   }else if(previous == NULL)
@@ -122,6 +123,7 @@ void *my_malloc(int size)
     if(newPrev->prev != NULL)
       newPrev->prev->next = newPrev;
     newPrev->next = &(freeListHead);
+    freeListHead.next = newPrev;
 
     return ((void*)prevNew) + sizeof(freeListNode);
   }
