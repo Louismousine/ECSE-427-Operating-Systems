@@ -7,12 +7,12 @@
 #define FIRST_FIT 1
 #define BEST_FIT 2
 
-#define FREELIST_ENTRY_SIZE sizeof(freeListNode)
+//#define FREELIST_ENTRY_SIZE sizeof(freeListNode)
 #define MAX_FREE_BLOCK 128000
 #define MALLOC_BLOCKSIZE 2048
 
 
-#define ALIGN(x) ((x/MALLOC_BLOCKSIZE+ 1) * MALLOC_BLOCKSIZE)
+#define ALIGN(x) ((x/MALLOC_BLOCKSIZE + 1) * MALLOC_BLOCKSIZE)
 
 typedef struct freeListNode
 {
@@ -93,20 +93,21 @@ void *my_malloc(int size)
     nextNew->next = NULL;
     nextNew->prev = NULL;
 
-    fprintf(stdout, "nextNew startTag: %d\n nextNew endTag: %d\n", nextNew->startTag, nextNew->endTag);
+    fprintf(stdout, "nextNew startTag: %d\nnextNew endTag: %d\nnextNew size: %d\n", nextNew->startTag, nextNew->endTag, nextNew->size);
 
     //put extra allocated memory into free list
     int newLoc = (int)sbrk(0);
-    freeListNode *newNext = (freeListNode*)sbrk(correctSize -(size + sizeof(freeListNode)));
+    freeListNode *newNext = (freeListNode*)sbrk(correctSize - size + sizeof(freeListNode));
     newNext->startTag = newLoc;
     newNext->endTag = (int)sbrk(0);
     newNext->next = freeListHead.next;
+    newNext->size = correctSize - size + sizeof(freeListNode);
     if(newNext->next != NULL)
       newNext->next->prev = newNext;
     newNext->prev = &(freeListHead);
     freeListHead.next = newNext;
 
-    fprintf(stdout, "newNext startTag: %d\n newNext endTag: %d\n", newNext->startTag, newNext->endTag);
+    fprintf(stdout, "newNext startTag: %d\nnewNext endTag: %d\nnewNext size: %d\n", newNext->startTag, newNext->endTag, newNext->size);
 
 
     return ((void*)nextNew) + sizeof(freeListNode);
@@ -121,20 +122,21 @@ void *my_malloc(int size)
     prevNew->next = NULL;
     prevNew->prev = NULL;
 
-    fprintf(stdout, "prevNew startTag: %d\n prevNew endTag: %d\n", prevNew->startTag, prevNew->endTag);
+    fprintf(stdout, "prevNew startTag: %d\nprevNew endTag: %d\nprevNew size: %d\n", prevNew->startTag, prevNew->endTag, prevNew->size);
 
     //put extra allocated memory into free list
     int newLoc = (int)sbrk(0);
-    freeListNode *newPrev = (freeListNode*)sbrk(correctSize -(size + sizeof(freeListNode)));
+    freeListNode *newPrev = (freeListNode*)sbrk(correctSize - size + sizeof(freeListNode));
     newPrev->startTag = newLoc;
     newPrev->endTag = (int)sbrk(0);
     newPrev->prev = freeListHead.prev;
+    newPrev->size= correctSize - size + sizeof(freeListNode);
     if(newPrev->prev != NULL)
       newPrev->prev->next = newPrev;
     newPrev->next = &(freeListHead);
     freeListHead.next = newPrev;
 
-    fprintf(stdout, "newPrev startTag: %d\n newPrev endTag: %d\n", newPrev->startTag, newPrev->endTag);
+    fprintf(stdout, "newPrev startTag: %d\nnewPrev endTag: %d\nnewPrev size: %d\n", newPrev->startTag, newPrev->endTag, newPrev->size);
 
 
     return ((void*)prevNew) + sizeof(freeListNode);
@@ -171,12 +173,13 @@ void my_free(void *ptr)
       //check corresponding tags, if they are equal update free list
       if(next->startTag == new->endTag)
       {
-        fprintf(stdout, "next startTag: %d\n new endTag: %d\n", next->startTag, new->endTag);
+        fprintf(stdout, "next startTag: %d\nnew endTag: %d\n", next->startTag, new->endTag);
         new->endTag = next->endTag;
         new->size += next->size;
         if(next->next != NULL)
           next->next->prev = next->prev;
         *nextAddr = next->next;
+        fprintf(stdout, "new startTag: %d\nnew endTag: %d\nnew size: %d\n", new->startTag, new->endTag, new->size);
       //check corresponding tags, if they are equal update free list
       }else if(next->endTag == new->startTag)
       {
@@ -192,12 +195,13 @@ void my_free(void *ptr)
       //check corresponding tags, if they are equal update free list
       if(previous->startTag == new->endTag)
       {
-        fprintf(stdout, "previous startTag: %d\n new endTag: %d\n", previous->startTag, new->endTag);
+        fprintf(stdout, "previous startTag: %d\nnew endTag: %d\n", previous->startTag, new->endTag);
         new->endTag = previous->endTag;
         new->size += previous->size;
         if(previous->prev != NULL)
           previous->prev->next = previous->next;
         *prevAddr = previous->prev;
+        fprintf(stdout, "previous startTag: %d\nprevious endTag: %d\nprevious size: %d\n", previous->startTag, previous->endTag, previous->size);
       //check corresponding tags, if they are equal update free list
       }else if(previous->endTag == new->startTag)
       {
