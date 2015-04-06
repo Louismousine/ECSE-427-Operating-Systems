@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-  my_mallopt(1);
+  my_mallopt(2);
   int* buffer = my_malloc(512);
   //int* buffer_check = malloc(512);
   int i = 0;
