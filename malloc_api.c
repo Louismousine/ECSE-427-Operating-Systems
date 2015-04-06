@@ -98,6 +98,9 @@ void *my_malloc(int size)
               nextUp->prev->next = nextUp->next;
             *nextAddr = nextUp->next;
 
+            next->next == NULL;
+            next->prev == NULL;
+
             return ((void*) nextUp) + sizeof(freeListNode);
 
           } else if(nextUp->size < bestSize)
@@ -119,6 +122,9 @@ void *my_malloc(int size)
             if(previous->next != NULL)
               previous->next->prev = previous->prev;
             *prevAddr = previous->prev;
+
+            previous->next == NULL;
+            previous->prev == NULL;
 
             return ((void*) previous) + sizeof(freeListNode);
 
@@ -160,6 +166,9 @@ void *my_malloc(int size)
             next->prev->next = next->next;
           *nextOne = next->next;
 
+          next->next == NULL;
+          next->prev == NULL;
+
           return ((void*) next) + sizeof(freeListNode);
         }
       }
@@ -172,6 +181,9 @@ void *my_malloc(int size)
           if(prev->next != NULL)
             prev->next->prev = prev->prev;
           *prevOne = prev->prev;
+
+          prev->next == NULL;
+          prev->prev == NULL;
 
           return ((void*) prev) + sizeof(freeListNode);
         }
@@ -267,9 +279,9 @@ void my_free(void *ptr)
   new->next = freeListHead.next;
   if(new->next != NULL)
     new->next->prev = new;
+  new->prev = &(freeListHead);
   if(new->prev != NULL)
     new->prev->next = new;
-  new->prev = &(freeListHead);
 
   freeListHead.next = new;
   freeSpace += new->size;
