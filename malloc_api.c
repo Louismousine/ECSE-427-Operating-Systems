@@ -35,10 +35,12 @@ int largestSpace = 0;
 void *my_malloc(int size)
 {
   //int tempStartTag;
+  int bestTag = 0;
+  int bestSize = 128001;
   int alignSize = size + sizeof(freeListNode);
   fprintf(stdout, "size of size: %d\n", size);
-  int correctSize = ALIGN(alignSize);
-  fprintf(stdout, "correct size is %d\n", correctSize);
+  int mallocSize = ALIGN(alignSize);
+  fprintf(stdout, "correct size is %d\n", mallocSize);
   int currentLoc = (int)sbrk(0);
 
   freeListNode *nextUp = freeListHead.next;
@@ -49,26 +51,55 @@ void *my_malloc(int size)
   //check free list for open spot
   while(nextUp != NULL || previous != NULL)
   {
-    if(currentPolicy == 1)
+    if(currentPolicy == 1)  //First fit
     {
-      if(nextUp->size >= correctSize && nextUp != NULL)
+      if(nextUp->size >= size && nextUp != NULL)
       {   //TODO: need to modify to cut the extra space into another free list entry
         nextUp->next->prev = nextUp->prev;
         *nextAddr = nextUp->next;
         //*nextAddr->prev = &(nextUp->prev);
         return ((void*) nextUp) + sizeof(freeListNode);
-      }else if (previous->size >= correctSize && previous != NULL)
+      }else if (previous->size >= size && previous != NULL)
       {
         previous->prev->next = previous->next;
         *prevAddr = previous->prev;
         //*prevAddr->next = &(previous->next);
         return ((void*) previous) + sizeof(freeListNode);
       }
-    }else if(currentPolicy == 2)
+    }else if(currentPolicy == 2) //Best Fit
     {
+      if(nextUp->size >= size && nextUp != NULL)  //find best possible in next
+      {
+        if(nextUp->size == size)
+        {
+          nextUp->next->prev = nextUp->prev;
+          *nextAddr = nextUp->next;
 
+          return ((void*) nextUp) + sizeof(freeListNode);
+
+        } else if(nextUp->size < bestSize)
+        {
+          bestTag = nextUp->startTag;
+          bestSize = nextUp->size;
+        }
+      }
+      //check previous free blocks if next yields no results
+      if(previous->size >= size && previous != NULL)
+      {
+        if(previous->size == size)
+        {
+          previous->prev->next = previous->next;
+          *prevAddr = previous->prev;
+
+          return ((void*) previous) + sizeof(freeListNode);
+
+        } else if(previous->size < bestSize)
+        {
+          bestTag = previous->startTag;
+          bestSize = previous->size;
+        }
+      }
     }
-
     if(nextUp != NULL)
     {
       nextAddr = &(nextUp->next);
@@ -79,7 +110,42 @@ void *my_malloc(int size)
       prevAddr = &(previous->prev);
       previous = previous->prev;
     }
+  }
+  //if running a best fit approach, now search for the best result that was found and return that spot
+  if(currentPolicy == 2)
+  {
+    freeListNode *next = freeListHead.next;
+    freeListNode *prev = freeListHead.prev;
+    freeListNode **nextOne = &(freeListHead.next);
+    freeListNode **prevOne = &(freeListHead.prev);
+    while(next != NULL || prev != NULL)
+    {
+      if(next->startTag == bestTag && nextUp != NULL)
+      {
+          next->next->prev = next->prev;
+          *nextOne = next->next;
 
+          return ((void*) next) + sizeof(freeListNode);
+      }
+      if(prev->size >= size && prev != NULL)
+      {
+          prev->prev->next = prev->next;
+          *prevOne = prev->prev;
+
+          return ((void*) prev) + sizeof(freeListNode);
+      }
+
+      if(next != NULL)
+      {
+        nextOne = &(next->next);
+        next = next->next;
+      }
+      if(prev != NULL)
+      {
+        prevOne = &(prev->prev);
+        prev = prev->prev;
+      }
+    }
   }
   //if no free blocks set up a new block and return the address of the pointer
 
@@ -100,11 +166,11 @@ void *my_malloc(int size)
 
     //put extra allocated memory into free list
     int newLoc = (int)sbrk(0);
-    freeListNode *newNext = (freeListNode*)sbrk(correctSize - size + sizeof(freeListNode));
+    freeListNode *newNext = (freeListNode*)sbrk(mallocSize - size + sizeof(freeListNode));
     newNext->startTag = newLoc;
     newNext->endTag = (int)sbrk(0);
     newNext->next = freeListHead.next;
-    newNext->size = correctSize - size + sizeof(freeListNode);
+    newNext->size = mallocSize - size + sizeof(freeListNode);
     if(newNext->next != NULL)
       newNext->next->prev = newNext;
     newNext->prev = &(freeListHead);
@@ -129,11 +195,11 @@ void *my_malloc(int size)
 
     //put extra allocated memory into free list
     int newLoc = (int)sbrk(0);
-    freeListNode *newPrev = (freeListNode*)sbrk(correctSize - size + sizeof(freeListNode));
+    freeListNode *newPrev = (freeListNode*)sbrk(mallocSize - size + sizeof(freeListNode));
     newPrev->startTag = newLoc;
     newPrev->endTag = (int)sbrk(0);
     newPrev->prev = freeListHead.prev;
-    newPrev->size= correctSize - size + sizeof(freeListNode);
+    newPrev->size= mallocSize - size + sizeof(freeListNode);
     if(newPrev->prev != NULL)
       newPrev->prev->next = newPrev;
     newPrev->next = &(freeListHead);
@@ -144,7 +210,7 @@ void *my_malloc(int size)
 
     return ((void*)prevNew) + sizeof(freeListNode);
   }
-  bytesAlloc += correctSize;
+  bytesAlloc += mallocSize;
   //error handling for my_malloc
   //my_malloc_error = "Error, mallocing required memory";
   //fprintf(stderr, "%s\n", my_malloc_error);
