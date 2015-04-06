@@ -63,6 +63,17 @@ int main(int argc, char* argv[])
       return -1;
     }
   }
+
+  int *buffer3 = my_malloc(512);
+  //int *buffer_check2 = malloc(512);
+  k=0;
+  for(i = 0; i < 512/sizeof(int); i++)
+  {
+    buffer2[i] = i+k;
+    k++;
+    k++;
+  }
+  my_free(buffer3);
   my_free(buffer2);
   free(buffer_check2);
   // if(buffer != NULL && buffer_check != NULL)
