@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
   }
 
 
-  int *buffer3 = my_malloc(512);
+  int *buffer3 = my_malloc(2050);
   //int *buffer_check2 = malloc(512);
   k=0;
   for(i = 0; i < 512/sizeof(int); i++)
