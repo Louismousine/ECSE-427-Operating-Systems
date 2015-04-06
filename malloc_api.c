@@ -12,7 +12,7 @@
 #define MALLOC_BLOCKSIZE 2048
 
 
-#define ALIGN(x) (int)((x/MALLOC_BLOCKSIZE + 1) * MALLOC_BLOCKSIZE)
+#define ALIGN(x) (int)(((x/MALLOC_BLOCKSIZE) + 1) * MALLOC_BLOCKSIZE)
 
 typedef struct freeListNode
 {
