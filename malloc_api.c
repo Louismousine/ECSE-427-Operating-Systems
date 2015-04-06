@@ -180,7 +180,7 @@ void my_free(void *ptr)
         previous->prev->next = previous->next;
         *prevAddr = previous->prev;
       //check corresponding tags, if they are equal update free list
-      } else if(previous->endTag == new->startTag)
+      }else if(previous->endTag == new->startTag)
       {
         new->startTag = previous->startTag;
         new->size += previous->size;
