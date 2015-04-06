@@ -345,8 +345,8 @@ void my_free(void *ptr)
     }
     if(next != NULL)
     {
-      prevAddr = &(next->prev);
-      previous = next->prev;
+      prevAddr = &(next);
+      previous = next;
       nextAddr = &(next->next);
       next = next->next;
     }else if(previous != NULL)
