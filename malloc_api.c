@@ -348,12 +348,10 @@ void my_free(void *ptr)
       nextAddr = &(next->next);
       next = next->next;
     }
-    if(previous != NULL)
+    if(next == NULL)
     {
-      prevAddr = &(next);
-      previous = next;
-      // prevAddr = &(previous->prev);
-      // previous = previous->prev;
+      prevAddr = &(next->prev);
+      previous = next->prev;
     }
   }
 }
