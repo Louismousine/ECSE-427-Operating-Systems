@@ -10,7 +10,7 @@
 //#define FREELIST_ENTRY_SIZE sizeof(freeListNode)
 #define MAX_FREE_BLOCK 128000
 #define MALLOC_BLOCKSIZE 2048
-
+#define FREE_RM 20000
 
 #define ALIGN(x) ((x/MALLOC_BLOCKSIZE + 1) * MALLOC_BLOCKSIZE)
 
@@ -24,6 +24,7 @@ typedef struct freeListNode
 } freeListNode;
 
 void updateContiguous();
+void updateTopFreeBlock();
 
 static freeListNode freeListHead = {-1, -1, 0, NULL, NULL};
 extern char *my_malloc_error;
@@ -59,42 +60,92 @@ void *my_malloc(int size)
     {
       if(nextUp != NULL)
       {
-        if(nextUp->size >= size)
+        if(nextUp->size >= (size + sizeof(freeListNode)))
         {   //TODO: need to modify to cut the extra space into another free list entry
-          if(nextUp->next != NULL)
-            nextUp->next->prev = nextUp->prev;
-          if(nextUp->prev != NULL)
-            nextUp->prev->next = nextUp->next;
-          *nextAddr = nextUp->next;
+          if(nextUp->size > (size + 2*sizeof(freeListNode)))
+          {
+            freeListNode newSpace = {-1,-1, 0, NULL, NULL};
+            newSpace.startTag = nextUp->startTag + (size + sizeof(freeListNode));
+            newSpace.size = nextUp->size - (size + sizeof(freeListNode));
+            newSpace.endTag = nextUp->endTag;
+            newSpace.next = nextUp->next;
+            newSpace.prev = nextUp->prev;
 
-          nextUp->next == NULL;
-          nextUp->prev == NULL;
-          //*nextAddr->prev = &(nextUp->prev);
-          return ((void*) nextUp) + sizeof(freeListNode);
+            nextUp->endTag = newSpace.startTag;
+            nextUp->size = size + sizeof(freeListNode);
+
+            if(nextUp->next != NULL)
+              nextUp->next->prev = newSpace;
+            if(nextUp->prev != NULL)
+              nextUp->prev->next = newSpace;
+            *nextAddr = nextUp->next;
+
+            nextUp->next == NULL;
+            nextUp->prev == NULL;
+            //*nextAddr->prev = &(nextUp->prev);
+            return ((void*) nextUp) + sizeof(freeListNode);
+          }else
+          {
+            if(nextUp->next != NULL)
+              nextUp->next->prev = nextUp->prev;
+            if(nextUp->prev != NULL)
+              nextUp->prev->next = nextUp->next;
+            *nextAddr = nextUp->next;
+
+            nextUp->next == NULL;
+            nextUp->prev == NULL;
+            //*nextAddr->prev = &(nextUp->prev);
+            return ((void*) nextUp) + sizeof(freeListNode);
+          }
         }
       } else if(previous != NULL)
       {
-        if (previous->size >= size && previous != NULL)
+        if (previous->size >= (size + sizeof(freeListNode)))
         {
-          if(previous->prev != NULL)
-            previous->prev->next = previous->next;
-          if(previous->next != NULL)
-            previous->next->prev = previous->prev;
-          *prevAddr = previous->prev;
+          if(previous->size > (size + 2*sizeof(freeListNode)))
+          {
+            freeListNode newSpace = {-1,-1, 0, NULL, NULL};
+            newSpace.startTag = previous->startTag + (size + sizeof(freeListNode));
+            newSpace.size = previous->size - (size + sizeof(freeListNode));
+            newSpace.endTag = previous->endTag;
+            newSpace.next = previous->next;
+            newSpace.prev = previous->prev;
 
-          previous->prev == NULL;
-          previous->next == NULL;
-          //*prevAddr->next = &(previous->next);
-          return ((void*) previous) + sizeof(freeListNode);
+            previous->endTag = newSpace.startTag;
+            previous->size = size + sizeof(freeListNode);
+
+            if(previous->prev != NULL)
+              previous->prev->next = previous->next;
+            if(previous->next != NULL)
+              previous->next->prev = previous->prev;
+            *prevAddr = previous->prev;
+
+            previous->prev == NULL;
+            previous->next == NULL;
+            //*prevAddr->next = &(previous->next);
+            return ((void*) previous) + sizeof(freeListNode);
+          }else
+          {
+            if(previous->prev != NULL)
+              previous->prev->next = previous->next;
+            if(previous->next != NULL)
+              previous->next->prev = previous->prev;
+            *prevAddr = previous->prev;
+
+            previous->prev == NULL;
+            previous->next == NULL;
+            //*prevAddr->next = &(previous->next);
+            return ((void*) previous) + sizeof(freeListNode);
+          }
         }
       }
     }else if(currentPolicy == 2) //Best Fit
     {
       if(nextUp != NULL)
       {
-        if(nextUp->size >= size)  //find best possible in next
+        if(nextUp->size >= (size + sizeof(freeListNode)))  //find best possible in next
         {
-          if(nextUp->size == size)
+          if(nextUp->size == (size + sizeof(freeListNode))
           {
             if(nextUp->next != NULL)
               nextUp->next->prev = nextUp->prev;
@@ -117,9 +168,9 @@ void *my_malloc(int size)
       //check previous free blocks if next yields no results
       if(previous != NULL)
       {
-        if(previous->size >= size)
+        if(previous->size >= (size + sizeof(freeListNode)))
         {
-          if(previous->size == size)
+          if(previous->size == (size + sizeof(freeListNode)))
           {
             if(previous->prev != NULL)
               previous->prev->next = previous->next;
@@ -164,32 +215,83 @@ void *my_malloc(int size)
       {
         if(next->startTag == bestTag)
         {
-          if(next->next != NULL)
-            next->next->prev = next->prev;
-          if(next->prev != NULL)
-            next->prev->next = next->next;
-          *nextOne = next->next;
+          if(next->size > (size + 2*sizeof(freeListNode)))  //if space split block up
+          {
+            freeListNode newSpace = {-1,-1, 0, NULL, NULL};
+            newSpace.startTag = next->startTag + (size + sizeof(freeListNode));
+            newSpace.size = next->size - (size + sizeof(freeListNode));
+            newSpace.endTag = next->endTag;
+            newSpace.next = next->next;
+            newSpace.prev = next->prev;
 
-          next->next == NULL;
-          next->prev == NULL;
+            next->endTag = newSpace.startTag;
+            next->size = size + sizeof(freeListNode);
 
-          return ((void*) next) + sizeof(freeListNode);
+            if(next->next != NULL)
+              next->next->prev = next->prev;
+            if(next->prev != NULL)
+              next->prev->next = next->next;
+            *nextOne = next->next;
+
+            next->next == NULL;
+            next->prev == NULL;
+
+            return ((void*) next) + sizeof(freeListNode);
+          }else //if not return this block
+          {
+
+            if(next->next != NULL)
+              next->next->prev = next->prev;
+            if(next->prev != NULL)
+              next->prev->next = next->next;
+            *nextOne = next->next;
+
+            next->next == NULL;
+            next->prev == NULL;
+
+            return ((void*) next) + sizeof(freeListNode);
+          }
         }
       }
       if(prev != NULL)
       {
-        if(prev->size >= size)
+        if(prev->startTag == bestTag)
         {
-          if(prev->prev != NULL)
-            prev->prev->next = prev->next;
-          if(prev->next != NULL)
-            prev->next->prev = prev->prev;
-          *prevOne = prev->prev;
+          if(prev->size > (size + 2*sizeof(freeListNode)))  //check to see if free block can be split up
+          {
+            freeListNode newSpace = {-1,-1, 0, NULL, NULL};
+            newSpace.startTag = prev->startTag + (size + sizeof(freeListNode));
+            newSpace.size = prev->size - (size + sizeof(freeListNode));
+            newSpace.endTag = prev->endTag;
+            newSpace.next = prev->next;
+            newSpace.prev = prev->prev;
 
-          prev->next == NULL;
-          prev->prev == NULL;
+            prev->endTag = newSpace.startTag;
+            prev->size = size + sizeof(freeListNode);
 
-          return ((void*) prev) + sizeof(freeListNode);
+            if(prev->prev != NULL)
+              prev->prev->next = prev->next;
+            if(prev->next != NULL)
+              prev->next->prev = prev->prev;
+            *prevOne = prev->prev;
+
+            prev->next == NULL;
+            prev->prev == NULL;
+
+            return ((void*) prev) + sizeof(freeListNode);
+          }else
+          {
+            if(prev->prev != NULL)
+              prev->prev->next = prev->next;
+            if(prev->next != NULL)
+              prev->next->prev = prev->prev;
+            *prevOne = prev->prev;
+
+            prev->next == NULL;
+            prev->prev == NULL;
+
+            return ((void*) prev) + sizeof(freeListNode);
+          }
         }
       }
 
@@ -401,6 +503,7 @@ void my_free(void *ptr)
       }
     }
   }
+  updateTopFreeBlock();
   updateContiguous();
 }
 
@@ -435,6 +538,56 @@ void updateContiguous()
       prev = prev->prev;
     }
   }
+}
+
+void updateTopFreeBlock()
+{
+  int topBlock = (int) sbrk(0)
+
+  freeListNode *next = freeListHead.next;
+  freeListNode *prev = freeListHead.prev;
+  freeListNode **nextAddr = &(freeListHead.next);
+  freeListNode **prevAddr = &(freeListHead.prev);
+
+  while(next != NULL || prev != NULL)
+  {
+    if(next != NULL)
+    {
+      if(next->endTag == topBlock)
+      {
+        if(next->size >= MAX_FREE_BLOCK)
+        {
+          sbrk(-20000);
+          next->size -= FREE_RM;
+          next->endTag = (int) sbrk(0);
+        }
+      }
+    }
+    if(prev != NULL)
+    {
+      if(prev->endTag == topBlock)
+      {
+        if(prev->size >= MAX_FREE_BLOCK)
+        {
+          sbrk(-20000);
+          prev->size -= FREE_RM;
+          prev->endTag = (int) sbrk(0);
+        }
+      }
+    }
+
+    if(next != NULL)
+    {
+      nextAddr = &(next->next);
+      next = next->next;
+    }
+    if(prev != NULL)
+    {
+      prevAddr = &(prev->prev);
+      prev = prev->prev;
+    }
+  }
+  updateContiguous();
 }
 
 void my_mallopt(int policy)
