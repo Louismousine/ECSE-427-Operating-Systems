@@ -161,14 +161,16 @@ void my_free(void *ptr)
       {
         new->endTag = next->endTag;
         new->size += next->size;
-        next->next->prev = next->prev;
+        if(next->next != NULL)
+          next->next->prev = next->prev;
         *nextAddr = next->next;
       //check corresponding tags, if they are equal update free list
       } else if(next->endTag == new->startTag)
       {
         new->startTag = next->startTag;
         new->size += next->size;
-        next->next->prev = next->prev;
+        if(next->next != NULL)
+          next->next->prev = next->prev;
         *nextAddr = next->next;
       }
     }
@@ -179,14 +181,16 @@ void my_free(void *ptr)
       {
         new->endTag = previous->endTag;
         new->size += previous->size;
-        previous->prev->next = previous->next;
+        if(previous->prev != NULL)
+          previous->prev->next = previous->next;
         *prevAddr = previous->prev;
       //check corresponding tags, if they are equal update free list
       }else if(previous->endTag == new->startTag)
       {
         new->startTag = previous->startTag;
         new->size += previous->size;
-        previous->prev->next = previous->next;
+        if(previous->prev != NULL)
+          previous->prev->next = previous->next;
         *prevAddr = previous->prev;
       }
     }
