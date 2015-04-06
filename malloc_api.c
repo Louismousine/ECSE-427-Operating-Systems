@@ -84,7 +84,7 @@ void *my_malloc(int size)
         }
       }
       //check previous free blocks if next yields no results
-      if(previous->size >= size && previous != NULL)
+      else if(previous->size >= size && previous != NULL)
       {
         if(previous->size == size)
         {
