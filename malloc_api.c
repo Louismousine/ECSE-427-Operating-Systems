@@ -348,7 +348,7 @@ void my_free(void *ptr)
       nextAddr = &(next->next);
       next = next->next;
     }
-    if(next == NULL)
+    if(next != NULL && next->next == NULL)
     {
       prevAddr = &(next->prev);
       previous = next->prev;
