@@ -45,6 +45,7 @@ void *my_malloc(int size)
   int currentLoc = (int)sbrk(0);
 
   bytesAlloc += (size + sizeof(freeListNode));
+  freeSpace += (mallocSize - size + sizeof(freeListNode));
 
   freeListNode *nextUp = freeListHead.next;
   freeListNode *previous = freeListHead.prev;
