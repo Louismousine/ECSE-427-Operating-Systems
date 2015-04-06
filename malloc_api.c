@@ -286,7 +286,7 @@ void my_free(void *ptr)
 
   freeListHead.next = new;
   freeSpace += new->size;
-  bytresAlloc -= new->size;
+  bytesAlloc -= new->size;
   //set uo required data to check adjacent free blocks
   freeListNode *next = new->next;
   freeListNode *previous = new->prev;
@@ -404,8 +404,8 @@ void updateContiguous()
 {
   freeListNode *next = freeListHead.next;
   freeListNode *prev = freeListHead.prev;
-  freeListNode **nextAddr = &(firstListHead.next);
-  freeListNode **prevAddr = &(firstListHead.prev);
+  freeListNode **nextAddr = &(freeListHead.next);
+  freeListNode **prevAddr = &(freeListHead.prev);
 
   while(next != NULL || prev != NULL)
   {
