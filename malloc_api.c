@@ -35,8 +35,8 @@ int largestSpace = 0;
 void *my_malloc(int size)
 {
   //int tempStartTag;
-  fprintf(stdout, "size of freeListNode: %d\n", sizeof(freeListNode));
-  int correctSize = ALIGN(size + sizeof(freeListNode));
+  fprintf(stdout, "size of size: %d\n", size);
+  int correctSize = (int) ALIGN(size + sizeof(freeListNode));
   fprintf(stdout, "correct size is %d\n", correctSize);
   int currentLoc = (int)sbrk(0);
 
