@@ -159,6 +159,7 @@ void my_free(void *ptr)
       //check corresponding tags, if they are equal update free list
       if(next->startTag == new->endTag)
       {
+        fprintf(stdout, "next startTag: %d\n new endTag: %d\n", next->startTag, new->endTag);
         new->endTag = next->endTag;
         new->size += next->size;
         if(next->next != NULL)
@@ -179,6 +180,7 @@ void my_free(void *ptr)
       //check corresponding tags, if they are equal update free list
       if(previous->startTag == new->endTag)
       {
+        fprintf(stdout, "previous startTag: %d\n new endTag: %d\n", previous->startTag, new->endTag);
         new->endTag = previous->endTag;
         new->size += previous->size;
         if(previous->prev != NULL)
