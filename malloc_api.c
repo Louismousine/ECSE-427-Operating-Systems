@@ -291,7 +291,7 @@ void my_free(void *ptr)
   freeListNode **nextAddr = &(new->next);
   freeListNode **prevAddr = &(new->prev);
   //if the block we are freeing has adjacent free block combine them
-  while(next != NULL || previous != NULL)
+  while(next != NULL)
   {
     if(next != NULL)
     {
