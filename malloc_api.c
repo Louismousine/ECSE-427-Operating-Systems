@@ -59,7 +59,12 @@ void *my_malloc(int size)
         {   //TODO: need to modify to cut the extra space into another free list entry
           if(nextUp->next != NULL)
             nextUp->next->prev = nextUp->prev;
+          if(nextUp->prev != NULL)
+            nextUp->prev->next = nextUp->next;
           *nextAddr = nextUp->next;
+
+          nextUp->next == NULL;
+          nextUp->prev == NULL;
           //*nextAddr->prev = &(nextUp->prev);
           return ((void*) nextUp) + sizeof(freeListNode);
         }
@@ -69,7 +74,12 @@ void *my_malloc(int size)
         {
           if(previous->prev != NULL)
             previous->prev->next = previous->next;
+          if(previous->next != NULL)
+            previous->next->prev = previous->prev;
           *prevAddr = previous->prev;
+
+          previous->prev == NULL;
+          previous->next == NULL;
           //*prevAddr->next = &(previous->next);
           return ((void*) previous) + sizeof(freeListNode);
         }
@@ -84,6 +94,8 @@ void *my_malloc(int size)
           {
             if(nextUp->next != NULL)
               nextUp->next->prev = nextUp->prev;
+            if(nextUp->prev != NULL)
+              nextUp->prev->next = nextUp->next;
             *nextAddr = nextUp->next;
 
             return ((void*) nextUp) + sizeof(freeListNode);
@@ -104,6 +116,8 @@ void *my_malloc(int size)
           {
             if(previous->prev != NULL)
               previous->prev->next = previous->next;
+            if(previous->next != NULL)
+              previous->next->prev = previous->prev;
             *prevAddr = previous->prev;
 
             return ((void*) previous) + sizeof(freeListNode);
@@ -142,6 +156,8 @@ void *my_malloc(int size)
         {
           if(next->next != NULL)
             next->next->prev = next->prev;
+          if(next->prev != NULL)
+            next->prev->next = next->next;
           *nextOne = next->next;
 
           return ((void*) next) + sizeof(freeListNode);
@@ -153,6 +169,8 @@ void *my_malloc(int size)
         {
           if(prev->prev != NULL)
             prev->prev->next = prev->next;
+          if(prev->next != NULL)
+            prev->next->prev = prev->prev;
           *prevOne = prev->prev;
 
           return ((void*) prev) + sizeof(freeListNode);
@@ -249,6 +267,8 @@ void my_free(void *ptr)
   new->next = freeListHead.next;
   if(new->next != NULL)
     new->next->prev = new;
+  if(new->prev != NULL)
+    new->prev->next = new;
   new->prev = &(freeListHead);
 
   freeListHead.next = new;
