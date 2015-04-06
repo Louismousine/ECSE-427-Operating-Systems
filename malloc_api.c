@@ -53,50 +53,62 @@ void *my_malloc(int size)
   {
     if(currentPolicy == 1)  //First fit
     {
-      if(nextUp->size >= size && nextUp != NULL)
-      {   //TODO: need to modify to cut the extra space into another free list entry
-        nextUp->next->prev = nextUp->prev;
-        *nextAddr = nextUp->next;
-        //*nextAddr->prev = &(nextUp->prev);
-        return ((void*) nextUp) + sizeof(freeListNode);
-      }else if (previous->size >= size && previous != NULL)
+      if(nextUp != NULL)
       {
-        previous->prev->next = previous->next;
-        *prevAddr = previous->prev;
-        //*prevAddr->next = &(previous->next);
-        return ((void*) previous) + sizeof(freeListNode);
-      }
-    }else if(currentPolicy == 2) //Best Fit
-    {
-      if(nextUp->size >= size && nextUp != NULL)  //find best possible in next
-      {
-        if(nextUp->size == size)
-        {
+        if(nextUp->size >= size)
+        {   //TODO: need to modify to cut the extra space into another free list entry
           nextUp->next->prev = nextUp->prev;
           *nextAddr = nextUp->next;
-
+          //*nextAddr->prev = &(nextUp->prev);
           return ((void*) nextUp) + sizeof(freeListNode);
-
-        } else if(nextUp->size < bestSize)
-        {
-          bestTag = nextUp->startTag;
-          bestSize = nextUp->size;
         }
-      }
-      //check previous free blocks if next yields no results
-      else if(previous->size >= size && previous != NULL)
+      } else if(previous != NULL)
       {
-        if(previous->size == size)
+        if (previous->size >= size && previous != NULL)
         {
           previous->prev->next = previous->next;
           *prevAddr = previous->prev;
-
+          //*prevAddr->next = &(previous->next);
           return ((void*) previous) + sizeof(freeListNode);
-
-        } else if(previous->size < bestSize)
+        }
+      }
+    }else if(currentPolicy == 2) //Best Fit
+    {
+      if(nextUp != NULL)
+      {
+        if(nextUp->size >= size)  //find best possible in next
         {
-          bestTag = previous->startTag;
-          bestSize = previous->size;
+          if(nextUp->size == size)
+          {
+            nextUp->next->prev = nextUp->prev;
+            *nextAddr = nextUp->next;
+
+            return ((void*) nextUp) + sizeof(freeListNode);
+
+          } else if(nextUp->size < bestSize)
+          {
+            bestTag = nextUp->startTag;
+            bestSize = nextUp->size;
+          }
+        }
+      }
+      //check previous free blocks if next yields no results
+      if(previous != NULL)
+      {
+        if(previous->size >= size)
+        {
+          if(previous->size == size)
+          {
+            previous->prev->next = previous->next;
+            *prevAddr = previous->prev;
+
+            return ((void*) previous) + sizeof(freeListNode);
+
+          } else if(previous->size < bestSize)
+          {
+            bestTag = previous->startTag;
+            bestSize = previous->size;
+          }
         }
       }
     }
@@ -120,19 +132,25 @@ void *my_malloc(int size)
     freeListNode **prevOne = &(freeListHead.prev);
     while(next != NULL || prev != NULL)
     {
-      if(next->startTag == bestTag && nextUp != NULL)
+      if(next != NULL)
       {
-          next->next->prev = next->prev;
-          *nextOne = next->next;
+        if(next->startTag == bestTag)
+        {
+            next->next->prev = next->prev;
+            *nextOne = next->next;
 
-          return ((void*) next) + sizeof(freeListNode);
+            return ((void*) next) + sizeof(freeListNode);
+        }
       }
-      if(prev->size >= size && prev != NULL)
+      if(prev != NULL)
       {
-          prev->prev->next = prev->next;
-          *prevOne = prev->prev;
+        if(prev->size >= size)
+        {
+            prev->prev->next = prev->next;
+            *prevOne = prev->prev;
 
-          return ((void*) prev) + sizeof(freeListNode);
+            return ((void*) prev) + sizeof(freeListNode);
+        }
       }
 
       if(next != NULL)
