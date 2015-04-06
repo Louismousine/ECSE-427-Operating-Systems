@@ -75,9 +75,9 @@ void *my_malloc(int size)
             nextUp->size = size + sizeof(freeListNode);
 
             if(nextUp->next != NULL)
-              nextUp->next->prev = newSpace;
+              nextUp->next->prev = &(newSpace);
             if(nextUp->prev != NULL)
-              nextUp->prev->next = newSpace;
+              nextUp->prev->next = &(newSpace);
             *nextAddr = nextUp->next;
 
             nextUp->next == NULL;
@@ -115,9 +115,9 @@ void *my_malloc(int size)
             previous->size = size + sizeof(freeListNode);
 
             if(previous->prev != NULL)
-              previous->prev->next = previous->next;
+              previous->prev->next = &(newSpace);
             if(previous->next != NULL)
-              previous->next->prev = previous->prev;
+              previous->next->prev = &(newSpace);
             *prevAddr = previous->prev;
 
             previous->prev == NULL;
@@ -145,7 +145,7 @@ void *my_malloc(int size)
       {
         if(nextUp->size >= (size + sizeof(freeListNode)))  //find best possible in next
         {
-          if(nextUp->size == (size + sizeof(freeListNode))
+          if(nextUp->size == (size + sizeof(freeListNode)))
           {
             if(nextUp->next != NULL)
               nextUp->next->prev = nextUp->prev;
@@ -228,9 +228,9 @@ void *my_malloc(int size)
             next->size = size + sizeof(freeListNode);
 
             if(next->next != NULL)
-              next->next->prev = next->prev;
+              next->next->prev = &(newSpace);
             if(next->prev != NULL)
-              next->prev->next = next->next;
+              next->prev->next = &(newSpace);
             *nextOne = next->next;
 
             next->next == NULL;
@@ -270,9 +270,9 @@ void *my_malloc(int size)
             prev->size = size + sizeof(freeListNode);
 
             if(prev->prev != NULL)
-              prev->prev->next = prev->next;
+              prev->prev->next = &(newSpace);
             if(prev->next != NULL)
-              prev->next->prev = prev->prev;
+              prev->next->prev = &(newSpace);
             *prevOne = prev->prev;
 
             prev->next == NULL;
@@ -542,7 +542,7 @@ void updateContiguous()
 
 void updateTopFreeBlock()
 {
-  int topBlock = (int) sbrk(0)
+  int topBlock = (int) sbrk(0);
 
   freeListNode *next = freeListHead.next;
   freeListNode *prev = freeListHead.prev;
