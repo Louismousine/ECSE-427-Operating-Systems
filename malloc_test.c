@@ -34,8 +34,7 @@ int main(int argc, char* argv[])
       return -1;
     }
   }
-  my_free(buffer);
-  free(buffer_check);
+
 
   int *buffer3 = my_malloc(512);
   //int *buffer_check2 = malloc(512);
@@ -46,6 +45,8 @@ int main(int argc, char* argv[])
     k++;
     k++;
   }
+  my_free(buffer);
+  free(buffer_check);
   my_free(buffer3);
 
   int *buffer2 = my_malloc(512);
