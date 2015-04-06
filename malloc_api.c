@@ -306,12 +306,16 @@ void my_free(void *ptr)
         if(next->next != NULL)
           next->next->prev = next->prev;
         *nextAddr = next->next;
+
+        next->size = 0;
+        next->next = NULL;
+        next->prev = NULL;
         fprintf(stdout, "new startTag: %d\nnew endTag: %d\nnew size: %d\n", new->startTag, new->endTag, new->size);
 
         next = new->next;
         previous = new->prev;
-        *nextAddr = new->next;
-        *prevAddr = new->prev;
+        nextAddr = &(new->next);
+        prevAddr = &(new->prev);
         within = 1;
       //check corresponding tags, if they are equal update free list
       }else if(next->endTag == new->startTag)
@@ -322,12 +326,15 @@ void my_free(void *ptr)
         if(next->next != NULL)
           next->next->prev = next->prev;
         *nextAddr = next->next;
+        next->size = 0;
+        next->next = NULL;
+        next->prev = NULL;
         fprintf(stdout, "new startTag: %d\nnew endTag: %d\nnew size: %d\n", new->startTag, new->endTag, new->size);
 
         next = new->next;
         previous = new->prev;
-        *nextAddr = new->next;
-        *prevAddr = new->prev;
+        nextAddr = &(new->next);
+        prevAddr = &(new->prev);
         within = 1;
       }
     }
@@ -342,12 +349,15 @@ void my_free(void *ptr)
         if(previous->prev != NULL)
           previous->prev->next = previous->next;
         *prevAddr = previous->prev;
+        previous->size = 0;
+        previous->next = NULL;
+        previous->prev = NULL;
         fprintf(stdout, "previous startTag: %d\nprevious endTag: %d\nprevious size: %d\n", previous->startTag, previous->endTag, previous->size);
 
         next = new->next;
         previous = new->prev;
-        *nextAddr = new->next;
-        *prevAddr = new->prev;
+        nextAddr = &(new->next);
+        prevAddr = &(new->prev);
         within = 1;
       //check corresponding tags, if they are equal update free list
       }else if(previous->endTag == new->startTag)
@@ -359,12 +369,15 @@ void my_free(void *ptr)
         if(previous->prev != NULL)
           previous->prev->next = previous->next;
         *prevAddr = previous->prev;
+        previous->size = 0;
+        previous->next = NULL;
+        previous->prev = NULL;
         fprintf(stdout, "previous startTag: %d\nprevious endTag: %d\nprevious size: %d\n", previous->startTag, previous->endTag, previous->size);
 
         next = new->next;
         previous = new->prev;
-        *nextAddr = new->next;
-        *prevAddr = new->prev;
+        nextAddr = &(new->next);
+        prevAddr = &(new->prev);
         within = 1;
       }
     }
