@@ -102,7 +102,7 @@ void *my_malloc(int size)
       newNext->next->prev = newNext;
     newNext->prev = &(freeListHead);
 
-    return ((void*)nextUp) + sizeof(freeListNode);
+    return ((void*)nextNew) + sizeof(freeListNode);
   }else if(previous == NULL)
   {
     freeListNode *prevNew;
@@ -123,7 +123,7 @@ void *my_malloc(int size)
       newPrev->prev->next = newPrev;
     newPrev->next = &(freeListHead);
 
-    return ((void*)nextUp) + sizeof(freeListNode);
+    return ((void*)prevNew) + sizeof(freeListNode);
   }
   bytesAlloc += correctSize;
   //error handling for my_malloc
