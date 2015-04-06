@@ -294,6 +294,7 @@ void my_free(void *ptr)
   //if the block we are freeing has adjacent free block combine them
   while(next != NULL || previous != NULL)
   {
+    within = 0;
     if(next != NULL)
     {
       //check corresponding tags, if they are equal update free list
