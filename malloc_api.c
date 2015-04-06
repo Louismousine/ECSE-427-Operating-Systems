@@ -138,7 +138,8 @@ void my_free(void *ptr)
     return;
   freeListNode *new = (freeListNode*)(((char*)ptr) - sizeof(freeListNode));
   new->next = freeListHead.next;
-  new->next->prev = new;
+  if(new->next != NULL)
+    new->next->prev = new;
   new->prev = &(freeListHead);
 
   freeListHead.next = new;
