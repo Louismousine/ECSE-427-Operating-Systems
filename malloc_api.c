@@ -364,7 +364,7 @@ void my_free(void *ptr)
         previous = new->prev;
         *nextAddr = new->next;
         *prevAddr = new->prev;
-        witin = 1;
+        within = 1;
       }
     }
     if(!within)
