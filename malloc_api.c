@@ -44,6 +44,8 @@ void *my_malloc(int size)
   fprintf(stdout, "correct size is %d\n", mallocSize);
   int currentLoc = (int)sbrk(0);
 
+  bytesAlloc += (size + sizeof(freeListNode));
+
   freeListNode *nextUp = freeListHead.next;
   freeListNode *previous = freeListHead.prev;
   freeListNode **nextAddr = &(freeListHead.next);
@@ -265,7 +267,6 @@ void *my_malloc(int size)
 
     return ((void*)prevNew) + sizeof(freeListNode);
   }
-  bytesAlloc += (size + sizeof(freeListNode));
   //error handling for my_malloc
   //my_malloc_error = "Error, mallocing required memory";
   //fprintf(stderr, "%s\n", my_malloc_error);
@@ -278,6 +279,10 @@ void my_free(void *ptr)
     return;
   freeListNode *new = (freeListNode*)(((char*)ptr) - sizeof(freeListNode));
   new->next = freeListHead.next;
+
+  freeSpace += new->size;
+  bytesAlloc -= new->size;
+
   if(new->next != NULL)
     new->next->prev = new;
   new->prev = &(freeListHead);
@@ -285,8 +290,6 @@ void my_free(void *ptr)
     new->prev->next = new;
 
   freeListHead.next = new;
-  freeSpace += new->size;
-  bytesAlloc -= new->size;
   //set uo required data to check adjacent free blocks
   freeListNode *next = new->next;
   freeListNode *previous = new->prev;
