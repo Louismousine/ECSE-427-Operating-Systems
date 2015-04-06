@@ -290,8 +290,9 @@ void my_free(void *ptr)
   freeListNode *previous = new->prev;
   freeListNode **nextAddr = &(new->next);
   freeListNode **prevAddr = &(new->prev);
+  int within = 0;
   //if the block we are freeing has adjacent free block combine them
-  while(next != NULL && previous != NULL)
+  while(next != NULL || previous != NULL)
   {
     if(next != NULL)
     {
@@ -305,17 +306,28 @@ void my_free(void *ptr)
           next->next->prev = next->prev;
         *nextAddr = next->next;
         fprintf(stdout, "new startTag: %d\nnew endTag: %d\nnew size: %d\n", new->startTag, new->endTag, new->size);
+
+        next = new->next;
+        previous = new->prev;
+        *nextAddr = &(new->next);
+        *prevAddr = &(new->prev);
+        within = 1;
       //check corresponding tags, if they are equal update free list
       }else if(next->endTag == new->startTag)
       {
         fprintf(stdout, "next endTag: %d\nnew startTag: %d\n", next->endTag, new->startTag);
-
         new->startTag = next->startTag;
         new->size += next->size;
         if(next->next != NULL)
           next->next->prev = next->prev;
         *nextAddr = next->next;
         fprintf(stdout, "new startTag: %d\nnew endTag: %d\nnew size: %d\n", new->startTag, new->endTag, new->size);
+
+        next = new->next;
+        previous = new->prev;
+        *nextAddr = &(new->next);
+        *prevAddr = &(new->prev);
+        within = 1;
       }
     }
     if(previous != NULL)
@@ -330,6 +342,12 @@ void my_free(void *ptr)
           previous->prev->next = previous->next;
         *prevAddr = previous->prev;
         fprintf(stdout, "previous startTag: %d\nprevious endTag: %d\nprevious size: %d\n", previous->startTag, previous->endTag, previous->size);
+
+        next = new->next;
+        previous = new->prev;
+        *nextAddr = &(new->next);
+        *prevAddr = &(new->prev);
+        within = 1;
       //check corresponding tags, if they are equal update free list
       }else if(previous->endTag == new->startTag)
       {
@@ -341,19 +359,26 @@ void my_free(void *ptr)
           previous->prev->next = previous->next;
         *prevAddr = previous->prev;
         fprintf(stdout, "previous startTag: %d\nprevious endTag: %d\nprevious size: %d\n", previous->startTag, previous->endTag, previous->size);
-      }
-      if(previous->prev == NULL)
-        break;
-    }
 
-    if(next != NULL && next->next == NULL)
+        next = new->next;
+        previous = new->prev;
+        *nextAddr = &(new->next);
+        *prevAddr = &(new->prev);
+        witin = 1;
+      }
+    }
+    if(!within)
     {
-      prevAddr = &(next->prev);
-      previous = next->prev;
-    }else if(next != NULL)
-    {
-      nextAddr = &(next->next);
-      next = next->next;
+      if(next != NULL)
+      {
+        nextAddr = &(next->next);
+        next = next->next;
+      }
+      if(previous != NULL)
+      {
+        prevAddr = &(previous->prev);
+        previous = previous->prev;
+      }
     }
   }
 }
