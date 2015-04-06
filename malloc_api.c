@@ -12,7 +12,7 @@
 #define MALLOC_BLOCKSIZE 2048
 
 
-#define ALIGN(x) (int)(((x/MALLOC_BLOCKSIZE) + 1) * MALLOC_BLOCKSIZE)
+#define ALIGN(x) ((x/MALLOC_BLOCKSIZE + 1) * MALLOC_BLOCKSIZE)
 
 typedef struct freeListNode
 {
@@ -35,8 +35,9 @@ int largestSpace = 0;
 void *my_malloc(int size)
 {
   //int tempStartTag;
+  int alignSize = size + sizeof(freeListNode);
   fprintf(stdout, "size of size: %d\n", size);
-  int correctSize = (int) ALIGN(size + sizeof(freeListNode));
+  int correctSize = ALIGN(alignSize);
   fprintf(stdout, "correct size is %d\n", correctSize);
   int currentLoc = (int)sbrk(0);
 
