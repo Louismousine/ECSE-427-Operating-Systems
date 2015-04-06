@@ -36,6 +36,7 @@ void *my_malloc(int size)
 {
   //int tempStartTag;
   int correctSize = ALIGN(size + sizeof(freeListNode));
+  fprintf(stdout, "correct size is %d\n", correctSize);
   int currentLoc = (int)sbrk(0);
 
   freeListNode *nextUp = freeListHead.next;
