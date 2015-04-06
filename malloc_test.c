@@ -66,6 +66,7 @@ int main(int argc, char* argv[])
   //   k++;
   //   k++;
   // }
+  my_mallinfo();
   fprintf(stdout, "buffer: \n");
   for(i = 0; i < 512/sizeof(int); i++)
   {
@@ -85,6 +86,6 @@ int main(int argc, char* argv[])
   //   fprintf(stderr, "Error freeing buffer");
   //   return -1;
   // }
-
+  my_mallinfo();
   return 0;
 }
