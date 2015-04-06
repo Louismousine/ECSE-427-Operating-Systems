@@ -23,8 +23,9 @@ typedef struct freeListNode
 
 } freeListNode;
 
-static freeListNode freeListHead = {-1, -1, 0, NULL, NULL};
+void updateContiguous();
 
+static freeListNode freeListHead = {-1, -1, 0, NULL, NULL};
 extern char *my_malloc_error;
 
 int currentPolicy = 1;
@@ -264,7 +265,7 @@ void *my_malloc(int size)
 
     return ((void*)prevNew) + sizeof(freeListNode);
   }
-  bytesAlloc += mallocSize;
+  bytesAlloc += (size + sizeof(freeListNode));
   //error handling for my_malloc
   //my_malloc_error = "Error, mallocing required memory";
   //fprintf(stderr, "%s\n", my_malloc_error);
@@ -285,6 +286,7 @@ void my_free(void *ptr)
 
   freeListHead.next = new;
   freeSpace += new->size;
+  bytresAlloc -= new->size;
   //set uo required data to check adjacent free blocks
   freeListNode *next = new->next;
   freeListNode *previous = new->prev;
@@ -393,6 +395,40 @@ void my_free(void *ptr)
         prevAddr = &(previous->prev);
         previous = previous->prev;
       }
+    }
+  }
+  updateContiguous();
+}
+
+void updateContiguous()
+{
+  freeListNode *next = freeListHead.next;
+  freeListNode *prev = freeListHead.prev;
+  freeListNode **nextAddr = &(firstListHead.next);
+  freeListNode **prevAddr = &(firstListHead.prev);
+
+  while(next != NULL || prev != NULL)
+  {
+    if(next != NULL)
+    {
+      if(next->size > largestSpace)
+        largestSpace = next->size;
+    }
+    if(prev != NULL)
+    {
+      if(prev->size > largestSpace)
+        largestSpace = prev->size;
+    }
+
+    if(next != NULL)
+    {
+      nextAddr = &(next->next);
+      next = next->next;
+    }
+    if(prev != NULL)
+    {
+      prevAddr = &(prev->prev);
+      prev = prev->prev;
     }
   }
 }
