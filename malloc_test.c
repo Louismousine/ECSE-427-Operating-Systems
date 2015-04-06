@@ -47,6 +47,7 @@ int main(int argc, char* argv[])
   }
   my_free(buffer);
   free(buffer_check);
+  fprintf(stdout, "first free successfull\n");
   my_free(buffer3);
 
   int *buffer2 = my_malloc(512);
