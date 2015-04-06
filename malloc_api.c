@@ -343,15 +343,15 @@ void my_free(void *ptr)
         fprintf(stdout, "previous startTag: %d\nprevious endTag: %d\nprevious size: %d\n", previous->startTag, previous->endTag, previous->size);
       }
     }
-    if(next != NULL)
-    {
-      nextAddr = &(next->next);
-      next = next->next;
-    }
+
     if(next != NULL && next->next == NULL)
     {
       prevAddr = &(next->prev);
       previous = next->prev;
+    }else if(next != NULL)
+    {
+      nextAddr = &(next->next);
+      next = next->next;
     }
   }
 }
