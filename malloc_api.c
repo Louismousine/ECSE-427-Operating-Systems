@@ -291,7 +291,7 @@ void my_free(void *ptr)
   freeListNode **nextAddr = &(new->next);
   freeListNode **prevAddr = &(new->prev);
   //if the block we are freeing has adjacent free block combine them
-  while(next != NULL || previous != NULL)
+  while(next != NULL && previous != NULL)
   {
     if(next != NULL)
     {
@@ -342,6 +342,8 @@ void my_free(void *ptr)
         *prevAddr = previous->prev;
         fprintf(stdout, "previous startTag: %d\nprevious endTag: %d\nprevious size: %d\n", previous->startTag, previous->endTag, previous->size);
       }
+      if(previous->previous == NULL)
+        break;
     }
 
     if(next != NULL && next->next == NULL)
