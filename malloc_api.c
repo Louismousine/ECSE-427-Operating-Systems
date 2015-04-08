@@ -414,12 +414,15 @@ void my_free(void *ptr)
   freeListHead.next = new;
 
   fprintf(stdout, "new next: %p\n", new->next);
-  fprintf(stdout, "next startTag: %p\nnew endTag: %p\n", next->startTag, new->endTag);
   //set uo required data to check adjacent free blocks
   freeListNode *next = new->next;
   freeListNode *previous = new->prev;
   freeListNode **nextAddr = &(new->next);
   freeListNode **prevAddr = &(new->prev);
+
+  fprintf(stdout, "next startTag: %p\nnew endTag: %p\n", next->startTag, new->endTag);
+
+
   int within = 0;
   //if the block we are freeing has adjacent free block combine them
   while(next != NULL || previous != NULL)
