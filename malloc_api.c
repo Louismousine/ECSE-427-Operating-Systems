@@ -84,7 +84,7 @@ void *my_malloc(int size)
             newSpace->next = freeListHead.next;
             newSpace->prev = &(freeListHead);
 
-            freeListHead.next = &(newSpace);
+            freeListHead.next = newSpace;
 
             nextUp->endTag = newSpace->startTag;
             nextUp->size = size + sizeof(freeListNode);
