@@ -65,29 +65,35 @@ void *my_malloc(int size)
           if(nextUp->size > (size + 2*sizeof(freeListNode)))
           {
             fprintf(stdout, "spliting free block that was found\n");
-            freeListNode newSpace = {NULL,NULL, 0, NULL, NULL};
-            newSpace.startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
-            newSpace.size = nextUp->size - (size + sizeof(freeListNode));
-            newSpace.endTag = (void*)nextUp->endTag;
+            freeListNode *newSpace;
+            void* top = sbrk(0);
+
+            brk(nextUp->startTag);
+
+            newSpace = (freeListNode*)(void*)((char*)(sbrk(0));
+
+            newSpace->startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
+            newSpace->size = nextUp->size - (size + sizeof(freeListNode));
+            newSpace->endTag = (void*)nextUp->endTag;
 
             if(nextUp->next != NULL)
               nextUp->next->prev = nextUp->prev;
             if(nextUp->prev != NULL)
               nextUp->prev->next = nextUp->next;
 
-            newSpace.next = freeListHead.next;
-            newSpace.prev = &(freeListHead);
+            newSpace->next = freeListHead.next;
+            newSpace->prev = &(freeListHead);
 
-            freeListHead.next = &(newSpace);
+            freeListHead->next = &(newSpace);
 
-            nextUp->endTag = newSpace.startTag;
+            nextUp->endTag = newSpace->startTag;
             nextUp->size = size + sizeof(freeListNode);
 
             fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnext startTag: %p\nnext endTag: %p\n",
-                    newSpace.startTag, newSpace.endTag, freeListHead.next->startTag, freeListHead.next->endTag);
+                    newSpace->startTag, newSpace->endTag, freeListHead.next->startTag, freeListHead.next->endTag);
 
-            if(newSpace.next != NULL)
-              newSpace.next->prev = &(newSpace);
+            if(newSpace->next != NULL)
+              newSpace->next->prev = &(newSpace);
             //*nextAddr = newSpace.next;
 
 
@@ -407,7 +413,7 @@ void my_free(void *ptr)
   if(new->next != NULL)
     new->next->prev = new;
 
-  //new->prev = &(freeListHead);
+  new->prev = &(freeListHead);
 
   // if(new->prev != NULL)
   //   new->prev->next = new;
