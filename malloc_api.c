@@ -399,6 +399,7 @@ void my_free(void *ptr)
     return;
   freeListNode *new = (freeListNode*)(((char*)ptr) - sizeof(freeListNode));
   new->next = freeListHead.next;
+  fprintf(stdout, "next startTag: %p\nnext endTag: %p\n", freeListHead.next->startTag, freeListHead.next->endTag);
 
   freeSpace += new->size;
   bytesAlloc -= new->size;
