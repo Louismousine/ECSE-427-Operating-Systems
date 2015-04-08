@@ -65,7 +65,7 @@ void *my_malloc(int size)
           if(nextUp->size > (size + 2*sizeof(freeListNode)))
           {
             fprintf(stdout, "spliting free block that was found\n");
-            freeListNode newSpace = {NULL,NULL, 0, NULL, NULL};
+            freeListNode *newSpace = (void*)((char*)(nextUp->startTag));
             newSpace.startTag = nextUp->startTag;
             newSpace.size = (size + sizeof(freeListNode));
             newSpace.endTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
