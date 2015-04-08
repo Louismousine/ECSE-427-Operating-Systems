@@ -424,7 +424,7 @@ void my_free(void *ptr)
   freeListNode **nextAddr = &(new->next);
   freeListNode **prevAddr = &(new->prev);
 
-  next->startTag = (void*)(new->next.startTag);
+  next->startTag = (void*)(freeListHead.next->startTag);
   fprintf(stdout, "next startTag: %p\nnext endTag: %p\n", next->startTag, next->endTag);
 
 
