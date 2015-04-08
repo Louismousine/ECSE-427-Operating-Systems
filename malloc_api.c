@@ -439,7 +439,7 @@ void my_free(void *ptr)
         prevAddr = &(new->prev);
         within = 1;
       //check corresponding tags, if they are equal update free list
-      }else if(next->endTag == new->startTag)
+    }else if(/*next->endTag ==*/ new->startTag)
       {
         fprintf(stdout, "next endTag: %p\nnew startTag: %p\n", next->endTag, new->startTag);
         new->startTag = next->startTag;
