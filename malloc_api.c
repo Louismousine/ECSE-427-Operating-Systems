@@ -81,7 +81,7 @@ void *my_malloc(int size)
               nextUp->next->prev = nextUp->prev;
             if(nextUp->prev != NULL)
               nextUp->prev->next = nextUp->next;
-            *nextAddr = nextUp->next;
+            //*nextAddr = nextUp->next;
 
 
             fprintf(stdout, "next: %p\n", freeListHead.next);
