@@ -64,7 +64,7 @@ void *my_malloc(int size)
         {   //TODO: need to modify to cut the extra space into another free list entry
           if(nextUp->size > (size + 2*sizeof(freeListNode)))
           {
-            fprintf(stdout, "spliting free block that was found");
+            fprintf(stdout, "spliting free block that was found\n");
             freeListNode newSpace = {NULL,NULL, 0, NULL, NULL};
             newSpace.startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
             newSpace.size = nextUp->size - (size + sizeof(freeListNode));
@@ -84,7 +84,7 @@ void *my_malloc(int size)
             //*nextAddr = nextUp->next;
 
 
-            fprintf(stdout, "next: %p\n", freeListHead.next);
+            fprintf(stdout, "next: %p\nnewSpace: %p\n", &(freeListHead.next), &(newSpace));
 
             nextUp->next == NULL;
             nextUp->prev == NULL;
