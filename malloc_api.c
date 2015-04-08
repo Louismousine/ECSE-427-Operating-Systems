@@ -252,6 +252,7 @@ void *my_malloc(int size)
             return ((void*) next) + sizeof(freeListNode);
           }
         }
+      }
       // }else if(prev != NULL)
       // {
       //   if(prev->startTag == bestTag)
@@ -292,7 +293,7 @@ void *my_malloc(int size)
       //       return ((void*) prev) + sizeof(freeListNode);
       //     }
       //   }
-      }
+      //}
 
       if(next != NULL)
       {
