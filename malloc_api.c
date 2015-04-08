@@ -81,10 +81,15 @@ void *my_malloc(int size)
               nextUp->next->prev = nextUp->prev;
             if(nextUp->prev != NULL)
               nextUp->prev->next = nextUp->next;
+
+              if(newSpace.next != NULL)
+                newSpace.next->prev = &(newSpace);
+              if(newSpace.prev != NULL)
+                newSpace.prev->next = &(newSpace);
             //*nextAddr = nextUp->next;
 
 
-            fprintf(stdout, "next: %p\nnewSpace: %p\n", &(freeListHead.next), &(newSpace));
+            fprintf(stdout, "next: %p\nnewSpace: %p\n", freeListHead.next, &(newSpace));
 
             nextUp->next == NULL;
             nextUp->prev == NULL;
