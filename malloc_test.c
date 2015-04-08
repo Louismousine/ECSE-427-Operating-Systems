@@ -46,10 +46,10 @@ int main(int argc, char* argv[])
     k++;
   }
   my_free(buffer);
-  //free(buffer_check);
+
   fprintf(stdout, "first free successfull\n");
   my_free(buffer3);
-
+  fprintf(stdout, "second free succesfull\n");
   int *buffer2 = my_malloc(512);
   //int *buffer_check2 = malloc(512);
   k=0;
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
   //   k++;
   // }
   my_mallinfo();
-  fprintf(stdout, "buffer: \n");
+  fprintf(stdout, "buffer2: \n");
   for(i = 0; i < 512/sizeof(int); i++)
   {
     fprintf(stdout, "%d\n", buffer2[i]);
