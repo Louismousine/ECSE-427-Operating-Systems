@@ -411,7 +411,7 @@ void my_free(void *ptr)
   // if(new->prev != NULL)
   //   new->prev->next = new;
 
-  //freeListHead.next = new;
+  freeListHead.next = &(new);
 
   fprintf(stdout, "new next: %p\n", new->next);
 
