@@ -408,8 +408,8 @@ void my_free(void *ptr)
 
   new->prev = &(freeListHead);
 
-  if(new->prev != NULL)
-    new->prev->next = new;
+  // if(new->prev != NULL)
+  //   new->prev->next = new;
 
   //freeListHead.next = new;
 
