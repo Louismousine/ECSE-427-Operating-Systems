@@ -65,48 +65,28 @@ void *my_malloc(int size)
           if(nextUp->size > (size + 2*sizeof(freeListNode)))
           {
             fprintf(stdout, "spliting free block that was found\n");
-            freeListNode *newSpace;
-            void* top = sbrk(0);
+            freeListNode newSpace = {NULL,NULL, 0, NULL, NULL};
+            newSpace.startTag = nextUp->startTag;
+            newSpace.size = (size + sizeof(freeListNode));
+            newSpace.endTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
 
-            brk(nextUp->startTag);
 
-            newSpace = (freeListNode*)((char*)(sbrk(0)) +(size + sizeof(freeListNode)));
-
-            newSpace->startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
-            newSpace->size = nextUp->size - (size + sizeof(freeListNode));
-            newSpace->endTag = (void*)nextUp->endTag;
-
-            if(nextUp->next != NULL)
-              nextUp->next->prev = nextUp->prev;
-            if(nextUp->prev != NULL)
-              nextUp->prev->next = nextUp->next;
-
-            newSpace->next = freeListHead.next;
-            newSpace->prev = &(freeListHead);
-
-            freeListHead.next = newSpace;
-
-            nextUp->endTag = newSpace->startTag;
-            nextUp->size = size + sizeof(freeListNode);
+            nextUp->startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
+            nextUp->endTag = newSpace.startTag;
+            nextUp->size = nextUp->size - (size + sizeof(freeListNode));
 
             fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnext startTag: %p\nnext endTag: %p\n",
-                    newSpace->startTag, newSpace->endTag, freeListHead.next->startTag, freeListHead.next->endTag);
-
-            if(newSpace->next != NULL)
-              newSpace->next->prev = newSpace;
-            //*nextAddr = newSpace.next;
+                    newSpace.startTag, newSpace.endTag, freeListHead.next->startTag, freeListHead.next->endTag);
 
 
             fprintf(stdout, "next: %p\nnewSpace: %p\n", freeListHead.next, &(newSpace));
 
-            nextUp->next == NULL;
-            nextUp->prev == NULL;
             //*nextAddr->prev = &(nextUp->prev);
 
             fprintf(stdout, "newSpace startTag: %p\nnewSpace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
-                    newSpace->startTag, newSpace->endTag, nextUp->startTag, nextUp->endTag);
+                    newSpace.startTag, newSpace.endTag, nextUp->startTag, nextUp->endTag);
 
-            return ((char*) nextUp) + sizeof(freeListNode);
+            return ((char*) newSpace) + sizeof(freeListNode);
           }else
           {
             if(nextUp->next != NULL)
