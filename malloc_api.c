@@ -70,7 +70,7 @@ void *my_malloc(int size)
 
             brk(nextUp->startTag);
 
-            newSpace = (freeListNode*)(void*)((char*)(sbrk(0));
+            newSpace = (freeListNode*)(sbrk(0));
 
             newSpace->startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
             newSpace->size = nextUp->size - (size + sizeof(freeListNode));
