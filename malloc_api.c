@@ -65,26 +65,23 @@ void *my_malloc(int size)
           if(nextUp->size > (size + 2*sizeof(freeListNode)))
           {
             fprintf(stdout, "spliting free block that was found\n");
-            freeListNode *newSpace = (void*)((char*)(nextUp->startTag));
+            freeListNode *newSpace = (void*)((char*)(nextUp->startTag);
             newSpace->startTag = nextUp->startTag;
             newSpace->size = (size + sizeof(freeListNode));
             newSpace->endTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
 
 
             nextUp->startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
-            //nextUp->endTag = newSpace->startTag;
             nextUp->size = nextUp->size - (size + sizeof(freeListNode));
 
-            fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnext startTag: %p\nnext endTag: %p\n",
-                    newSpace->startTag, newSpace->endTag, freeListHead.next->startTag, freeListHead.next->endTag);
-
-
-            fprintf(stdout, "next: %p\nnewSpace: %p\n", freeListHead.next, &(newSpace));
-
-            //*nextAddr->prev = &(nextUp->prev);
-
-            fprintf(stdout, "newSpace startTag: %p\nnewSpace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
-                    newSpace->startTag, newSpace->endTag, nextUp->startTag, nextUp->endTag);
+            // fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnext startTag: %p\nnext endTag: %p\n",
+            //         newSpace->startTag, newSpace->endTag, freeListHead.next->startTag, freeListHead.next->endTag);
+            //
+            //
+            // fprintf(stdout, "next: %p\nnewSpace: %p\n", freeListHead.next, &(newSpace));
+            //
+            // fprintf(stdout, "newSpace startTag: %p\nnewSpace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
+            //         newSpace->startTag, newSpace->endTag, nextUp->startTag, nextUp->endTag);
 
             return ((char*) newSpace) + sizeof(freeListNode);
           }else
@@ -107,26 +104,18 @@ void *my_malloc(int size)
         {
           if(previous->size > (size + 2*sizeof(freeListNode)))
           {
-            freeListNode newSpace = {NULL,NULL, 0, NULL, NULL};
-            newSpace.startTag = (void*)((char*)(previous->startTag) + (size + sizeof(freeListNode)));
-            newSpace.size = previous->size - (size + sizeof(freeListNode));
-            newSpace.endTag = previous->endTag;
-            newSpace.next = previous->next;
-            newSpace.prev = previous->prev;
+            fprintf(stdout, "spliting free block that was found\n");
+            freeListNode *newSpace = (void*)((char*)(previous->startTag);
+            newSpace->startTag = previous->startTag;
+            newSpace->size = (size + sizeof(freeListNode));
+            newSpace->endTag = (void*)((char*)(previous->startTag) + (size + sizeof(freeListNode)));
 
-            previous->endTag = newSpace.startTag;
-            previous->size = size + sizeof(freeListNode);
 
-            if(previous->prev != NULL)
-              previous->prev->next = &(newSpace);
-            if(previous->next != NULL)
-              previous->next->prev = &(newSpace);
-            *prevAddr = newSpace.prev;
+            previous->startTag = (void*)((char*)(previous->startTag) + (size + sizeof(freeListNode)));
+            previous->size = previous->size - (size + sizeof(freeListNode));
 
-            previous->prev == NULL;
-            previous->next == NULL;
-            //*prevAddr->next = &(previous->next);
-            return ((char*) previous) + sizeof(freeListNode);
+            return ((char*) newSpace) + sizeof(freeListNode);
+
           }else
           {
             if(previous->prev != NULL)
@@ -220,26 +209,26 @@ void *my_malloc(int size)
         {
           if(next->size > (size + 2*sizeof(freeListNode)))  //if space split block up
           {
-            freeListNode newSpace = {NULL,NULL, 0, NULL, NULL};
-            newSpace.startTag = (void*)(((char*)next->startTag) + (size + sizeof(freeListNode)));
-            newSpace.size = next->size - (size + sizeof(freeListNode));
-            newSpace.endTag = next->endTag;
-            newSpace.next = next->next;
-            newSpace.prev = next->prev;
+            fprintf(stdout, "spliting free block that was found\n");
+            freeListNode *newSpace = (void*)((char*)(next->startTag);
+            newSpace->startTag = next->startTag;
+            newSpace->size = (size + sizeof(freeListNode));
+            newSpace->endTag = (void*)((char*)(next->startTag) + (size + sizeof(freeListNode)));
 
-            next->endTag = newSpace.startTag;
-            next->size = size + sizeof(freeListNode);
 
-            if(next->next != NULL)
-              next->next->prev = &(newSpace);
-            if(next->prev != NULL)
-              next->prev->next = &(newSpace);
-            *nextOne = newSpace.next;
+            next->startTag = (void*)((char*)(next->startTag) + (size + sizeof(freeListNode)));
+            next->size = next->size - (size + sizeof(freeListNode));
 
-            next->next == NULL;
-            next->prev == NULL;
+            // fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnext startTag: %p\nnext endTag: %p\n",
+            //         newSpace->startTag, newSpace->endTag, freeListHead.next->startTag, freeListHead.next->endTag);
+            //
+            //
+            // fprintf(stdout, "next: %p\nnewSpace: %p\n", freeListHead.next, &(newSpace));
+            //
+            // fprintf(stdout, "newSpace startTag: %p\nnewSpace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
+            //         newSpace->startTag, newSpace->endTag, nextUp->startTag, nextUp->endTag);
 
-            return ((char*) next) + sizeof(freeListNode);
+            return ((char*) newSpace) + sizeof(freeListNode);
           }else //if not return this block
           {
 
@@ -261,27 +250,17 @@ void *my_malloc(int size)
         if(prev->startTag == bestTag)
         {
           if(prev->size > (size + 2*sizeof(freeListNode)))  //check to see if free block can be split up
-          {
-            freeListNode newSpace = {NULL,NULL, 0, NULL, NULL};
-            newSpace.startTag = (void*)(((char*)prev->startTag) + (size + sizeof(freeListNode)));
-            newSpace.size = prev->size - (size + sizeof(freeListNode));
-            newSpace.endTag = prev->endTag;
-            newSpace.next = prev->next;
-            newSpace.prev = prev->prev;
+          {  fprintf(stdout, "spliting free block that was found\n");
+            freeListNode *newSpace = (void*)((char*)(prev->startTag);
+            newSpace->startTag = prev->startTag;
+            newSpace->size = (size + sizeof(freeListNode));
+            newSpace->endTag = (void*)((char*)(prev->startTag) + (size + sizeof(freeListNode)));
 
-            prev->endTag = newSpace.startTag;
-            prev->size = size + sizeof(freeListNode);
 
-            if(prev->prev != NULL)
-              prev->prev->next = &(newSpace);
-            if(prev->next != NULL)
-              prev->next->prev = &(newSpace);
-            *prevOne = newSpace.prev;
+            prev->startTag = (void*)((char*)(prev->startTag) + (size + sizeof(freeListNode)));
+            prev->size = prev->size - (size + sizeof(freeListNode));
 
-            prev->next == NULL;
-            prev->prev == NULL;
-
-            return ((char*) prev) + sizeof(freeListNode);
+            return ((char*) newSpace) + sizeof(freeListNode);
           }else
           {
             if(prev->prev != NULL)
