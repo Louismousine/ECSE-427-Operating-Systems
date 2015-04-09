@@ -509,6 +509,9 @@ void updateContiguous()
   freeListNode **nextAddr = &(freeListHead.next);
   freeListNode **prevAddr = &(freeListHead.prev);
 
+  if(next != NULL)
+    largestSpace = next->size;
+
   while(next != NULL || prev != NULL)
   {
     if(next != NULL)
