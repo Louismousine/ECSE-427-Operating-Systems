@@ -21,27 +21,40 @@ int main(int argc, char* argv[])
     k++;
   }
   k = 0;
-  fprintf(output, "buffer: \n");
-  for(i = 0; i < 512/sizeof(int); i++)
-  {
-    fprintf(output, "%d\n", buffer[i]);
-  }
-
 
   int *buffer3 = my_malloc(2050);
 
   k=0;
-  for(i = 0; i < 512/sizeof(int); i++)
+  for(i = 0; i < 2050/sizeof(int); i++)
   {
     buffer3[i] = i+k;
     k++;
     k++;
   }
+  k=0;
+
+  for(i = 0; i < 512/sizeof(int); i++)
+  {
+    if(buffer[i] != i+k)
+      fprintf(output, "Error, data offset in buffer at %d\n", i);
+    k++;
+    k++;
+  }
+  k=0;
+
+  for(i = 0; i < 2050/sizeof(int); i++)
+  {
+    if(buffer3[i] != i+k)
+      fprintf(output, "Error, data offset in buffer3 at %d\n", i);
+    k++;
+    k++;
+  }
+
+
   my_free(buffer);
 
-  fprintf(output, "first free successfull\n");
-  my_free(buffer3);
-  fprintf(output, "second free succesfull\n");
+  fprintf(output, "buffer freed successfully\n");
+
 
 
   int *buffer2 = my_malloc(512);
@@ -54,16 +67,34 @@ int main(int argc, char* argv[])
   }
 
   my_mallinfo();
-  fprintf(output, "buffer2: \n");
+
+  my_free(buffer3);
+  fprintf(output, "buffer3 freed succesfully\n");
+
   for(i = 0; i < 512/sizeof(int); i++)
   {
-    fprintf(output, "%d\n", buffer2[i]);
+    if(buffer2[i] != i+k)
+      fprintf(output, "Error, data offset in buffer2 at %d\n", i);
+    k++;
+    k++;
   }
-
+  k=0;
 
   my_free(buffer2);
+  fprintf(output, "buffer2 freed succesfully\n");
 
   my_mallinfo();
+
+
+
+
+
+
+
+
+
+
+
   fclose(output);
   return 0;
 }
