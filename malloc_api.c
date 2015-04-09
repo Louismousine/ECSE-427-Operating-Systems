@@ -65,7 +65,7 @@ void *my_malloc(int size)
           if(nextUp->size > (size + 2*sizeof(freeListNode)))
           {
             fprintf(stdout, "spliting free block that was found\n");
-            freeListNode *newSpace = (void*)((char*)(nextUp->startTag);
+            freeListNode *newSpace = (void*)((char*)(nextUp->startTag));
             newSpace->startTag = nextUp->startTag;
             newSpace->size = (size + sizeof(freeListNode));
             newSpace->endTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
@@ -105,7 +105,7 @@ void *my_malloc(int size)
           if(previous->size > (size + 2*sizeof(freeListNode)))
           {
             fprintf(stdout, "spliting free block that was found\n");
-            freeListNode *newSpace = (void*)((char*)(previous->startTag);
+            freeListNode *newSpace = (void*)((char*)(previous->startTag));
             newSpace->startTag = previous->startTag;
             newSpace->size = (size + sizeof(freeListNode));
             newSpace->endTag = (void*)((char*)(previous->startTag) + (size + sizeof(freeListNode)));
@@ -210,7 +210,7 @@ void *my_malloc(int size)
           if(next->size > (size + 2*sizeof(freeListNode)))  //if space split block up
           {
             fprintf(stdout, "spliting free block that was found\n");
-            freeListNode *newSpace = (void*)((char*)(next->startTag);
+            freeListNode *newSpace = (void*)((char*)(next->startTag));
             newSpace->startTag = next->startTag;
             newSpace->size = (size + sizeof(freeListNode));
             newSpace->endTag = (void*)((char*)(next->startTag) + (size + sizeof(freeListNode)));
@@ -251,7 +251,7 @@ void *my_malloc(int size)
         {
           if(prev->size > (size + 2*sizeof(freeListNode)))  //check to see if free block can be split up
           {  fprintf(stdout, "spliting free block that was found\n");
-            freeListNode *newSpace = (void*)((char*)(prev->startTag);
+            freeListNode *newSpace = (void*)((char*)(prev->startTag));
             newSpace->startTag = prev->startTag;
             newSpace->size = (size + sizeof(freeListNode));
             newSpace->endTag = (void*)((char*)(prev->startTag) + (size + sizeof(freeListNode)));
