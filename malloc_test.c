@@ -6,11 +6,14 @@
 
 int main(int argc, char* argv[])
 {
-  my_mallopt(2);
-  int* buffer = my_malloc(512);
-  //int* buffer_check = malloc(512);
+  FILE *output = fopen("malloc_output.txt", "w");
+
   int i = 0;
   int k = 0;
+  my_mallopt(1);
+
+  int* buffer = my_malloc(512);
+
   for(i = 0; i < 512/sizeof(int); i++)
   {
     buffer[i] = i+k;
@@ -18,26 +21,15 @@ int main(int argc, char* argv[])
     k++;
   }
   k = 0;
-  // for(i = 0; i < 512/sizeof(int); i++)
-  // {
-  //   buffer_check[i] = i+k;
-  //   k++;
-  //   k++;
-  // }
-  fprintf(stdout, "buffer: \n");
+  fprintf(output, "buffer: \n");
   for(i = 0; i < 512/sizeof(int); i++)
   {
-    fprintf(stdout, "%d\n", buffer[i]);
-    // if(buffer_check[i] != buffer[i])
-    // {
-    //   fprintf(stderr, "Error, buffer does not match expected result\n");
-    //   return -1;
-    // }
+    fprintf(output, "%d\n", buffer[i]);
   }
 
 
   int *buffer3 = my_malloc(2050);
-  //int *buffer_check2 = malloc(512);
+
   k=0;
   for(i = 0; i < 512/sizeof(int); i++)
   {
@@ -47,11 +39,12 @@ int main(int argc, char* argv[])
   }
   my_free(buffer);
 
-  fprintf(stdout, "first free successfull\n");
+  fprintf(output, "first free successfull\n");
   my_free(buffer3);
-  fprintf(stdout, "second free succesfull\n");
+  fprintf(output, "second free succesfull\n");
+
+
   int *buffer2 = my_malloc(512);
-  //int *buffer_check2 = malloc(512);
   k=0;
   for(i = 0; i < 512/sizeof(int); i++)
   {
@@ -59,33 +52,17 @@ int main(int argc, char* argv[])
     k++;
     k++;
   }
-  // k = 0;
-  // for(i = 0; i < 512/sizeof(int); i++)
-  // {
-  //   buffer_check2[i] = i+k;
-  //   k++;
-  //   k++;
-  // }
+
   my_mallinfo();
-  fprintf(stdout, "buffer2: \n");
+  fprintf(output, "buffer2: \n");
   for(i = 0; i < 512/sizeof(int); i++)
   {
-    fprintf(stdout, "%d\n", buffer2[i]);
-    // if(buffer_check[i] != buffer2[i])
-    // {
-    //   fprintf(stderr, "Error, buffer does not match expected result\n");
-    //   return -1;
-    // }
+    fprintf(output, "%d\n", buffer2[i]);
   }
 
 
   my_free(buffer2);
-  //free(buffer_check2);
-  // if(buffer != NULL && buffer_check != NULL)
-  // {
-  //   fprintf(stderr, "Error freeing buffer");
-  //   return -1;
-  // }
+
   my_mallinfo();
   return 0;
 }

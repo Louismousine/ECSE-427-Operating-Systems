@@ -40,9 +40,9 @@ void *my_malloc(int size)
   void* bestTag;
   size_t bestSize = 128001;
   int alignSize = size + sizeof(freeListNode);
-  fprintf(stdout, "size of size: %d\n", size);
+  //fprintf(stdout, "size of size: %d\n", size);
   int mallocSize = ALIGN(alignSize);
-  fprintf(stdout, "correct size is %d\n", mallocSize);
+  //fprintf(stdout, "correct size is %d\n", mallocSize);
   void* currentLoc = sbrk(0);
 
   bytesAlloc += (size + sizeof(freeListNode));
@@ -301,7 +301,7 @@ void *my_malloc(int size)
     freeSpace += (mallocSize - size + sizeof(freeListNode));
 
 
-    fprintf(stdout, "nextNew startTag: %p\nnextNew endTag: %p\nnextNew size: %d\n", nextNew->startTag, nextNew->endTag, nextNew->size);
+    //fprintf(stdout, "nextNew startTag: %p\nnextNew endTag: %p\nnextNew size: %d\n", nextNew->startTag, nextNew->endTag, nextNew->size);
 
     //put extra allocated memory into free list
     void* newLoc = sbrk(0);
