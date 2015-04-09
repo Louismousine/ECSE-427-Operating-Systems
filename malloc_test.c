@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-  FILE *output = fopen("malloc_output.txt", "rw");
+  FILE *output = fopen("malloc_output.txt", "w");
 
   int i = 0;
   int k = 0;
