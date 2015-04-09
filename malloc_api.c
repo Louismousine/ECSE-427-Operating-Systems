@@ -254,8 +254,9 @@ void *my_malloc(int size)
       {
         if(prev->startTag == bestTag)
         {
-          if(prev->size > (size + MIN_SIZE)  //check to see if free block can be split up
-          {  fprintf(stdout, "spliting free block that was found\n");
+          if(prev->size > (size + MIN_SIZE))  //check to see if free block can be split up
+          {
+            fprintf(stdout, "spliting free block that was found\n");
             freeListNode *newSpace = (void*)((char*)(prev->startTag));
             newSpace->startTag = prev->startTag;
             newSpace->size = (size);
