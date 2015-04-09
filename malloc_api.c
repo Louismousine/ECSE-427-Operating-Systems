@@ -76,10 +76,10 @@ void *my_malloc(int size)
             nextUp->startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
             nextUp->size = nextUp->size - (size + sizeof(freeListNode));
 
-            // fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnext startTag: %p\nnext endTag: %p\n",
-            //         newSpace->startTag, newSpace->endTag, freeListHead.next->startTag, freeListHead.next->endTag);
-            //
-            //
+            fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
+                    newSpace->startTag, newSpace->endTag, nextUp->startTag, nextUp->endTag);
+
+
             // fprintf(stdout, "next: %p\nnewSpace: %p\n", freeListHead.next, &(newSpace));
             //
             // fprintf(stdout, "newSpace startTag: %p\nnewSpace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
