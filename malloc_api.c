@@ -405,7 +405,7 @@ void my_free(void *ptr)
     if(next != NULL)
     {
       //check corresponding tags, if they are equal update free list
-      if(next->startTag == new->endTag)
+      if(next->startTag == new->endTag && next->size !=0 && new->size !=0);
       {
         fprintf(stdout, "next startTag: %p\nnew endTag: %p\n", next->startTag, new->endTag);
         new->endTag = next->endTag;
