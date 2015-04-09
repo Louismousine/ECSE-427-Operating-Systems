@@ -70,7 +70,8 @@ void *my_malloc(int size)
             newSpace->startTag = nextUp->startTag;
             newSpace->size = (size + sizeof(freeListNode));
             newSpace->endTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
-
+            newSpace->next = NULL;
+            newSpace->prev = NULL;
 
             nextUp->startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
             nextUp->size = nextUp->size - (size + sizeof(freeListNode));
@@ -112,7 +113,8 @@ void *my_malloc(int size)
             newSpace->startTag = previous->startTag;
             newSpace->size = (size + sizeof(freeListNode));
             newSpace->endTag = (void*)((char*)(previous->startTag) + (size + sizeof(freeListNode)));
-
+            newSpace->next = NULL;
+            newSpace->prev = NULL;
 
             previous->startTag = (void*)((char*)(previous->startTag) + (size + sizeof(freeListNode)));
             previous->size = previous->size - (size + sizeof(freeListNode));
@@ -222,7 +224,8 @@ void *my_malloc(int size)
             newSpace->startTag = next->startTag;
             newSpace->size = (size + sizeof(freeListNode));
             newSpace->endTag = (void*)((char*)(next->startTag) + (size + sizeof(freeListNode)));
-
+            newSpace->next = NULL;
+            newSpace->prev = NULL;
 
             next->startTag = (void*)((char*)(next->startTag) + (size + sizeof(freeListNode)));
             next->size = next->size - (size + sizeof(freeListNode));
@@ -256,7 +259,8 @@ void *my_malloc(int size)
             newSpace->startTag = prev->startTag;
             newSpace->size = (size + sizeof(freeListNode));
             newSpace->endTag = (void*)((char*)(prev->startTag) + (size + sizeof(freeListNode)));
-
+            newSpace->next = NULL;
+            newSpace->prev = NULL;
 
             prev->startTag = (void*)((char*)(prev->startTag) + (size + sizeof(freeListNode)));
             prev->size = prev->size - (size + sizeof(freeListNode));
