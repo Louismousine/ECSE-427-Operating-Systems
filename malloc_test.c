@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 
   my_free(buffer3);
   fprintf(output, "buffer3 freed succesfully\n");
-
+  k = 0;
   for(i = 0; i < 512/sizeof(int); i++)
   {
     if(buffer2[i] != i+k)
