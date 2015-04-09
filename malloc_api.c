@@ -84,6 +84,7 @@ void *my_malloc(int size)
             // fprintf(stdout, "newSpace startTag: %p\nnewSpace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
             //         newSpace->startTag, newSpace->endTag, nextUp->startTag, nextUp->endTag);
 
+            updateContiguous();
             return ((char*) newSpace) + sizeof(freeListNode);
           }else
           {
@@ -95,7 +96,8 @@ void *my_malloc(int size)
 
             nextUp->next == NULL;
             nextUp->prev == NULL;
-            //*nextAddr->prev = &(nextUp->prev);
+
+            updateContiguous();
             return ((char*) nextUp) + sizeof(freeListNode);
           }
         }
@@ -115,6 +117,7 @@ void *my_malloc(int size)
             previous->startTag = (void*)((char*)(previous->startTag) + (size + sizeof(freeListNode)));
             previous->size = previous->size - (size + sizeof(freeListNode));
 
+            updateContiguous();
             return ((char*) newSpace) + sizeof(freeListNode);
 
           }else
@@ -127,7 +130,8 @@ void *my_malloc(int size)
 
             previous->prev == NULL;
             previous->next == NULL;
-            //*prevAddr->next = &(previous->next);
+
+            updateContiguous();
             return ((char*) previous) + sizeof(freeListNode);
           }
         }
@@ -149,6 +153,7 @@ void *my_malloc(int size)
             nextUp->next == NULL;
             nextUp->prev == NULL;
 
+            updateContiguous();
             return ((char*) nextUp) + sizeof(freeListNode);
 
           } else if(nextUp->size < bestSize)
@@ -174,6 +179,7 @@ void *my_malloc(int size)
             previous->next == NULL;
             previous->prev == NULL;
 
+            updateContiguous();
             return ((char*) previous) + sizeof(freeListNode);
 
           } else if(previous->size < bestSize)
@@ -221,6 +227,7 @@ void *my_malloc(int size)
             next->startTag = (void*)((char*)(next->startTag) + (size + sizeof(freeListNode)));
             next->size = next->size - (size + sizeof(freeListNode));
 
+            updateContiguous();
             return ((char*) newSpace) + sizeof(freeListNode);
           }else //if not return this block
           {
@@ -234,6 +241,7 @@ void *my_malloc(int size)
             next->next == NULL;
             next->prev == NULL;
 
+            updateContiguous();
             return ((char*) next) + sizeof(freeListNode);
           }
         }
@@ -253,6 +261,7 @@ void *my_malloc(int size)
             prev->startTag = (void*)((char*)(prev->startTag) + (size + sizeof(freeListNode)));
             prev->size = prev->size - (size + sizeof(freeListNode));
 
+            updateContiguous();
             return ((char*) newSpace) + sizeof(freeListNode);
           }else
           {
@@ -265,6 +274,7 @@ void *my_malloc(int size)
             prev->next == NULL;
             prev->prev == NULL;
 
+            updateContiguous();
             return ((char*) prev) + sizeof(freeListNode);
           }
         }
@@ -317,7 +327,7 @@ void *my_malloc(int size)
 
     fprintf(stdout, "newNext startTag: %p\nnewNext endTag: %p\nnewNext size: %d\n", newNext->startTag, newNext->endTag, newNext->size);
 
-
+    updateContiguous();
     return ((char*)nextNew) + sizeof(freeListNode);
   }else if(previous == NULL)
   {
@@ -346,9 +356,10 @@ void *my_malloc(int size)
 
     fprintf(stdout, "newPrev startTag: %p\nnewPrev endTag: %p\nnewPrev size: %d\n", newPrev->startTag, newPrev->endTag, newPrev->size);
 
-
+    updateContiguous();
     return ((char*)prevNew) + sizeof(freeListNode);
   }
+  updateContiguous();
   //error handling for my_malloc
   //my_malloc_error = "Error, mallocing required memory";
   //fprintf(stderr, "%s\n", my_malloc_error);
