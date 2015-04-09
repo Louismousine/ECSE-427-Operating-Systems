@@ -319,11 +319,11 @@ void *my_malloc(int size)
 
     //put extra allocated memory into free list
     void* newLoc = sbrk(0);
-    freeListNode *newNext = (freeListNode*)sbrk(mallocSize - size + sizeof(freeListNode));
+    freeListNode *newNext = (freeListNode*)sbrk(mallocSize - size);
     newNext->startTag = newLoc;
     newNext->endTag = sbrk(0);
     newNext->next = freeListHead.next;
-    newNext->size = mallocSize - size + sizeof(freeListNode);
+    newNext->size = mallocSize - size;
     if(newNext->next != NULL)
       newNext->next->prev = newNext;
     newNext->prev = &(freeListHead);
@@ -348,11 +348,11 @@ void *my_malloc(int size)
 
     //put extra allocated memory into free list
     void* newLoc = sbrk(0);
-    freeListNode *newPrev = (freeListNode*)sbrk(mallocSize - size + sizeof(freeListNode));
+    freeListNode *newPrev = (freeListNode*)sbrk(mallocSize - size);
     newPrev->startTag = newLoc;
     newPrev->endTag = sbrk(0);
     newPrev->prev = freeListHead.prev;
-    newPrev->size= mallocSize - size + sizeof(freeListNode);
+    newPrev->size= mallocSize - size;
     if(newPrev->prev != NULL)
       newPrev->prev->next = newPrev;
     newPrev->next = &(freeListHead);
