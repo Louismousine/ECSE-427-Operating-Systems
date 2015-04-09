@@ -57,12 +57,12 @@ void *my_malloc(int size)
   {
     if(currentPolicy == 1)  //First fit
     {
-      freeSpace -= (size + sizeof(freeListNode));
 
       if(nextUp != NULL)
       {
         if(nextUp->size >= (size + sizeof(freeListNode)))
-        {   //TODO: need to modify to cut the extra space into another free list entry
+        {
+          freeSpace -= (size + sizeof(freeListNode));
           if(nextUp->size > (size + 2*sizeof(freeListNode)))
           {
             fprintf(stdout, "spliting free block that was found\n");
@@ -134,8 +134,6 @@ void *my_malloc(int size)
       }
     }else if(currentPolicy == 2) //Best Fit
     {
-      freeSpace -= (size + sizeof(freeListNode));
-
       if(nextUp != NULL)
       {
         if(nextUp->size >= (size + sizeof(freeListNode)))  //find best possible in next
@@ -210,6 +208,7 @@ void *my_malloc(int size)
       {
         if(next->startTag == bestTag)
         {
+          freeSpace -= (size + sizeof(freeListNode));
           if(next->size > (size + 2*sizeof(freeListNode)))  //if space split block up
           {
             fprintf(stdout, "spliting free block that was found\n");
