@@ -7,6 +7,7 @@
 #define FIRST_FIT 1
 #define BEST_FIT 2
 
+#define MIN_SIZE 100
 #define MAX_FREE_BLOCK 128000
 #define MALLOC_BLOCKSIZE 2048
 #define FREE_RM 20000
@@ -45,7 +46,7 @@ void *my_malloc(int size)
   //fprintf(stdout, "correct size is %d\n", mallocSize);
   void* currentLoc = sbrk(0);
 
-  bytesAlloc += (size + sizeof(freeListNode));
+  bytesAlloc += (size);
 
   freeListNode *nextUp = freeListHead.next;
   freeListNode *previous = freeListHead.prev;
@@ -60,21 +61,21 @@ void *my_malloc(int size)
 
       if(nextUp != NULL)
       {
-        if(nextUp->size >= (size + sizeof(freeListNode)))
+        if(nextUp->size >= (size))
         {
-          freeSpace -= (size + sizeof(freeListNode));
-          if(nextUp->size > (size + 2*sizeof(freeListNode)))
+          freeSpace -= (size);
+          if(nextUp->size > (size + MIN_SIZE))
           {
             fprintf(stdout, "spliting free block that was found\n");
             freeListNode *newSpace = (void*)((char*)(nextUp->startTag));
             newSpace->startTag = nextUp->startTag;
-            newSpace->size = (size + sizeof(freeListNode));
-            newSpace->endTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
+            newSpace->size = (size);
+            newSpace->endTag = (void*)((char*)(nextUp->startTag) + (size);
             newSpace->next = NULL;
             newSpace->prev = NULL;
 
-            nextUp->startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
-            nextUp->size = nextUp->size - (size + sizeof(freeListNode));
+            nextUp->startTag = (void*)((char*)(nextUp->startTag) + (size);
+            nextUp->size = nextUp->size - (size);
 
             fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
                     newSpace->startTag, newSpace->endTag, nextUp->startTag, nextUp->endTag);
@@ -104,20 +105,20 @@ void *my_malloc(int size)
         }
       } else if(previous != NULL)
       {
-        if (previous->size >= (size + sizeof(freeListNode)))
+        if (previous->size >= (size)
         {
-          if(previous->size > (size + 2*sizeof(freeListNode)))
+          if(previous->size > (size + MIN_SIZE))
           {
             fprintf(stdout, "spliting free block that was found\n");
             freeListNode *newSpace = (void*)((char*)(previous->startTag));
             newSpace->startTag = previous->startTag;
-            newSpace->size = (size + sizeof(freeListNode));
-            newSpace->endTag = (void*)((char*)(previous->startTag) + (size + sizeof(freeListNode)));
+            newSpace->size = (size);
+            newSpace->endTag = (void*)((char*)(previous->startTag) + (size);
             newSpace->next = NULL;
             newSpace->prev = NULL;
 
-            previous->startTag = (void*)((char*)(previous->startTag) + (size + sizeof(freeListNode)));
-            previous->size = previous->size - (size + sizeof(freeListNode));
+            previous->startTag = (void*)((char*)(previous->startTag) + (size);
+            previous->size = previous->size - (size);
 
             updateContiguous();
             return ((char*) newSpace) + sizeof(freeListNode);
@@ -142,9 +143,9 @@ void *my_malloc(int size)
     {
       if(nextUp != NULL)
       {
-        if(nextUp->size >= (size + sizeof(freeListNode)))  //find best possible in next
+        if(nextUp->size >= (size)) //find best possible in next
         {
-          if(nextUp->size == (size + sizeof(freeListNode)))
+          if(nextUp->size == (size)
           {
             if(nextUp->next != NULL)
               nextUp->next->prev = nextUp->prev;
@@ -168,9 +169,9 @@ void *my_malloc(int size)
       //check previous free blocks if next yields no results
       if(previous != NULL)
       {
-        if(previous->size >= (size + sizeof(freeListNode)))
+        if(previous->size >= size)
         {
-          if(previous->size == (size + sizeof(freeListNode)))
+          if(previous->size == (size))
           {
             if(previous->prev != NULL)
               previous->prev->next = previous->next;
@@ -216,19 +217,19 @@ void *my_malloc(int size)
       {
         if(next->startTag == bestTag)
         {
-          freeSpace -= (size + sizeof(freeListNode));
-          if(next->size > (size + 2*sizeof(freeListNode)))  //if space split block up
+          freeSpace -= (size);
+          if(next->size > (size + MIN_SIZE))  //if space split block up
           {
             fprintf(stdout, "spliting free block that was found\n");
             freeListNode *newSpace = (void*)((char*)(next->startTag));
             newSpace->startTag = next->startTag;
-            newSpace->size = (size + sizeof(freeListNode));
-            newSpace->endTag = (void*)((char*)(next->startTag) + (size + sizeof(freeListNode)));
+            newSpace->size = (size);
+            newSpace->endTag = (void*)((char*)(next->startTag) + (size);
             newSpace->next = NULL;
             newSpace->prev = NULL;
 
-            next->startTag = (void*)((char*)(next->startTag) + (size + sizeof(freeListNode)));
-            next->size = next->size - (size + sizeof(freeListNode));
+            next->startTag = (void*)((char*)(next->startTag) + (size);
+            next->size = next->size - (size);
 
             updateContiguous();
             return ((char*) newSpace) + sizeof(freeListNode);
@@ -253,17 +254,17 @@ void *my_malloc(int size)
       {
         if(prev->startTag == bestTag)
         {
-          if(prev->size > (size + 2*sizeof(freeListNode)))  //check to see if free block can be split up
+          if(prev->size > (size + MIN_SIZE)  //check to see if free block can be split up
           {  fprintf(stdout, "spliting free block that was found\n");
             freeListNode *newSpace = (void*)((char*)(prev->startTag));
             newSpace->startTag = prev->startTag;
-            newSpace->size = (size + sizeof(freeListNode));
-            newSpace->endTag = (void*)((char*)(prev->startTag) + (size + sizeof(freeListNode)));
+            newSpace->size = (size);
+            newSpace->endTag = (void*)((char*)(prev->startTag) + (size);
             newSpace->next = NULL;
             newSpace->prev = NULL;
 
-            prev->startTag = (void*)((char*)(prev->startTag) + (size + sizeof(freeListNode)));
-            prev->size = prev->size - (size + sizeof(freeListNode));
+            prev->startTag = (void*)((char*)(prev->startTag) + (size);
+            prev->size = prev->size - (size);
 
             updateContiguous();
             return ((char*) newSpace) + sizeof(freeListNode);
@@ -305,14 +306,14 @@ void *my_malloc(int size)
 
     freeListNode *nextNew;
 
-    nextNew = (freeListNode*)sbrk(size + sizeof(freeListNode));
+    nextNew = (freeListNode*)sbrk(size);
     nextNew->startTag = currentLoc;
     nextNew->endTag = sbrk(0);
-    nextNew->size = size + sizeof(freeListNode);
+    nextNew->size = size;
     nextNew->next = NULL;
     nextNew->prev = NULL;
 
-    freeSpace += (mallocSize - size + sizeof(freeListNode));
+    freeSpace += (mallocSize - size);
 
 
     //fprintf(stdout, "nextNew startTag: %p\nnextNew endTag: %p\nnextNew size: %d\n", nextNew->startTag, nextNew->endTag, nextNew->size);
@@ -337,10 +338,10 @@ void *my_malloc(int size)
   {
     freeListNode *prevNew;
 
-    prevNew = (freeListNode*)sbrk(size + sizeof(freeListNode));
+    prevNew = (freeListNode*)sbrk(size);
     prevNew->startTag = currentLoc;
     prevNew->endTag = sbrk(0);
-    prevNew->size = size + sizeof(freeListNode);
+    prevNew->size = size;
     prevNew->next = NULL;
     prevNew->prev = NULL;
 
