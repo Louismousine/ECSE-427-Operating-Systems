@@ -70,11 +70,11 @@ void *my_malloc(int size)
             freeListNode *newSpace = (void*)((char*)(nextUp->startTag));
             newSpace->startTag = nextUp->startTag;
             newSpace->size = (size);
-            newSpace->endTag = (void*)((char*)(nextUp->startTag) + (size);
+            newSpace->endTag = (void*)((char*)(nextUp->startTag) + (size));
             newSpace->next = NULL;
             newSpace->prev = NULL;
 
-            nextUp->startTag = (void*)((char*)(nextUp->startTag) + (size);
+            nextUp->startTag = (void*)((char*)(nextUp->startTag) + (size));
             nextUp->size = nextUp->size - (size);
 
             fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
@@ -113,11 +113,11 @@ void *my_malloc(int size)
             freeListNode *newSpace = (void*)((char*)(previous->startTag));
             newSpace->startTag = previous->startTag;
             newSpace->size = (size);
-            newSpace->endTag = (void*)((char*)(previous->startTag) + (size);
+            newSpace->endTag = (void*)((char*)(previous->startTag) + (size));
             newSpace->next = NULL;
             newSpace->prev = NULL;
 
-            previous->startTag = (void*)((char*)(previous->startTag) + (size);
+            previous->startTag = (void*)((char*)(previous->startTag) + (size));
             previous->size = previous->size - (size);
 
             updateContiguous();
@@ -224,11 +224,11 @@ void *my_malloc(int size)
             freeListNode *newSpace = (void*)((char*)(next->startTag));
             newSpace->startTag = next->startTag;
             newSpace->size = (size);
-            newSpace->endTag = (void*)((char*)(next->startTag) + (size);
+            newSpace->endTag = (void*)((char*)(next->startTag) + (size));
             newSpace->next = NULL;
             newSpace->prev = NULL;
 
-            next->startTag = (void*)((char*)(next->startTag) + (size);
+            next->startTag = (void*)((char*)(next->startTag) + (size));
             next->size = next->size - (size);
 
             updateContiguous();
@@ -259,11 +259,11 @@ void *my_malloc(int size)
             freeListNode *newSpace = (void*)((char*)(prev->startTag));
             newSpace->startTag = prev->startTag;
             newSpace->size = (size);
-            newSpace->endTag = (void*)((char*)(prev->startTag) + (size);
+            newSpace->endTag = (void*)((char*)(prev->startTag) + (size));
             newSpace->next = NULL;
             newSpace->prev = NULL;
 
-            prev->startTag = (void*)((char*)(prev->startTag) + (size);
+            prev->startTag = (void*)((char*)(prev->startTag) + (size));
             prev->size = prev->size - (size);
 
             updateContiguous();
