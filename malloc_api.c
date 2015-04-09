@@ -105,7 +105,7 @@ void *my_malloc(int size)
         }
       } else if(previous != NULL)
       {
-        if (previous->size >= (size)
+        if (previous->size >= (size))
         {
           if(previous->size > (size + MIN_SIZE))
           {
@@ -145,7 +145,7 @@ void *my_malloc(int size)
       {
         if(nextUp->size >= (size)) //find best possible in next
         {
-          if(nextUp->size == (size)
+          if(nextUp->size == (size))
           {
             if(nextUp->next != NULL)
               nextUp->next->prev = nextUp->prev;
