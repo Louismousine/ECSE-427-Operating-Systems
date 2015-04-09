@@ -64,5 +64,6 @@ int main(int argc, char* argv[])
   my_free(buffer2);
 
   my_mallinfo();
+  fclose(output);
   return 0;
 }
