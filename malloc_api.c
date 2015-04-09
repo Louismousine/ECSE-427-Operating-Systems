@@ -405,7 +405,7 @@ void my_free(void *ptr)
     if(next != NULL)
     {
       //check corresponding tags, if they are equal update free list
-      if(next->startTag == new->endTag && next->size !=0 && new->size !=0)
+      if(next->startTag == new->endTag)
       {
         fprintf(stdout, "next startTag: %p\nnew endTag: %p\n", next->startTag, new->endTag);
         new->endTag = next->endTag;
@@ -415,6 +415,8 @@ void my_free(void *ptr)
         *nextAddr = next->next;
 
         next->size = 0;
+        next->endTag = NULL;
+        next->startTag = NULL;
         next->next = NULL;
         next->prev = NULL;
         fprintf(stdout, "new startTag: %p\nnew endTag: %p\nnew size: %d\n", new->startTag, new->endTag, new->size);
@@ -425,7 +427,7 @@ void my_free(void *ptr)
         prevAddr = &(new->prev);
         within = 1;
       //check corresponding tags, if they are equal update free list
-    }else if(next->endTag == new->startTag && next->size !=0 && new->size !=0)
+    }else if(next->endTag == new->startTag)
       {
         fprintf(stdout, "next endTag: %p\nnew startTag: %p\n", next->endTag, new->startTag);
         new->startTag = next->startTag;
@@ -434,6 +436,8 @@ void my_free(void *ptr)
           next->next->prev = next->prev;
         *nextAddr = next->next;
         next->size = 0;
+        next->endTag = NULL;
+        next->startTag = NULL;
         next->next = NULL;
         next->prev = NULL;
         fprintf(stdout, "new startTag: %p\nnew endTag: %p\nnew size: %d\n", new->startTag, new->endTag, new->size);
@@ -448,7 +452,7 @@ void my_free(void *ptr)
     if(previous != NULL)
     {
       //check corresponding tags, if they are equal update free list
-      if(previous->startTag == new->endTag && previous->size !=0 && new->size !=0)
+      if(previous->startTag == new->endTag)
       {
         fprintf(stdout, "previous startTag: %p\nnew endTag: %p\n", previous->startTag, new->endTag);
         new->endTag = previous->endTag;
@@ -457,6 +461,8 @@ void my_free(void *ptr)
           previous->prev->next = previous->next;
         *prevAddr = previous->prev;
         previous->size = 0;
+        previous->endTag = NULL;
+        previous->startTag = NULL;
         previous->next = NULL;
         previous->prev = NULL;
         fprintf(stdout, "previous startTag: %p\nprevious endTag: %p\nprevious size: %d\n", previous->startTag, previous->endTag, previous->size);
@@ -467,7 +473,7 @@ void my_free(void *ptr)
         prevAddr = &(new->prev);
         within = 1;
       //check corresponding tags, if they are equal update free list
-    }else if(previous->endTag == new->startTag  && previous->size !=0 && new->size !=0)
+      }else if(previous->endTag == new->startTag)
       {
         fprintf(stdout, "previous endTag: %p\nnew startTag: %p\n", previous->endTag, new->startTag);
 
@@ -477,6 +483,8 @@ void my_free(void *ptr)
           previous->prev->next = previous->next;
         *prevAddr = previous->prev;
         previous->size = 0;
+        previous->endTag = NULL;
+        previous->startTag = NULL;
         previous->next = NULL;
         previous->prev = NULL;
         fprintf(stdout, "previous startTag: %p\nprevious endTag: %p\nprevious size: %d\n", previous->startTag, previous->endTag, previous->size);
