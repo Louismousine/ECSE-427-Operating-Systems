@@ -46,7 +46,6 @@ void *my_malloc(int size)
   void* currentLoc = sbrk(0);
 
   bytesAlloc += (size + sizeof(freeListNode));
-  freeSpace += (mallocSize - size + sizeof(freeListNode));
 
   freeListNode *nextUp = freeListHead.next;
   freeListNode *previous = freeListHead.prev;
@@ -58,6 +57,8 @@ void *my_malloc(int size)
   {
     if(currentPolicy == 1)  //First fit
     {
+      freeSpace -= (size + sizeof(freeListNode));
+
       if(nextUp != NULL)
       {
         if(nextUp->size >= (size + sizeof(freeListNode)))
@@ -133,6 +134,8 @@ void *my_malloc(int size)
       }
     }else if(currentPolicy == 2) //Best Fit
     {
+      freeSpace -= (size + sizeof(freeListNode));
+
       if(nextUp != NULL)
       {
         if(nextUp->size >= (size + sizeof(freeListNode)))  //find best possible in next
@@ -219,15 +222,6 @@ void *my_malloc(int size)
             next->startTag = (void*)((char*)(next->startTag) + (size + sizeof(freeListNode)));
             next->size = next->size - (size + sizeof(freeListNode));
 
-            // fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnext startTag: %p\nnext endTag: %p\n",
-            //         newSpace->startTag, newSpace->endTag, freeListHead.next->startTag, freeListHead.next->endTag);
-            //
-            //
-            // fprintf(stdout, "next: %p\nnewSpace: %p\n", freeListHead.next, &(newSpace));
-            //
-            // fprintf(stdout, "newSpace startTag: %p\nnewSpace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
-            //         newSpace->startTag, newSpace->endTag, nextUp->startTag, nextUp->endTag);
-
             return ((char*) newSpace) + sizeof(freeListNode);
           }else //if not return this block
           {
@@ -295,6 +289,7 @@ void *my_malloc(int size)
 
   if(nextUp == NULL)
   {
+
     freeListNode *nextNew;
 
     nextNew = (freeListNode*)sbrk(size + sizeof(freeListNode));
@@ -303,6 +298,9 @@ void *my_malloc(int size)
     nextNew->size = size + sizeof(freeListNode);
     nextNew->next = NULL;
     nextNew->prev = NULL;
+
+    freeSpace += (mallocSize - size + sizeof(freeListNode));
+
 
     fprintf(stdout, "nextNew startTag: %p\nnextNew endTag: %p\nnextNew size: %d\n", nextNew->startTag, nextNew->endTag, nextNew->size);
 
@@ -364,7 +362,6 @@ void my_free(void *ptr)
     return;
   freeListNode *new = (freeListNode*)(((char*)ptr) - sizeof(freeListNode));
   new->next = freeListHead.next;
-  fprintf(stdout, "next startTag: %p\nnext endTag: %p\n", (void*)new->next->startTag, new->next->endTag);
 
   freeSpace += new->size;
   bytesAlloc -= new->size;
@@ -374,14 +371,10 @@ void my_free(void *ptr)
 
   new->prev = &(freeListHead);
 
-  // if(new->prev != NULL)
-  //   new->prev->next = new;
+  if(new->prev != NULL)
+    new->prev->next = new;
 
   freeListHead.next = new;
-
-  fprintf(stdout, "new next: %p\n", new->next);
-
-  fprintf(stdout, "new startTag: %p\nnew endTag: %p\n", new->startTag, new->endTag);
 
 
   //set uo required data to check adjacent free blocks
@@ -389,10 +382,6 @@ void my_free(void *ptr)
   freeListNode *previous = new->prev;
   freeListNode **nextAddr = &(new->next);
   freeListNode **prevAddr = &(new->prev);
-
-  //next->startTag = (void*)(freeListHead.next->startTag);
-  fprintf(stdout, "next startTag: %p\nnext endTag: %p\n", next->startTag, next->endTag);
-
 
   int within = 0;
   //if the block we are freeing has adjacent free block combine them
