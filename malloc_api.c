@@ -221,7 +221,7 @@ void my_free(void *ptr)
 
   int within = 0;
   //if the block we are freeing has adjacent free block combine them
-  while(next != NULL
+  while(next != NULL)
   {
     within = 0;
     //check corresponding tags, if they are equal update free list
