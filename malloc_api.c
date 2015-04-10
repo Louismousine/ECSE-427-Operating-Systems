@@ -121,7 +121,7 @@ void *my_malloc(int size)
   //if running a best fit approach, now search for the best result that was found and return that spot
   if(currentPolicy == 2)
   {
-    freeListNode *next = freeListHead;
+    freeListNode *next = *(freeListHead);
 
     while(next->next != NULL)
     {
