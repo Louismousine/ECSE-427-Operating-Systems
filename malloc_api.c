@@ -7,7 +7,7 @@
 #define FIRST_FIT 1
 #define BEST_FIT 2
 
-#define MIN_FREE 50
+#define MIN_FREE 100
 #define MAX_FREE_BLOCK 128000
 #define MALLOC_BLOCKSIZE 2048
 #define FREE_RM 20000
