@@ -7,7 +7,7 @@
 int main(int argc, char* argv[])
 {
   FILE *output = fopen("malloc_output.txt", "w");
-  int* buffer = my_malloc(2000);
-  
+  int* buffer = my_malloc(2048);
+
   return 0;
 }
