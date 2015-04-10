@@ -45,12 +45,12 @@ void *my_malloc(int size)
     int* free_end = (int*)sbrk(0);
 
     fprintf(stdout, "initial start: %p\n", start);
-    start = NEW_TAG(size, 0);
+    *start = NEW_TAG(size, 0);
     fprintf(stdout, "post tag start: %p\n", start);
-    start = INCR_PTR(start, 4);
+    *start = INCR_PTR(start, 4);
     fprintf(stdout, "post INCR start: %p\n", start);
     int* end = INCR_PTR(start, size-4);
-    end = NEW_TAG(size, 0);
+    *end = NEW_TAG(size, 0);
     //end = INCR_PTR(end, 4)
 
   }
