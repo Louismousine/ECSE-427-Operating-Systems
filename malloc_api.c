@@ -41,13 +41,13 @@ void *my_malloc(int size)
 
   if(head.next == NULL || tail.prev == NULL)
   {
-    int* start = (int*)sbrk(full_size);
+    void* start = (int*)sbrk(full_size);
     int* free_end = (int*)sbrk(0);
 
     fprintf(stdout, "initial start: %p\n", start);
     *start = NEW_TAG(size, 0);
     fprintf(stdout, "post tag start: %p\n", start);
-    *start = (int*)INCR_PTR(start, 4);
+    *start = INCR_PTR(start, 4);
     fprintf(stdout, "post INCR start: %p\n", start);
     int* end = (int*)INCR_PTR(start, size-4);
     *end = NEW_TAG(size, 0);
