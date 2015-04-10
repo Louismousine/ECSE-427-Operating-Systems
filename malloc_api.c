@@ -281,35 +281,18 @@ void my_free(void *ptr)
 void updateContiguous()
 {
   freeListNode *next = freeListHead.next;
-  freeListNode *prev = freeListHead.prev;
-  freeListNode **nextAddr = &(freeListHead.next);
-  freeListNode **prevAddr = &(freeListHead.prev);
 
   if(next != NULL)
     largestSpace = next->size;
 
-  while(next != NULL || prev != NULL)
+  while(next != NULL)
   {
-    if(next != NULL)
-    {
-      if(next->size > largestSpace)
-        largestSpace = next->size;
-    }
-    if(prev != NULL)
-    {
-      if(prev->size > largestSpace)
-        largestSpace = prev->size;
-    }
+    if(next->size > largestSpace)
+      largestSpace = next->size;
 
     if(next != NULL)
     {
-      nextAddr = &(next->next);
       next = next->next;
-    }
-    if(prev != NULL)
-    {
-      prevAddr = &(prev->prev);
-      prev = prev->prev;
     }
   }
 }
@@ -319,46 +302,22 @@ void updateTopFreeBlock()
   void* topBlock = sbrk(0);
 
   freeListNode *next = freeListHead.next;
-  freeListNode *prev = freeListHead.prev;
   freeListNode **nextAddr = &(freeListHead.next);
-  freeListNode **prevAddr = &(freeListHead.prev);
 
-  while(next != NULL || prev != NULL)
+  while(next != NULL)
   {
-    if(next != NULL)
+    if(next->endTag == topBlock)
     {
-      if(next->endTag == topBlock)
+      if(next->size >= MAX_FREE_BLOCK)
       {
-        if(next->size >= MAX_FREE_BLOCK)
-        {
-          sbrk(-20000);
-          next->size -= FREE_RM;
-          next->endTag = sbrk(0);
-        }
+        sbrk(-20000);
+        next->size -= 20000;
+        next->endTag = sbrk(0);
       }
     }
-    if(prev != NULL)
-    {
-      if(prev->endTag == topBlock)
-      {
-        if(prev->size >= MAX_FREE_BLOCK)
-        {
-          sbrk(-20000);
-          prev->size -= FREE_RM;
-          prev->endTag = sbrk(0);
-        }
-      }
-    }
-
     if(next != NULL)
     {
-      nextAddr = &(next->next);
       next = next->next;
-    }
-    if(prev != NULL)
-    {
-      prevAddr = &(prev->prev);
-      prev = prev->prev;
     }
   }
   updateContiguous();
