@@ -25,7 +25,7 @@ typedef struct freeListNode
 void updateContiguous();
 void updateTopFreeBlock();
 
-static freeListNode *freeListHead = {NULL, NULL, 0, NULL};
+static freeListNode freeListHead = {NULL, NULL, 0, NULL};
 extern char *my_malloc_error;
 
 int currentPolicy = 1;
@@ -41,7 +41,7 @@ void *my_malloc(int size)
   int alignSize = size + sizeof(freeListNode);
   int mallocSize = ALIGN(alignSize);
 
-  freeListNode *nextUp = freeListHead;
+  freeListNode *nextUp = &(freeListHead);
   //check free list for open spot
   while(nextUp->next != NULL)
   {
@@ -121,7 +121,7 @@ void *my_malloc(int size)
   //if running a best fit approach, now search for the best result that was found and return that spot
   if(currentPolicy == 2)
   {
-    freeListNode *next = freeListHead;
+    freeListNode *next = &(freeListHead);
 
     while(next->next != NULL)
     {
