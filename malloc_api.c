@@ -17,7 +17,7 @@
 #define DECR_PTR(ptr, len) (((char*)ptr) - len)
 #define NEW_TAG(len,free) ((len << 1) + free == 1 ? 0b1 : 0b0)
 
-typedef struct freeListNode
+typedef struct FreeListNode
 {
   struct FreeListNode *prev;
   struct FreeListNode *next;
