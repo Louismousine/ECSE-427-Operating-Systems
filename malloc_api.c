@@ -19,9 +19,9 @@
 
 typedef struct FreeListNode
 {
-  struct FreeListNode *prev;
   struct FreeListNode *next;
-} freeListNode;
+  struct FreeListNode *prev;
+} FreeListNode;
 
 void updateContiguous();
 void updateTopFreeBlock();
