@@ -184,7 +184,7 @@ void *my_malloc(int size)
     freeListNode *newFree = (freeListNode*)sbrk(mallocSize - size + sizeof(freeListNode));
     newFree->startTag = newLoc;
     newFree->endTag = sbrk(0);
-    *(newFree->next) = *(freeListHead.next);
+    newFree->next = freeListHead.next;
     newFree->size = mallocSize - size;
 
     freeListHead.next = newFree;
