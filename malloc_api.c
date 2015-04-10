@@ -7,6 +7,7 @@
 #define FIRST_FIT 1
 #define BEST_FIT 2
 
+#define MIN_FREE 50
 #define MAX_FREE_BLOCK 128000
 #define MALLOC_BLOCKSIZE 2048
 #define FREE_RM 20000
@@ -45,7 +46,7 @@ void *my_malloc(int size)
   //fprintf(stdout, "correct size is %d\n", mallocSize);
   void* currentLoc = sbrk(0);
 
-  bytesAlloc += (size + sizeof(freeListNode));
+  bytesAlloc += size;
 
   freeListNode *nextUp = freeListHead.next;
   freeListNode *previous = freeListHead.prev;
@@ -60,21 +61,21 @@ void *my_malloc(int size)
 
       if(nextUp != NULL)
       {
-        if(nextUp->size >= (size + sizeof(freeListNode)))
+        if(nextUp->size >= size )
         {
-          freeSpace -= (size + sizeof(freeListNode));
-          if(nextUp->size > (size + 2*sizeof(freeListNode)))
+          freeSpace -= size;
+          if(nextUp->size > size + MIN_FREEE )
           {
             fprintf(stdout, "spliting free block that was found\n");
             freeListNode *newSpace = (void*)((char*)(nextUp->startTag));
             newSpace->startTag = nextUp->startTag;
-            newSpace->size = (size + sizeof(freeListNode));
-            newSpace->endTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
+            newSpace->size = size;
+            newSpace->endTag = (void*)((char*)(nextUp->startTag) + size );
             newSpace->next = NULL;
             newSpace->prev = NULL;
 
-            nextUp->startTag = (void*)((char*)(nextUp->startTag) + (size + sizeof(freeListNode)));
-            nextUp->size = nextUp->size - (size + sizeof(freeListNode));
+            nextUp->startTag = (void*)((char*)(nextUp->startTag) + size );
+            nextUp->size = nextUp->size - size;
 
             fprintf(stdout, "newspace startTag: %p\nnewspace endTag: %p\nnextUp startTag: %p\nnextUp endTag: %p\n",
                     newSpace->startTag, newSpace->endTag, nextUp->startTag, nextUp->endTag);
@@ -460,6 +461,7 @@ void my_free(void *ptr)
         fprintf(stdout, "previous startTag: %p\nnew endTag: %p\n", previous->startTag, new->endTag);
         new->endTag = previous->endTag;
         new->size += previous->size;
+        new->prev
         if(previous->prev != NULL)
           previous->prev->next = previous->next;
         *prevAddr = previous->prev;
