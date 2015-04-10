@@ -47,9 +47,9 @@ void *my_malloc(int size)
     fprintf(stdout, "initial start: %p\n", start);
     *start = NEW_TAG(size, 0);
     fprintf(stdout, "post tag start: %p\n", start);
-    *start = INCR_PTR(start, 4);
+    *start = (int*)INCR_PTR(start, 4);
     fprintf(stdout, "post INCR start: %p\n", start);
-    int* end = INCR_PTR(start, size-4);
+    int* end = (int*)INCR_PTR(start, size-4);
     *end = NEW_TAG(size, 0);
     //end = INCR_PTR(end, 4)
 
