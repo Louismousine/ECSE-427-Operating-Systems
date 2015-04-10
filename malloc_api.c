@@ -64,7 +64,7 @@ void *my_malloc(int size)
         if(nextUp->size >= size )
         {
           freeSpace -= size;
-          if(nextUp->size > size + MIN_FREEE )
+          if(nextUp->size > size + MIN_FREE )
           {
             fprintf(stdout, "spliting free block that was found\n");
             freeListNode *newSpace = (void*)((char*)(nextUp->startTag));
@@ -461,7 +461,7 @@ void my_free(void *ptr)
         fprintf(stdout, "previous startTag: %p\nnew endTag: %p\n", previous->startTag, new->endTag);
         new->endTag = previous->endTag;
         new->size += previous->size;
-        new->prev
+        new->prev = previous->prev;
         if(previous->prev != NULL)
           previous->prev->next = previous->next;
         *prevAddr = previous->prev;
