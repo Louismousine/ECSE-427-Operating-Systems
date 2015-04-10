@@ -240,8 +240,8 @@ void my_free(void *ptr)
       next->next = NULL;
       fprintf(stdout, "new startTag: %p\nnew endTag: %p\nnew size: %d\n", new->startTag, new->endTag, new->size);
 
-      next = freeListHead.next;
-      nextAddr = &(freeListHead.next);
+      next = new->next;
+      nextAddr = &(new->next);
 
       within = 1;
     //check corresponding tags, if they are equal update free list
