@@ -141,11 +141,7 @@ void my_free(void *ptr)
     int* start = (int*)INCR_PTR(bot_check, 4);
     FreeListNode *new = (FreeListNode*)start;
     addNode(new);
-    fprintf(stdout, "new free node: %p\n", new);
-
-    fprintf(stdout, "new free node next: %p\n", new->next);
-
-    fprintf(stdout, "new free node prev: %p\n", new->prev);
+    
   }else if(!bot_free)
   {
     int bot_size = GET_TAG_SIZE(bot_check[0]);
@@ -168,11 +164,6 @@ void my_free(void *ptr)
 
     FreeListNode *new = (FreeListNode*)start;
     addNode(new);
-    fprintf(stdout, "new free node: %p\n", new);
-
-    fprintf(stdout, "new free node next: %p\n", new->next);
-
-    fprintf(stdout, "new free node prev: %p\n", new->prev);
   }else if(!top_free)
   {
     int top_size = GET_TAG_SIZE(top_check[0]);
@@ -192,11 +183,6 @@ void my_free(void *ptr)
     int* start = (int*)INCR_PTR(new_free, 4);
     FreeListNode *new = (FreeListNode*)start;
     addNode(new);
-    fprintf(stdout, "new free node: %p\n", new);
-
-    fprintf(stdout, "new free node next: %p\n", new->next);
-
-    fprintf(stdout, "new free node prev: %p\n", new->prev);
   }else
   {
 
@@ -208,11 +194,6 @@ void my_free(void *ptr)
 
     FreeListNode *new = (FreeListNode*)start;
     addNode(new);
-    fprintf(stdout, "new free node: %p\n", new);
-
-    fprintf(stdout, "new free node next: %p\n", new->next);
-
-    fprintf(stdout, "new free node prev: %p\n", new->prev);
   }
 }
 
