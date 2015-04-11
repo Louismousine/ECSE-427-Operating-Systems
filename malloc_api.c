@@ -16,7 +16,8 @@
 #define INCR_PTR(ptr, len) (((char*)ptr) + len)
 #define DECR_PTR(ptr, len) (((char*)ptr) - len)
 #define NEW_TAG(len,free) ((len << 1) + (free == 1 ? 0b0 : 0b1))
-#define TAG_SIZE
+#define GET_TAG_SIZE(ptr) (ptr >> 1)
+#define GET_TAG_FREE(ptr) (ptr & 0b1)
 
 typedef struct FreeListNode
 {
@@ -26,10 +27,13 @@ typedef struct FreeListNode
 
 void updateContiguous();
 void updateTopFreeBlock();
-unsigned getBits(unsigned start, unsigned finish, unsigned num);
+void* createNew(int size, int best_size);
+void removeNode(FreeListNode *iter);
+void addNode(FreeListNode *new);
 
-static FreeListNode head = {NULL, NULL};
-static FreeListNode tail = {NULL, NULL};
+FreeListNode *head;
+FreeListNode *tail;
+
 extern char *my_malloc_error;
 
 int currentPolicy = 1;
@@ -39,62 +43,150 @@ int largestSpace = 0;
 
 void *my_malloc(int size)
 {
-  int full_size = ALIGN(size);
-  fprintf(stdout, "full_size: %d\n", full_size);
-
-  if(head.next == NULL || tail.prev == NULL)
+  if(size < 0)
   {
-    int* start = (int*)sbrk(full_size);
-    int* free_end = (int*)sbrk(0);
-
-    *start = NEW_TAG(size, 0);
-    start = (int*)INCR_PTR(start, 4);
-    int* end = (int*)INCR_PTR(start, size);
-    *end = NEW_TAG(size, 0);
-
-    int* free_start = (int*)INCR_PTR(end, 4);
-    *free_start = NEW_TAG(full_size - size, 1);
-    free_start = (int*)INCR_PTR(free_start, 4);
-
-    FreeListNode *new = (FreeListNode*)free_start;
-
-    new->next = &(tail);
-    new->prev = &(head);
-    tail.prev = new;
-    head.next = new;
-
-    free_end = (int*)DECR_PTR(free_end, 4);
-    *free_end = NEW_TAG(full_size - size, 1);
-
-    start = (int*)DECR_PTR(start, 4);
-
-    unsigned val = getBits(1, 31, (unsigned)(start[0] >> 1));
-    unsigned used = getBits(0, 0, (unsigned)(start[0]));
-    fprintf(stdout, "val: %d\nused: %d\n", val, used);
-
-    return (void*)start;
-  } else
-  {
-    FreeListNode *next_iter = head.next;
-    FreeListNode *prev_init = tail.prev;
-    while(next_iter != NULL || prev_init != NULL)
-    {
-      if(next_iter != NULL)
-      {
-        int* check = (int*)(next_iter);
-
-        check = (int*)DECR_PTR(check, 4);
-
-
-      }
-    }
+    fprintf(stderr, "Error, requested a negative size\n");
+    return;
   }
+  if(currentPolicy == 1)
+  {
+    FreeListNode *iter = head;
+    unsigned best = 128001;
 
+    while(iter != NULL)
+    {
+      int* check = (int*)(iter);
+
+      check = (int*)DECR_PTR(check, 4);
+      unsigned avail_size = GET_TAG_SIZE(check[0]);
+      //fprintf(stdout, "size:%d\n", avail_size);
+      if(avail_size - 8 >= size)
+      {
+        return createNew(size, avail_size);
+      }
+      if(iter != NULL)
+        iter = iter->next;
+    }
+    return createNew(size, -1);
+  }else if(currentPolicy == 2)
+  {
+    FreeListNode *iter = head;
+    unsigned best = 128001;
+
+    while(iter != NULL)
+    {
+      int* check = (int*)(iter);
+
+      check = (int*)DECR_PTR(check, 4);
+      unsigned avail_size = GET_TAG_SIZE(check[0]);
+      //fprintf(stdout, "size:%d\n", avail_size);
+      if(avail_size - 8 == size)
+        return createNew(size, avail_size);
+      else if(avail_size - 8 >= size && avail_size <= best)
+      {
+        best = avail_size;
+      }
+      if(iter != NULL)
+        iter = iter->next;
+    }
+    return createNew(size, best);
+  }else
+  {
+
+  }
 }
 
 void my_free(void *ptr)
 {
+  int* new_free = (int*)(ptr);
 
+  new_free = (int*)DECR_PTR(new_free, 4);
+
+  int free_size = GET_TAG_SIZE(new_free[0]);
+  fprintf(stdout, "free_size: %d\n", free_size);
+
+  int* bot_check = (int*)DECR_PTR(new_free, 4);
+  int* top_check = (int*)INCR_PTR(new_free, free_size + 4);
+
+  int bot_free = GET_TAG_FREE(bot_check[0]);
+  fprintf(stdout, "bot_free: %d\n", bot_free);
+  int top_free = GET_TAG_FREE(top_check[0]);
+  fprintf(stdout, "top_free: %d\n", top_free);
+
+  if(!bot_free && !top_free)
+  {
+    int bot_size = GET_TAG_SIZE(bot_check[0]);
+    bot_check = (int*)DECR_PTR(bot_check, bot_size);
+
+    int top_size = GET_TAG_SIZE(top_check[0]);
+    top_check = (int*)INCR_PTR (top_check, top_size);
+
+    FreeListNode *rem_bot = (FreeListNode*)(bot_check);
+    FreeListNode *rem_top = (FreeListNode*)(top_check);
+
+    removeNode(rem_bot);
+    removeNode(rem_top);
+
+    free_size += (bot_size + top_size + 16);
+    bot_check = (int*)DECR_PTR(bot_check, 4);
+    top_check = (int*)INCR_PTR(top_check, 4);
+    *bot_check = NEW_TAG(free_size, 1);
+    *top_check = NEW_TAG(free_size, 1);
+
+    int* start = (int*)INCR_PTR(bot_check, 4);
+    FreeListNode *new = (FreeListNode*)start;
+    addNode(new);
+
+  }else if(!bot_free)
+  {
+    int bot_size = GET_TAG_SIZE(bot_check[0]);
+    bot_check = (int*)DECR_PTR(bot_check, bot_size);
+
+    FreeListNode *rem_bot = (FreeListNode*)(bot_check);
+
+    removeNode(rem_bot);
+
+    bot_check = (int*)DECR_PTR(bot_check, 4);
+    new_free = (int*)INCR_PTR(new_free, free_size + 4);
+
+    free_size += (bot_size + 8);
+
+    *bot_check = NEW_TAG(free_size, 1);
+    *new_free = NEW_TAG(free_size, 1);
+
+    int* start = (int*)INCR_PTR(bot_check, 4);
+
+    FreeListNode *new = (FreeListNode*)start;
+    addNode(new);
+  }else if(!top_free)
+  {
+    int top_size = GET_TAG_SIZE(top_check[0]);
+    top_check = (int*)INCR_PTR (top_check, top_size);
+
+    FreeListNode *rem_top = (FreeListNode*)(top_check);
+
+    removeNode(rem_top);
+
+    top_check = (int*)INCR_PTR(top_check, 4);
+
+    free_size += (top_size + 8);
+    *new_free = NEW_TAG(free_size, 1);
+    *top_check = NEW_TAG(free_size, 1);
+
+    int* start = (int*)INCR_PTR(new_free, 4);
+    FreeListNode *new = (FreeListNode*)start;
+    addNode(new);
+  }else
+  {
+    *new_free = NEW_TAG(free_size, 1);
+    new_free = (int*)INCR_PTR(new_free, free_size + 4);
+    *new_free = NEW_TAG(free_size, 1);
+
+    int* start = (int*)INCR_PTR(bot_check, 8);
+
+    FreeListNode *new = (FreeListNode*)start;
+    addNode(new);
+  }
 }
 
 void updateContiguous()
@@ -130,13 +222,164 @@ void my_mallinfo()
   fprintf(stdout, "Current policy number: %d\n", currentPolicy);
 }
 
-unsigned getBits(unsigned start, unsigned finish, unsigned num)
+void* createNew(int size, int best_size)
 {
-   unsigned result = 0;
-   unsigned i;
-   for (i=start; i<=finish; i++)
-   {
-       result |= 1 << i;
+  int full_size = ALIGN(size);
+  fprintf(stdout, "full_size: %d\n", full_size);
+  if(best_size == -1 || best_size == 128001)
+  {
+    if(full_size > (size + 2*sizeof(FreeListNode) +  8))
+    {
+      int* start = (int*)sbrk(full_size + 8);
+      int* free_end = (int*)sbrk(0);
+
+      *start = NEW_TAG(size, 0);
+      start = (int*)INCR_PTR(start, 4);
+      int* end = (int*)INCR_PTR(start, size);
+      *end = NEW_TAG(size, 0);
+
+      int* free_start = (int*)INCR_PTR(end, 4);
+      *free_start = NEW_TAG(full_size - size, 1);
+      free_start = (int*)INCR_PTR(free_start, 4);
+
+      FreeListNode *new = (FreeListNode*)free_start;
+      //FreeListNode *temp = head;
+      addNode(new);
+
+      fprintf(stdout, "new free node: %p\n", new);
+
+      fprintf(stdout, "new free node next: %p\n", new->next);
+
+      fprintf(stdout, "new free node prev: %p\n", new->prev);
+
+      free_end = (int*)DECR_PTR(free_end, 4);
+      *free_end = NEW_TAG(full_size - size, 1);
+
+      return (void*)start;
+    } else
+    {
+      int* start = (int*)sbrk(full_size + 8);
+
+      *start = NEW_TAG(full_size, 0);
+      start = (int*)INCR_PTR(start, 4);
+      int* end = (int*)INCR_PTR(start, full_size);
+      *end = NEW_TAG(full_size, 0);
+
+      fprintf(stdout, "Allocated %d extra bytes to requested malloc()\n", full_size - size);
+      return (void*)start;
     }
-   return result & num;
+  }else
+  {
+    FreeListNode *iter = head;
+    while(iter != NULL)
+    {
+      int* check = (int*)(iter);
+
+      check = (int*)DECR_PTR(check, 4);
+      unsigned avail_size = GET_TAG_SIZE(check[0]);
+      if(avail_size == best_size)
+        break;
+      else if(iter != NULL)
+        iter = iter->next;
+
+    }
+    int* check = (int*)(iter);
+
+    check = (int*)DECR_PTR(check, 4);
+    unsigned avail_size = GET_TAG_SIZE(check[0]);
+    fprintf(stdout, "size:%d\n", avail_size);
+    if(avail_size - 8 >= size && avail_size > (size + 2*sizeof(FreeListNode) + 8))
+    {
+      fprintf(stdout, "filling free block\n");
+      int new_size = avail_size - (size + 8);
+      int* start = (int*)check;
+      int* free_end = (int*)INCR_PTR(check, avail_size);
+
+      *start = NEW_TAG(size, 0);
+      start = (int*)INCR_PTR(start, 4);
+      int* end = (int*)INCR_PTR(start, size);
+      *end = NEW_TAG(size, 0);
+
+      int* free_start = (int*)INCR_PTR(end, 4);
+      *free_start = NEW_TAG(new_size, 1);
+      free_start = (int*)INCR_PTR(free_start, 4);
+
+      removeNode(iter);
+
+      FreeListNode *new = (FreeListNode*)free_start;
+      addNode(new);
+
+      fprintf(stdout, "current free node: %p\n", new);
+      fprintf(stdout, "current free node next: %p\n", new->next);
+      fprintf(stdout, "current free node prev: %p\n", new->prev);
+
+      free_end = (int*)DECR_PTR(free_end, 4);
+      *free_end = NEW_TAG(new_size, 1);
+
+      return (void*)start;
+    } else if(avail_size - 8 >= size)
+    {
+      int* start = (int*)check;
+
+      *start = NEW_TAG(avail_size-8, 0);
+      start = (int*)INCR_PTR(start, 4);
+      int* end = (int*)INCR_PTR(start, avail_size-8);
+      *end = NEW_TAG(avail_size-8, 0);
+
+      fprintf(stdout, "removed free node: %p\n", iter);
+
+      fprintf(stdout, "removed free node next: %p\n", iter->next);
+
+      fprintf(stdout, "removed free node prev: %p\n", iter->prev);
+
+      if(iter->next != NULL)
+      iter->next->prev = iter->prev;
+      if(iter->prev != NULL)
+      iter->prev->next = iter->next;
+
+      iter->next = NULL;
+      iter->prev = NULL;
+      iter = NULL;
+
+      fprintf(stdout, "Allocated %d extra bytes to requested malloc()\n", avail_size - (size + 8));
+      return (void*)start;
+    }
+  }
+}
+
+void removeNode(FreeListNode *iter)
+{
+  if(iter->prev != NULL)
+    iter->prev->next = iter->next;
+  if(iter->next != NULL)
+    iter->next->prev = iter->prev;
+
+  if(iter == head)
+  {
+    head = iter->next;
+  }
+  if(iter == tail)
+  {
+    tail = iter->prev;
+  }
+
+  iter->next = NULL;
+  iter->prev = NULL;
+  iter = NULL;
+
+}
+
+void addNode(FreeListNode *new)
+{
+  if(head != NULL)
+  {
+    head->prev = new;
+    new->next = head;
+    head = new;
+    new->prev = NULL;
+  }else
+  {
+    head = new;
+    tail = new;
+  }
 }
