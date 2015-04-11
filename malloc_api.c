@@ -301,7 +301,7 @@ void* createNew(int size, int best_size)
       fprintf(stdout, "filling free block\n");
       int new_size = (avail_size - (size + 8));
       int* start = (int*)check;
-      int* free_end = (int*)INCR_PTR(check, (avail_size - 4));
+      int* free_end = (int*)INCR_PTR(check, (avail_size));
 
       *start = NEW_TAG(size, 0);
       start = (int*)INCR_PTR(start, 4);
