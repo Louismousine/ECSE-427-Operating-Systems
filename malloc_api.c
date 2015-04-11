@@ -16,7 +16,7 @@
 #define INCR_PTR(ptr, len) (((char*)ptr) + len)
 #define DECR_PTR(ptr, len) (((char*)ptr) - len)
 #define NEW_TAG(len,free) ((len << 1) + (free == 1 ? 0b0 : 0b1))
-#define GET_TAG_SIZE(ptr) (ptr >> 1)
+#define GET_TAG_SIZE(len) (len >> 1)
 #define GET_TAG_FREE(ptr) (ptr & 0b1)
 
 typedef struct FreeListNode
@@ -106,7 +106,7 @@ void my_free(void *ptr)
   fprintf(stdout, "free_size: %d\n", free_size);
 
   int* bot_check = (int*)DECR_PTR(new_free, 4);
-  int* top_check = (int*)INCR_PTR(new_free, (free_size + 4));
+  int* top_check = (int*)INCR_PTR(new_free, (free_size + 8));
 
   int bot_free = GET_TAG_FREE(bot_check[0]);
   fprintf(stdout, "bot_free: %d\n", bot_free);
@@ -120,9 +120,11 @@ void my_free(void *ptr)
   {
     int bot_size = GET_TAG_SIZE(bot_check[0]);
     bot_check = (int*)DECR_PTR(bot_check, (bot_size - 8));
+    fprintf(stdout, "bot_size: %d\n", bot_size);
 
     int top_size = GET_TAG_SIZE(top_check[0]);
     top_check = (int*)INCR_PTR (top_check, (top_size - 8));
+    fprintf(stdout, "bot_size: %d\n", top_size);
 
     FreeListNode *rem_bot = (FreeListNode*)(bot_check);
     FreeListNode *rem_top = (FreeListNode*)(top_check);
@@ -166,6 +168,7 @@ void my_free(void *ptr)
   {
     int top_size = GET_TAG_SIZE(top_check[0]);
     top_check = (int*)INCR_PTR (top_check, (top_size-8));
+    fprintf(stdout, "bot_size: %d\n", top_size);
 
     FreeListNode *rem_top = (FreeListNode*)(top_check);
 
@@ -256,7 +259,7 @@ void* createNew(int size, int best_size)
 
       fprintf(stdout, "new free node prev: %p\n", new->prev);
 
-      free_end = (int*)INCR_PTR(free_start, (full_size - size - 4));
+      free_end = (int*)DECR_PTR(free_end, 4);
       *free_end = NEW_TAG((full_size - size), 1);
 
       return (void*)start;
@@ -295,9 +298,9 @@ void* createNew(int size, int best_size)
     if(avail_size - 8 >= size && avail_size > (size + 2*sizeof(FreeListNode) + 8))
     {
       fprintf(stdout, "filling free block\n");
-      int new_size = avail_size - (size + 8);
+      int new_size = (avail_size - (size + 8));
       int* start = (int*)check;
-      int* free_end = (int*)INCR_PTR(check, (avail_size + 4));
+      int* free_end = (int*)INCR_PTR(check, (avail_size - 4));
 
       *start = NEW_TAG(size, 0);
       start = (int*)INCR_PTR(start, 4);

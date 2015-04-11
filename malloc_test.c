@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-  my_mallopt(2);
+  my_mallopt(1);
   FILE *output = fopen("malloc_output.txt", "w");
   int* buffer = my_malloc(2048);
   int i = 0;
@@ -16,7 +16,8 @@ int main(int argc, char* argv[])
     buffer[i] = i + k;
     k++;
   }
-  int* buffer2 = my_malloc(2048);
+  int* buffer2 = my_malloc(5000);
+  //int* buffer5 = my_malloc(5000);
   k = 0;
   for(i = 0; i < 2048/sizeof(int); i++)
   {
@@ -25,7 +26,7 @@ int main(int argc, char* argv[])
   }
   my_free(buffer);
   //my_free(buffer2);
-  int* buffer3 = my_malloc(14000);
+  int* buffer3 = my_malloc(13000);
   k = 0;
   for(i = 0; i < 2048/sizeof(int); i++)
   {
