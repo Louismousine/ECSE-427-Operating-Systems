@@ -16,10 +16,10 @@ int main(int argc, char* argv[])
     buffer[i] = i + k;
     k++;
   }
-  int* buffer2 = my_malloc(2048);
+  int* buffer2 = my_malloc(12048);
   //int* buffer5 = my_malloc(5000);
   k = 0;
-  for(i = 0; i < 2048/sizeof(int); i++)
+  for(i = 0; i < 12048/sizeof(int); i++)
   {
     buffer2[i] = i + k;
     k++;
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
     buffer3[i] = i + k;
     k++;
   }
-  int* buffer4 = my_malloc(15000);
+  int* buffer4 = my_malloc(2048);
   k = 0;
   for(i = 0; i < 15000/sizeof(int); i++)
   {
