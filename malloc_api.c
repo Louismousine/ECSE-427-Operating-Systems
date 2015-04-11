@@ -119,7 +119,7 @@ void my_free(void *ptr)
   if(!bot_free && !top_free)
   {
     int bot_size = GET_TAG_SIZE(bot_check[0]);
-    bot_check = (int*)DECR_PTR(bot_check, (bot_size - 4));
+    bot_check = (int*)DECR_PTR(bot_check, (bot_size - 12));
     fprintf(stdout, "bot_size: %d\n", bot_size);
 
     int top_size = GET_TAG_SIZE(top_check[0]);
