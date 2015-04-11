@@ -106,20 +106,23 @@ void my_free(void *ptr)
   fprintf(stdout, "free_size: %d\n", free_size);
 
   int* bot_check = (int*)DECR_PTR(new_free, 4);
-  int* top_check = (int*)INCR_PTR(new_free, free_size + 4);
+  int* top_check = (int*)INCR_PTR(new_free, (free_size + 4));
 
   int bot_free = GET_TAG_FREE(bot_check[0]);
   fprintf(stdout, "bot_free: %d\n", bot_free);
   int top_free = GET_TAG_FREE(top_check[0]);
   fprintf(stdout, "top_free: %d\n", top_free);
 
+  int bot_size_check = GET_TAG_SIZE(bot_check[0]);
+  if(bot_size_check == 0)
+    bot_free = -1;
   if(!bot_free && !top_free)
   {
     int bot_size = GET_TAG_SIZE(bot_check[0]);
-    bot_check = (int*)DECR_PTR(bot_check, bot_size);
+    bot_check = (int*)DECR_PTR(bot_check, (bot_size - 8));
 
     int top_size = GET_TAG_SIZE(top_check[0]);
-    top_check = (int*)INCR_PTR (top_check, top_size);
+    top_check = (int*)INCR_PTR (top_check, (top_size - 8));
 
     FreeListNode *rem_bot = (FreeListNode*)(bot_check);
     FreeListNode *rem_top = (FreeListNode*)(top_check);
@@ -127,7 +130,7 @@ void my_free(void *ptr)
     removeNode(rem_bot);
     removeNode(rem_top);
 
-    free_size += (bot_size + top_size + 16);
+    free_size += (bot_size + top_size + 8);
     bot_check = (int*)DECR_PTR(bot_check, 4);
     top_check = (int*)INCR_PTR(top_check, 4);
     *bot_check = NEW_TAG(free_size, 1);
@@ -140,14 +143,15 @@ void my_free(void *ptr)
   }else if(!bot_free)
   {
     int bot_size = GET_TAG_SIZE(bot_check[0]);
-    bot_check = (int*)DECR_PTR(bot_check, bot_size);
+    fprintf(stdout, "bot_size: %d\n", bot_size);
+    bot_check = (int*)DECR_PTR(bot_check, (bot_size - 8));
 
     FreeListNode *rem_bot = (FreeListNode*)(bot_check);
 
     removeNode(rem_bot);
 
     bot_check = (int*)DECR_PTR(bot_check, 4);
-    new_free = (int*)INCR_PTR(new_free, free_size + 4);
+    new_free = (int*)INCR_PTR(new_free, (free_size + 4));
 
     free_size += (bot_size + 8);
 
@@ -161,7 +165,7 @@ void my_free(void *ptr)
   }else if(!top_free)
   {
     int top_size = GET_TAG_SIZE(top_check[0]);
-    top_check = (int*)INCR_PTR (top_check, top_size);
+    top_check = (int*)INCR_PTR (top_check, (top_size-8));
 
     FreeListNode *rem_top = (FreeListNode*)(top_check);
 
@@ -178,11 +182,11 @@ void my_free(void *ptr)
     addNode(new);
   }else
   {
-    *new_free = NEW_TAG(free_size, 1);
-    new_free = (int*)INCR_PTR(new_free, free_size + 4);
-    *new_free = NEW_TAG(free_size, 1);
+    *new_free = NEW_TAG((free_size + 8), 1);
+    new_free = (int*)INCR_PTR(new_free, (free_size + 4));
+    *new_free = NEW_TAG((free_size+8), 1);
 
-    int* start = (int*)INCR_PTR(bot_check, 8);
+    int* start = (int*)DECR_PTR(new_free, free_size);
 
     FreeListNode *new = (FreeListNode*)start;
     addNode(new);
@@ -239,7 +243,7 @@ void* createNew(int size, int best_size)
       *end = NEW_TAG(size, 0);
 
       int* free_start = (int*)INCR_PTR(end, 4);
-      *free_start = NEW_TAG(full_size - size, 1);
+      *free_start = NEW_TAG((full_size - size), 1);
       free_start = (int*)INCR_PTR(free_start, 4);
 
       FreeListNode *new = (FreeListNode*)free_start;
@@ -253,7 +257,7 @@ void* createNew(int size, int best_size)
       fprintf(stdout, "new free node prev: %p\n", new->prev);
 
       free_end = (int*)DECR_PTR(free_end, 4);
-      *free_end = NEW_TAG(full_size - size, 1);
+      *free_end = NEW_TAG((full_size - size), 1);
 
       return (void*)start;
     } else
@@ -293,7 +297,7 @@ void* createNew(int size, int best_size)
       fprintf(stdout, "filling free block\n");
       int new_size = avail_size - (size + 8);
       int* start = (int*)check;
-      int* free_end = (int*)INCR_PTR(check, avail_size);
+      int* free_end = (int*)INCR_PTR(check, (avail_size + 4));
 
       *start = NEW_TAG(size, 0);
       start = (int*)INCR_PTR(start, 4);
@@ -321,10 +325,10 @@ void* createNew(int size, int best_size)
     {
       int* start = (int*)check;
 
-      *start = NEW_TAG(avail_size-8, 0);
+      *start = NEW_TAG((avail_size-8), 0);
       start = (int*)INCR_PTR(start, 4);
-      int* end = (int*)INCR_PTR(start, avail_size-8);
-      *end = NEW_TAG(avail_size-8, 0);
+      int* end = (int*)INCR_PTR(start, (avail_size-8));
+      *end = NEW_TAG((avail_size-8), 0);
 
       fprintf(stdout, "removed free node: %p\n", iter);
 
