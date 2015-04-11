@@ -124,7 +124,7 @@ void my_free(void *ptr)
 
     int top_size = GET_TAG_SIZE(top_check[0]);
     top_check = (int*)INCR_PTR (top_check, 4);
-    fprintf(stdout, "bot_size: %d\n", top_size);
+    fprintf(stdout, "top_size: %d\n", top_size);
 
     FreeListNode *rem_bot = (FreeListNode*)(bot_check);
     FreeListNode *rem_top = (FreeListNode*)(top_check);
@@ -168,7 +168,7 @@ void my_free(void *ptr)
   {
     int top_size = GET_TAG_SIZE(top_check[0]);
     top_check = (int*)INCR_PTR (top_check, (4));
-    fprintf(stdout, "bot_size: %d\n", top_size);
+    fprintf(stdout, "top_size: %d\n", top_size);
 
     FreeListNode *rem_top = (FreeListNode*)(top_check);
 
