@@ -256,7 +256,7 @@ void* createNew(int size, int best_size)
 
       fprintf(stdout, "new free node prev: %p\n", new->prev);
 
-      free_end = (int*)DECR_PTR(free_end, 4);
+      free_end = (int*)INCR_PTR(free_start, (full_size - size - 4));
       *free_end = NEW_TAG((full_size - size), 1);
 
       return (void*)start;
