@@ -119,11 +119,11 @@ void my_free(void *ptr)
   if(!bot_free && !top_free)
   {
     int bot_size = GET_TAG_SIZE(bot_check[0]);
-    bot_check = (int*)DECR_PTR(bot_check, (bot_size - 12));
+    bot_check = (int*)DECR_PTR(bot_check, (bot_size - 8));
     fprintf(stdout, "bot_size: %d\n", bot_size);
 
     int top_size = GET_TAG_SIZE(top_check[0]);
-    top_check = (int*)INCR_PTR (top_check, (top_size - 4));
+    top_check = (int*)INCR_PTR (top_check, 4);
     fprintf(stdout, "bot_size: %d\n", top_size);
 
     FreeListNode *rem_bot = (FreeListNode*)(bot_check);
@@ -134,7 +134,7 @@ void my_free(void *ptr)
 
     free_size += (bot_size + top_size + 8);
     bot_check = (int*)DECR_PTR(bot_check, 4);
-    top_check = (int*)INCR_PTR(top_check, 4);
+    top_check = (int*)INCR_PTR(top_check, (top_size - 8));
     *bot_check = NEW_TAG(free_size, 1);
     *top_check = NEW_TAG(free_size, 1);
 
@@ -167,14 +167,14 @@ void my_free(void *ptr)
   }else if(!top_free)
   {
     int top_size = GET_TAG_SIZE(top_check[0]);
-    top_check = (int*)INCR_PTR (top_check, (top_size-8));
+    top_check = (int*)INCR_PTR (top_check, (4));
     fprintf(stdout, "bot_size: %d\n", top_size);
 
     FreeListNode *rem_top = (FreeListNode*)(top_check);
 
     removeNode(rem_top);
 
-    top_check = (int*)INCR_PTR(top_check, 4);
+    top_check = (int*)INCR_PTR(top_check, (top_size - 8));
 
     free_size += (top_size + 8);
     *new_free = NEW_TAG(free_size, 1);
@@ -185,6 +185,7 @@ void my_free(void *ptr)
     addNode(new);
   }else
   {
+
     *new_free = NEW_TAG((free_size + 8), 1);
     new_free = (int*)INCR_PTR(new_free, (free_size + 4));
     *new_free = NEW_TAG((free_size+8), 1);
@@ -235,7 +236,7 @@ void* createNew(int size, int best_size)
   fprintf(stdout, "full_size: %d\n", full_size);
   if(best_size == -1 || best_size == 128001)
   {
-    if(full_size > (size + 2*sizeof(FreeListNode) +  8))
+    if(full_size > (size + sizeof(FreeListNode) +  8))
     {
       int* start = (int*)sbrk(full_size + 8);
       int* free_end = (int*)sbrk(0);
@@ -259,7 +260,7 @@ void* createNew(int size, int best_size)
 
       fprintf(stdout, "new free node prev: %p\n", new->prev);
 
-      free_end = (int*)DECR_PTR(free_end, 4);
+      free_end = (int*)INCR_PTR(free_start, (full_size-(size + 8)));
       *free_end = NEW_TAG((full_size - size), 1);
 
       return (void*)start;
@@ -280,13 +281,13 @@ void* createNew(int size, int best_size)
     FreeListNode *iter = head;
     while(iter != NULL)
     {
-      int* check = (int*)(iter);
+      int* find = (int*)(iter);
 
-      check = (int*)DECR_PTR(check, 4);
-      unsigned avail_size = GET_TAG_SIZE(check[0]);
+      find = (int*)DECR_PTR(find, 4);
+      unsigned avail_size = GET_TAG_SIZE(find[0]);
       if(avail_size == best_size)
         break;
-      else if(iter != NULL)
+      else
         iter = iter->next;
 
     }
@@ -295,7 +296,7 @@ void* createNew(int size, int best_size)
     check = (int*)DECR_PTR(check, 4);
     unsigned avail_size = GET_TAG_SIZE(check[0]);
     fprintf(stdout, "size:%d\n", avail_size);
-    if(avail_size - 8 >= size && avail_size > (size + 2*sizeof(FreeListNode) + 8))
+    if(avail_size - 8 >= size && avail_size > (size + sizeof(FreeListNode) + 8))
     {
       fprintf(stdout, "filling free block\n");
       int new_size = (avail_size - (size + 8));
@@ -322,7 +323,8 @@ void* createNew(int size, int best_size)
 
       free_end = (int*)DECR_PTR(free_end, 4);
       *free_end = NEW_TAG(new_size, 1);
-
+      int val = GET_TAG_SIZE(free_end[0]);
+      fprintf(stdout, "val: %d\n", val);
       return (void*)start;
     } else if(avail_size - 8 >= size)
     {

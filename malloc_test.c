@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     buffer2[i] = i + k;
     k++;
   }
-  //my_free(buffer);
+  my_free(buffer);
   //my_free(buffer2);
   int* buffer3 = my_malloc(13000);
   k = 0;
