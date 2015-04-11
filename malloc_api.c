@@ -119,11 +119,11 @@ void my_free(void *ptr)
   if(!bot_free && !top_free)
   {
     int bot_size = GET_TAG_SIZE(bot_check[0]);
-    bot_check = (int*)DECR_PTR(bot_check, (bot_size - 8));
+    bot_check = (int*)DECR_PTR(bot_check, (bot_size - 4));
     fprintf(stdout, "bot_size: %d\n", bot_size);
 
     int top_size = GET_TAG_SIZE(top_check[0]);
-    top_check = (int*)INCR_PTR (top_check, (top_size - 8));
+    top_check = (int*)INCR_PTR (top_check, (top_size - 4));
     fprintf(stdout, "bot_size: %d\n", top_size);
 
     FreeListNode *rem_bot = (FreeListNode*)(bot_check);
