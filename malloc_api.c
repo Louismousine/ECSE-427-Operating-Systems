@@ -8,9 +8,9 @@
 #define BEST_FIT 2
 
 #define MIN_FREE 100
-#define MAX_FREE_BLOCK 128000
 #define MALLOC_BLOCKSIZE 16384
 #define FREE_RM 20000
+#define TOP_FREE 131072
 
 #define ALIGN(x) ((x/MALLOC_BLOCKSIZE + 1) * MALLOC_BLOCKSIZE)
 #define INCR_PTR(ptr, len) (((char*)ptr) + len)
@@ -34,24 +34,32 @@ void addNode(FreeListNode *new);
 FreeListNode *head;
 FreeListNode *tail;
 
-extern char *my_malloc_error;
+char *my_malloc_error;
+int* top_block;
 
 int currentPolicy = 1;
 int bytesAlloc = 0;
 int freeSpace = 0;
 int largestSpace = 0;
+int number_calls = 0;
 
 void *my_malloc(int size)
 {
+  if(number_calls == 0)
+  {
+    my_malloc_error = (char*)sbrk(1024);
+  }
+  number_calls++;
+
   if(size < 0)
   {
-    fprintf(stderr, "Error, requested a negative size\n");
-    return;
+    my_malloc_error = "Error, mallocing requested space";
+    return NULL;
   }
   if(currentPolicy == 1)
   {
     FreeListNode *iter = head;
-    unsigned best = 128001;
+    //unsigned best = 131073;
 
     while(iter != NULL)
     {
@@ -71,7 +79,7 @@ void *my_malloc(int size)
   }else if(currentPolicy == 2)
   {
     FreeListNode *iter = head;
-    unsigned best = 128001;
+    unsigned best = 131073;
 
     while(iter != NULL)
     {
@@ -90,10 +98,9 @@ void *my_malloc(int size)
         iter = iter->next;
     }
     return createNew(size, best);
-  }else
-  {
-
   }
+  my_malloc_error = "Error, mallocing required space";
+  return NULL;
 }
 
 void my_free(void *ptr)
@@ -141,7 +148,7 @@ void my_free(void *ptr)
     int* start = (int*)INCR_PTR(bot_check, 4);
     FreeListNode *new = (FreeListNode*)start;
     addNode(new);
-    
+
   }else if(!bot_free)
   {
     int bot_size = GET_TAG_SIZE(bot_check[0]);
@@ -195,6 +202,7 @@ void my_free(void *ptr)
     FreeListNode *new = (FreeListNode*)start;
     addNode(new);
   }
+  updateTopFreeBlock();
 }
 
 void updateContiguous()
@@ -204,7 +212,23 @@ void updateContiguous()
 
 void updateTopFreeBlock()
 {
+  int* check_top = (int*)(top_block);
+  check_top = (int*)DECR_PTR(check_top, 4);
+  int top_tag = GET_TAG_FREE(check_top[0]);
+  if(top_tag == 0)
+  {
+    unsigned top_size = GET_TAG_SIZE(check_top[0]);
 
+    if(top_size >=  TOP_FREE)
+    {
+      sbrk(-20000);
+      top_size -= 20000;
+      *check_top = NEW_TAG(top_size, 1);
+      check_top = (int*)INCR_PTR(check_top, (top_size - 4));
+
+      *check_top = NEW_TAG(top_size, 1);
+    }
+  }
 }
 
 void my_mallopt(int policy)
@@ -228,18 +252,22 @@ void my_mallinfo()
   fprintf(stdout, "Current amount of free space: %d\n", freeSpace);
   fprintf(stdout, "Current largest contiguous free space: %d\n", largestSpace);
   fprintf(stdout, "Current policy number: %d\n", currentPolicy);
+  fprintf(stdout, "Total number of my_malloc() calls: %d\n", number_calls);
 }
 
 void* createNew(int size, int best_size)
 {
   int full_size = ALIGN(size);
   fprintf(stdout, "full_size: %d\n", full_size);
-  if(best_size == -1 || best_size == 128001)
+
+  if(best_size == -1 || best_size == 131073)
   {
+    int* start = (int*)sbrk(full_size + 8);
+    int* free_end = (int*)sbrk(0);
+
+    top_block = free_end;
     if(full_size > (size + sizeof(FreeListNode) +  8))
     {
-      int* start = (int*)sbrk(full_size + 8);
-      int* free_end = (int*)sbrk(0);
 
       *start = NEW_TAG(size, 0);
       start = (int*)INCR_PTR(start, 4);
@@ -266,7 +294,7 @@ void* createNew(int size, int best_size)
       return (void*)start;
     } else
     {
-      int* start = (int*)sbrk(full_size + 8);
+      //int* start = (int*)sbrk(full_size + 8);
 
       *start = NEW_TAG(full_size, 0);
       start = (int*)INCR_PTR(start, 4);
