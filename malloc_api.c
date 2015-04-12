@@ -229,6 +229,7 @@ void updateTopFreeBlock()
       check_top = (int*)INCR_PTR(check_top, (top_size - 4));
 
       *check_top = NEW_TAG(top_size, 1);
+      top_block = (int*)DECR_PTR(top_block, 20000);
     }
   }
 }
