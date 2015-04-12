@@ -221,8 +221,10 @@ void updateTopFreeBlock()
 
     if(top_size >=  TOP_FREE)
     {
+      check_top = (int*)DECR_PTR(check_top, (top_size - 4));
       sbrk(-20000);
       top_size -= 20000;
+
       *check_top = NEW_TAG(top_size, 1);
       check_top = (int*)INCR_PTR(check_top, (top_size - 4));
 
