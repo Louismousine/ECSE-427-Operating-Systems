@@ -213,7 +213,7 @@ void updateContiguous()
 {
   FreeListNode *iter = head;
   int biggest = 0;
-  while(iter != NULL)
+  while(iter != NULL || iter != tail)
   {
     int* update = (int*)iter;
     update = (int*)DECR_PTR(update, 4);
