@@ -213,7 +213,7 @@ void updateContiguous()
 {
   FreeListNode *iter = head;
   int biggest = 0;
-  while(iter != NULL || iter != tail)
+  while(iter != NULL)
   {
     int* update = (int*)iter;
     update = (int*)DECR_PTR(update, 4);
@@ -408,16 +408,9 @@ void* createNew(int size, int best_size)
 
       fprintf(stdout, "removed free node prev: %p\n", iter->prev);
 
-      if(iter->next != NULL)
-      iter->next->prev = iter->prev;
-      if(iter->prev != NULL)
-      iter->prev->next = iter->next;
+      removeNode(iter);
 
-      iter->next = NULL;
-      iter->prev = NULL;
-      iter = NULL;
-
-      bytesAlloc += avail_size;
+      bytesAlloc += (avail_size-8);
       freeSpace -= avail_size;
 
       fprintf(stdout, "Allocated %d extra bytes to requested malloc()\n", avail_size - (size + 8));

@@ -51,9 +51,9 @@ int main(int argc, char* argv[])
   my_free(buffer3);
   my_mallinfo();
 
-  int* buffer4 = my_malloc(17000);
+  int* buffer4 = my_malloc(15000);
   k = 0;
-  for(i = 0; i < 17000/sizeof(int); i++)
+  for(i = 0; i < 15000/sizeof(int); i++)
   {
     buffer4[i] = i + k;
     k++;
