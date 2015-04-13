@@ -220,8 +220,8 @@ void updateContiguous()
     int update_size = GET_TAG_SIZE(update[0]);
     if(update_size > biggest)
       biggest = update_size;
-    else
-      iter = iter->next;
+
+    iter = iter->next;
   }
   largestSpace = biggest;
 
