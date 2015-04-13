@@ -272,16 +272,18 @@ void* createNew(int size, int best_size)
 
   if(best_size == -1 || best_size == 131073)  //if a new block must be created do so
   {
-    int* start = (int*)sbrk(full_size + 8);   //increment the program break
-    int* free_end = (int*)sbrk(0);
-    bytesAlloc += size;
-    top_block = free_end;
+
     //if the requested size has enough excess to form a free block do so
     if(full_size > (size + sizeof(FreeListNode) +  8))
     {
       full_size = ALIGN(size);
     }else
       full_size = ALIGN(size + MALLOC_BLOCKSIZE);
+      
+    int* start = (int*)sbrk(full_size + 8);   //increment the program break
+    int* free_end = (int*)sbrk(0);
+    bytesAlloc += size;
+    top_block = free_end;
 
     *start = NEW_TAG(size, 0);
     start = (int*)INCR_PTR(start, 4);
