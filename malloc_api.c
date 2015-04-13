@@ -278,8 +278,10 @@ void* createNew(int size, int best_size)
     {
       full_size = ALIGN(size);
     }else
-      full_size = ALIGN(size + MALLOC_BLOCKSIZE);
-      
+    {
+      full_size += MALLOC_BLOCKSIZE;
+    }
+
     int* start = (int*)sbrk(full_size + 8);   //increment the program break
     int* free_end = (int*)sbrk(0);
     bytesAlloc += size;

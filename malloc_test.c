@@ -5,7 +5,7 @@
 #include "malloc_api.h"
 
 #define MALLOC_BLOCKSIZE BLOCK_SIZE
-#define SIZE_ONE 16383
+#define SIZE_ONE 2048
 #define SIZE_TWO 4096
 #define SIZE_THREE 15000
 #define BLOCK_SIZE 16384
