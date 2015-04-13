@@ -1,9 +1,16 @@
+/*
+  Memory Allocator Test Doc ECSE 427 Winter 2015
+  Author: Stephen Carter 260500858; stephen.carter@mail.mcgill.ca
+  Last Edit: April 13th, 2015
+  Stephen Carter (C) April 2015.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "malloc_api.h"
 
+//must be modified if one of of the block created is ~ >= 16384
 #define MALLOC_BLOCKSIZE BLOCK_SIZE
 #define SIZE_ONE 2048
 #define SIZE_TWO 4096

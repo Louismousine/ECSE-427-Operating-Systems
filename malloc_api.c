@@ -1,10 +1,9 @@
 /*
   Memory Allocator ECSE 427 Winter 2015
-  Author: Stephen Carter 260500858
+  Author: Stephen Carter 260500858; stephen.carter@mail.mcgill.ca
   Last Edit: April 13th, 2015
   Stephen Carter (C) April 2015.
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -272,12 +271,11 @@ void* createNew(int size, int best_size)
 
   if(best_size == -1 || best_size == 131073)  //if a new block must be created do so
   {
-
     //if the requested size has enough excess to form a free block do so
     if(full_size > (size + sizeof(FreeListNode) +  8))
     {
       full_size = ALIGN(size);
-    }else
+    }else //if not create a second block for free.
     {
       full_size += MALLOC_BLOCKSIZE;
     }
@@ -302,10 +300,11 @@ void* createNew(int size, int best_size)
     freeSpace += (full_size - size);
     free_end = (int*)INCR_PTR(free_start, (full_size-(size + 8)));
     *free_end = NEW_TAG((full_size - size), 1);
+
     updateContiguous();
-    return (void*)start;
+    return (void*)start;  //return the address to for malloc
   }else
-  {
+  { //if a block has been specified search for it in free list
     FreeListNode *iter = head;
     while(iter != NULL)
     {
@@ -317,10 +316,11 @@ void* createNew(int size, int best_size)
       else
         iter = iter->next;
     }
-    int* check = (int*)(iter);
+    int* check = (int*)(iter);    //once found recheck the size of said block
     check = (int*)DECR_PTR(check, 4);
     unsigned avail_size = GET_TAG_SIZE(check[0]);
 
+    //either fill the entire free space or split it up
     if(avail_size - 8 >= size && avail_size > (size + sizeof(FreeListNode) + 8))
     {
       int new_size = (avail_size - (size + 8));
@@ -336,7 +336,7 @@ void* createNew(int size, int best_size)
       *free_start = NEW_TAG(new_size, 1);
       free_start = (int*)INCR_PTR(free_start, 4);
 
-      removeNode(iter);
+      removeNode(iter);                           //remove old node and add new one
 
       FreeListNode *new = (FreeListNode*)free_start;
       addNode(new);
@@ -348,9 +348,9 @@ void* createNew(int size, int best_size)
       bytesAlloc += size;
       freeSpace -= (size+8);
       updateContiguous();
-      return (void*)start;
+      return (void*)start;      //return the address to be written too
     } else if(avail_size - 8 >= size)
-    {
+    { //or return entire free block space and do not split it
       int* start = (int*)check;
 
       *start = NEW_TAG((avail_size-8), 0);
@@ -358,7 +358,7 @@ void* createNew(int size, int best_size)
       int* end = (int*)INCR_PTR(start, (avail_size-8));
       *end = NEW_TAG((avail_size-8), 0);
 
-      removeNode(iter);
+      removeNode(iter);         //remove the free node and return the appropriate address
 
       bytesAlloc += (avail_size-8);
       freeSpace -= avail_size;
@@ -370,7 +370,7 @@ void* createNew(int size, int best_size)
   }
 }
 
-void removeNode(FreeListNode *iter)
+void removeNode(FreeListNode *iter) //removes a node from the doubly linked list
 {
   if(iter->prev != NULL)
     iter->prev->next = iter->next;
@@ -386,7 +386,7 @@ void removeNode(FreeListNode *iter)
   iter = NULL;
 }
 
-void addNode(FreeListNode *new)
+void addNode(FreeListNode *new) //adds a node to the head of the doubly linked list
 {
   if(head != NULL)
   {
