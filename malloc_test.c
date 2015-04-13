@@ -6,10 +6,11 @@
 
 int main(int argc, char* argv[])
 {
+  FILE *output = fopen("malloc_output.txt", "w");
+  my_mallinfo();
   my_mallopt(1);
   int* fail = my_malloc(-10);
-  fprintf(stderr, "%s\n", my_malloc_error);
-  FILE *output = fopen("malloc_output.txt", "w");
+  fprintf(output, "%s\n", my_malloc_error);
   int* buffer = my_malloc(2048);
   int i = 0;
   int k = 0;
@@ -18,8 +19,15 @@ int main(int argc, char* argv[])
     buffer[i] = i + k;
     k++;
   }
+  my_mallinfo();
+  fprintf(output, "buffer: %p\n", buffer);
+
+
   int* buffer2 = my_malloc(2048);
-  //int* buffer5 = my_malloc(5000);
+  fprintf(output, "buffer2: %p\n", buffer2);
+
+  my_mallinfo();
+
   k = 0;
   for(i = 0; i < 2048/sizeof(int); i++)
   {
@@ -27,7 +35,8 @@ int main(int argc, char* argv[])
     k++;
   }
   my_free(buffer);
-  //my_free(buffer2);
+  my_mallinfo();
+
   int* buffer3 = my_malloc(140000);
   k = 0;
   for(i = 0; i < 140000/sizeof(int); i++)
@@ -35,7 +44,13 @@ int main(int argc, char* argv[])
     buffer3[i] = i + k;
     k++;
   }
+  fprintf(output, "buffer3: %p\n", buffer3);
+
+  my_mallinfo();
+
   my_free(buffer3);
+  my_mallinfo();
+
   int* buffer4 = my_malloc(2048);
   k = 0;
   for(i = 0; i < 2048/sizeof(int); i++)
@@ -43,9 +58,16 @@ int main(int argc, char* argv[])
     buffer4[i] = i + k;
     k++;
   }
+  fprintf(output, "buffer4: %p\n", buffer4);
+
+  my_mallinfo();
 
   my_free(buffer2);
+  my_mallinfo();
+
   my_free(buffer4);
+
+  my_mallinfo();
 
 
   fclose(output);
