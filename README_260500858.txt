@@ -1,0 +1,66 @@
+MALLOC_API DOCUMENTATION
+
+
+Author: Stephen Carter 260500858
+
+
+my_malloc() uses the tag system proposed in the assignment documentation.
+
+The program break is increased by 8 extra bytes for the first set of allocated tags.
+
+THIS IS NOT INCLUDED IN THE NUMBER OF BYTES ALLOCATED OR IN ITS SIZE. 
+Free blocks report 
+the block size and their tag size, ie size = sizeof(block) + 8.
+
+It is important to note that these 8 bytes are added every time sbrk() is called to allocate space.
+
+This means for every full sized block that sbrk() allocates there are 8 bytes that
+are also allocated.
+
+
+
+my_malloc_error is allocated 1024 bytes.
+The extra 4 bytes allocated are used a buffer
+
+area to signal the start the program break.
+This 4 byte block is assigned no information and
+
+is checked for in my_free() when freeing blocks,
+it is handled appropriately.
+
+
+
+The first list and my_free() are implemented as suggested,
+placing a previous
+and next pointer at the start of the block
+when the block is tagged free. 
+So the tag system and doubly linked
+list are both implemented in free blocks.
+
+
+
+If the top free block is larger than 128KB (1024 * 128)
+then the program break is decreased by 20,000 bytes.
+
+
+
+The my_mallinfo() also prints the number of my_malloc() calls made.
+
+
+
+I added 3 other functions to the api that can be helpful for testing specified below
+
+
+int my_bytes()  //return bytes allocated
+
+
+
+int my_free_space() //return free space
+
+
+
+int my_largestSpace() //return largest contiguous space
+
+
+
+Stephen Carter (C) April 13, 2015
